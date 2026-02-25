@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trade Block</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- BASE STYLES --- */
+        :root {
+            /* Light Theme (Default) */
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-sub: #64748B;
+            --primary: #10B981;
+            /* Emerald 500 */
+            --danger: #EF4444;
+            /* Red 500 */
+            --border: #E2E8F0;
+            --accent-gold: #D97706;
+            /* Amber 600 */
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .dark {
+            /* Dark Theme */
+            --bg-color: #111827;
+            --card-bg: #1F2937;
+            --text-color: #F3F4F6;
+            --text-sub: #9CA3AF;
+            --border: #374151;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-gold {
+            /* Gold Theme (Premium) */
+            --bg-color: #000000;
+            --card-bg: #000000;
+            --text-color: #D4AF37;
+            /* Genuine Gold */
+            --text-sub: #A3A3A3;
+            --primary: #D4AF37;
+            --danger: #B91C1C;
+            --border: #D4AF37;
+            --shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        /* --- APP CONTAINER --- */
+        #app-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        /* --- COMPONENTS --- */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 9999px;
+            font-weight: 800;
+            text-align: center;
+            transition: transform 0.1s active;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 1.125rem;
+            /* text-lg */
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .theme-gold .btn-primary {
+            background: linear-gradient(135deg, #FFE082 0%, #B7892B 100%);
+            color: #000000;
+            text-shadow: none;
+            border: 1px solid #FFF;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-gold .btn-gold {
+            background: linear-gradient(135deg, #FFE082 0%, #B7892B 100%);
+            color: black;
+            text-shadow: none;
+            border: 1px solid #FFF;
+        }
+
+        /* Range Slider Customization */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-top: -10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Chart Canvas */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 65%;
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .theme-gold #bg-canvas {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-frame" class="fade-in">
+        <!-- CANVAS BACK -->
+        <canvas id="bg-canvas"></canvas>
+
+        <!-- HEADER -->
+        <header
+            class="relative z-10 p-6 flex justify-between items-start bg-gradient-to-b from-[var(--bg-color)] to-transparent pointer-events-none">
+            <div class="pointer-events-auto">
+                <h1 class="text-3xl font-black italic tracking-tighter leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--text-color)] to-[var(--text-sub)] pr-2 py-1"
+                    style="font-family: 'Inter', sans-serif;">TRADE BLOCK</h1>
+                <p class="text-sm font-bold opacity-60 mt-0 tracking-widest pl-1">トレード ブロック</p>
+            </div>
+            <div class="flex gap-2 pointer-events-auto">
+                <button id="btn-lang-ja" onclick="app.setLang('ja')"
+                    class="text-sm font-bold px-3 py-2 rounded border border-[var(--border)] bg-[var(--card-bg)] shadow-sm transition">JP</button>
+                <button id="btn-lang-en" onclick="app.setLang('en')"
+                    class="text-sm font-bold px-3 py-2 rounded border border-[var(--border)] bg-[var(--card-bg)] shadow-sm transition">EN</button>
+            </div>
+        </header>
+
+        <!-- MAIN SCROLLABLE CONTENT -->
+        <main id="main-content" class="relative z-10 flex-1 overflow-y-auto no-scrollbar p-6 pt-0 pb-28">
+            <!-- Dynamic Content -->
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav
+            class="absolute bottom-0 w-full bg-[var(--card-bg)]/95 backdrop-blur-md border-t border-[var(--border)] z-40 pb-8 pt-3 px-6 flex justify-between shadow-lg">
+            <button onclick="app.setTab('home')" class="flex flex-col items-center flex-1 gap-1 group nav-btn"
+                data-tab="home">
+                <span class="text-3xl filter grayscale group-hover:grayscale-0 transition">🏠</span>
+                <span class="text-xs font-bold mt-1">TIMER</span>
+            </button>
+            <button onclick="app.setTab('history')" class="flex flex-col items-center flex-1 gap-1 group nav-btn"
+                data-tab="history">
+                <span class="text-3xl filter grayscale group-hover:grayscale-0 transition">📊</span>
+                <span class="text-xs font-bold mt-1">HISTORY</span>
+            </button>
+            <button onclick="app.setTab('settings')" class="flex flex-col items-center flex-1 gap-1 group nav-btn"
+                data-tab="settings">
+                <span class="text-3xl filter grayscale group-hover:grayscale-0 transition">⚙️</span>
+                <span class="text-xs font-bold mt-1">SETTINGS</span>
+            </button>
+        </nav>
+
+        <!-- MODAL OVERLAY -->
+        <div id="modal-container"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+            <!-- Injected Modal Content -->
+        </div>
+    </div>
+
+    <script>
+        /*******************************************************
+         * TRADE BLOCK V6.6 - iOS READY
+         *******************************************************/
+
+        const CONSTANTS = {
+            DEFAULT_FEE: 500,
+            MIN_FEE: 100,
+            MAX_FEE: 100000,
+            STEP_FEE: 100,
+            SECURE_PROFIT_HOUR: 7
+        };
+
+        const I18N = {
+            ja: {
+                tab_home: "タイマー", tab_history: "履歴", tab_settings: "設定",
+                lock_btn: "ロック開始", secure_profit_btn: "勝ち逃げ (翌朝07:00まで)",
+                time_remain: "残り時間", unlock_fee: "解除料",
+                history_title: "支払い履歴", no_history: "履歴はありません",
+                settings_title: "設定", theme: "テーマ", blocked_apps: "ブロックアプリ", select: "選択",
+                premium_config: "プレミアム設定 (解除料)", premium_title: "プレミアムプラン",
+                sub_monthly: "月額サブスクリプション (¥1,500)",
+                upgrade_cta: "アップグレードして機能を解放",
+                confirm_title: "最終確認", confirm_desc: "以下のリスクに同意してロックします。",
+                chk_risk: "リスクを理解しました", chk_agree: "同意してロックします",
+                cancel: "キャンセル", confirm: "決定",
+                risk_1: "設定時間までアプリを使用できません。", risk_2: "解除には解除料が必要になります。",
+                secure_confirm: "現在時刻から翌朝07:00まで強制ロックします。\n解除できませんがよろしいですか？",
+                locked_alert: "ロック中は設定を変更できません。",
+                back: "戻る", select_apps_title: "アプリを選択", confirm_selection: "選択を確定",
+                app_active: "ブロック有効", save_fee: "解除料を更新", fee_saved: "設定を保存しました",
+                premium_history_lock: "履歴機能はプレミアム限定です",
+                premium_headline: "勝ち逃げこそが最強の聖杯",
+                premium_subhead: "年間収支をプラスにする唯一の規律",
+                premium_body: "「あと少し...」その欲が全ての利益を溶かしていませんか？<br>プロと敗者の差は「勝ち逃げ」ができるか、ただ一点です。<br>利益確定の瞬間に相場から強制隔離される。<br>この「強制力」さえあれば、資産は確実に積み上がります。",
+                premium_roi: "月額1,500円はコストではありません。<br>あなたの数百万円の損失を防ぐ、最強の投資です。",
+                feat_secure: "感情を排除する「翌朝までの鉄壁ロック」",
+                feat_gold: "成功者だけが知る「黒と金の支配者テーマ」",
+                feat_custom: "覚悟を決める「解除料カスタム設定」",
+                upgrade_now: "追加機能を購入",
+                mode_timer: "トレードブロック", mode_secure: "勝ち逃げモード",
+                unlock_title: "ロック解除", pay_unlock_btn: "支払って解除", force_unlock: "強制解除",
+                menu_tutorial: "チュートリアルを見る", menu_legal: "利用規約・免責事項",
+                legal_title: "利用規約・免責事項",
+                legal_text: `
+                    <h4 class="font-bold mb-1">1. 免責事項</h4>
+                    <p class="mb-2 text-sm opacity-80">本アプリは、ユーザーの自己規律を補助するためのツールであり、投資助言や利益を保証するものではありません。</p>
+                    <p class="mb-2 text-sm opacity-80">本アプリの機能（ロック機能等）により、特定のタイミングで取引ができず、機会損失や金銭的損失が発生した場合でも、開発者は一切の責任を負いません。</p>
+                    
+                    <h4 class="font-bold mb-1">2. 強制解除と費用</h4>
+                    <p class="mb-2 text-sm opacity-80">ロック中の強制解除には、設定された解除料（ペナルティ）が必要です。これはユーザー自身の自己管理のための機能であり、緊急時であっても解除には所定の手続きが必要です。</p>
+                    
+                    <h4 class="font-bold mb-1">3. 健康上の注意</h4>
+                    <p class="mb-2 text-sm opacity-80">過度なストレスや依存を感じる場合は、直ちにトレードを中止し、専門機関へ相談してください。</p>
+                `,
+                tutorial_title: "ようこそ、Trade Blockへ",
+                tutorial_step1_title: "規律を守る",
+                tutorial_step1_desc: "感情的なトレードは資産を溶かします。このアプリは、物理的にアプリへのアクセスを遮断し、冷静さを取り戻させます。",
+                tutorial_step2_title: "勝ち逃げモード",
+                tutorial_step2_desc: "利益が出たら即座にロック。翌朝まで強制的に市場から離れることで、利益を確実に積み上げます。",
+                tutorial_step3_title: "自己責任",
+                tutorial_step3_desc: "ロック中は一切の操作ができません。このリスクを理解した上で、規律あるトレードを行ってください。",
+                start_btn: "始める"
+            },
+            en: {
+                tab_home: "TIMER", tab_history: "HISTORY", tab_settings: "SETTINGS",
+                lock_btn: "LOCK", secure_profit_btn: "SECURE PROFIT (Until 7AM)",
+                time_remain: "Time Remaining", unlock_fee: "Unlock Fee",
+                history_title: "Payment History", no_history: "No History",
+                settings_title: "Settings", theme: "Theme", blocked_apps: "Blocked Apps", select: "Select",
+                premium_config: "Premium Config (Unlock Fee)", premium_title: "Premium Plan",
+                sub_monthly: "Monthly Subscription ($10)",
+                upgrade_cta: "Upgrade to unlock features",
+                confirm_title: "Final Check", confirm_desc: "Agree to risks to proceed.",
+                chk_risk: "I understand the risks", chk_agree: "I agree to lock",
+                cancel: "Cancel", confirm: "Confirm",
+                risk_1: "Cannot access apps until timer ends.", risk_2: "Fee required to unlock early.",
+                secure_confirm: "Lock app until 7:00 AM tomorrow?\nThis cannot be undone.",
+                locked_alert: "Settings cannot be changed while locked.",
+                back: "Back", select_apps_title: "Select Apps", confirm_selection: "Confirm Selection",
+                app_active: "Active", save_fee: "Update Fee", fee_saved: "Settings Saved",
+                premium_history_lock: "History is Premium Only",
+                premium_headline: "The Holy Grail of Trading",
+                premium_subhead: "Discipline is the only way to win.",
+                premium_body: "Greed destroys profits. The difference between pros and amateurs is knowing when to stop.<br>Force yourself away from the market after a win.",
+                premium_roi: "$10/mo is not a cost. It's an investment to save thousands.",
+                feat_secure: "Ironclad Lock until next morning",
+                feat_gold: "Exclusive Gold Theme for Winners",
+                feat_custom: "Custom Unlock Fee for Commitment",
+                upgrade_now: "GET DISCIPLINE NOW",
+                mode_timer: "Timer Lock", mode_secure: "Secure Profit",
+                unlock_title: "UNLOCK", pay_unlock_btn: "PAY & UNLOCK", force_unlock: "Force Unlock",
+                menu_tutorial: "Show Tutorial", menu_legal: "Terms & Disclaimer",
+                legal_title: "Terms & Disclaimer",
+                legal_text: `
+                    <h4 class="font-bold mb-1">1. Disclaimer</h4>
+                    <p class="mb-2 text-sm opacity-80">This app is a discipline tool and does not guarantee profits. Not financial advice.</p>
+                    <p class="mb-2 text-sm opacity-80">The developer is not liable for any losses (financial or opportunity) caused by the inability to trade during a lock.</p>
+                `,
+                tutorial_title: "Welcome to Trade Block",
+                tutorial_step1_title: "Discipline First",
+                tutorial_step1_desc: "Emotional trading destroys wealth. Block access to regain coool.",
+                tutorial_step2_title: "Secure Profit",
+                tutorial_step2_desc: "Lock immediately after a win. Force yourself away until tomorrow.",
+                tutorial_step3_title: "Your Responsibility",
+                tutorial_step3_desc: "No access during lock. Use with understanding of risks.",
+                start_btn: "Get Started"
+            }
+        };
+
+        class TradeGuardApp {
+            constructor() {
+                this.state = {
+                    lang: 'ja', tab: 'home', page: 'main', homeMode: 'timer',
+                    isPremium: false, isLocked: false, lockEndTime: null,
+                    fee: CONSTANTS.DEFAULT_FEE, duration: 60, theme: 'light',
+                    history: [], hasSeenTutorial: false
+                };
+                this.timerInterval = null;
+                this.chartInterval = null;
+                this.candles = [];
+                this.init();
+            }
+
+            init() {
+                try {
+                    const saved = localStorage.getItem('tradeblock_v5');
+                    if (saved) this.state = { ...this.state, ...JSON.parse(saved) };
+                } catch (e) { console.error(e); }
+
+                if (this.state.isLocked && Date.now() > this.state.lockEndTime) {
+                    this.unlock(true);
+                }
+
+                this.applyTheme(this.state.theme);
+                this.setLang(this.state.lang);
+                this.startTimer();
+                this.initChart();
+
+                if (!this.state.hasSeenTutorial) {
+                    this.showTutorial();
+                }
+                this.render();
+            }
+
+            save() { localStorage.setItem('tradeblock_v5', JSON.stringify(this.state)); }
+
+            resetData() {
+                if (confirm("DEBUG: Reset all data?")) {
+                    localStorage.clear(); location.reload();
+                }
+            }
+
+            t(key) { return I18N[this.state.lang][key] || key; }
+
+            startTimer() {
+                if (this.timerInterval) clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    if (this.state.isLocked) {
+                        const now = Date.now();
+                        const diff = this.state.lockEndTime - now;
+                        if (diff <= 0) this.unlock();
+                        else this.updateTimerUI(diff);
+                    }
+                }, 1000);
+            }
+
+            unlock(silent = false) {
+                this.state.isLocked = false;
+                this.state.lockEndTime = null;
+                this.save();
+                this.render();
+                if (!silent) alert("UNLOCKED / 時間経過により解除されました");
+            }
+
+            applyTheme(theme) {
+                const root = document.documentElement;
+                root.className = '';
+                if (theme === 'dark') root.classList.add('dark');
+                if (theme === 'gold') root.classList.add('theme-gold');
+            }
+
+            setLang(lang) {
+                this.state.lang = lang;
+                this.save();
+                this.render();
+            }
+
+            setHomeMode(mode) { this.state.homeMode = mode; this.render(); }
+            setTab(tab) { this.state.tab = tab; this.state.page = 'main'; this.save(); this.render(); }
+            setPage(page) { this.state.page = page; this.render(); }
+
+            toggleTheme(theme) {
+                if (theme === 'gold' && !this.state.isPremium) {
+                    this.showPremiumModal(); return;
+                }
+                this.state.theme = theme;
+                this.applyTheme(theme);
+                this.save();
+                this.render();
+            }
+
+            updateFeeDisplay(val) {
+                const el = document.getElementById('fee-display');
+                if (el) {
+                    const cur = this.state.lang === 'ja' ? '¥' : '$';
+                    el.innerText = cur + parseInt(val).toLocaleString();
+                }
+            }
+
+            saveFee() {
+                const slider = document.getElementById('fee-slider');
+                if (slider) {
+                    this.state.fee = parseInt(slider.value);
+                    this.save(); alert(this.t('fee_saved')); this.render();
+                }
+            }
+
+            initChart() {
+                const canvas = document.getElementById('bg-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                const resize = () => {
+                    width = canvas.parentElement.offsetWidth;
+                    height = canvas.parentElement.offsetHeight * 0.7;
+                    canvas.width = width; canvas.height = height;
+                };
+                window.addEventListener('resize', resize); resize();
+                this.candles = [];
+                let price = 100;
+                for (let i = 0; i < 30; i++) {
+                    const move = (Math.random() - 0.5) * 5;
+                    this.candles.push({ open: price, close: price + move, high: price + Math.abs(move) + 1, low: price - Math.abs(move) - 1 });
+                    price += move;
+                }
+                let lastCandleTime = Date.now();
+                const tick = () => {
+                    const now = Date.now();
+                    if (now - lastCandleTime >= 3000) {
+                        this.candles.push({ open: price, close: price, high: price, low: price });
+                        if (this.candles.length > 40) this.candles.shift();
+                        lastCandleTime = now;
+                    }
+                    const change = (Math.random() - 0.5) * 0.5;
+                    const c = this.candles[this.candles.length - 1];
+                    c.close += change;
+                    if (c.close > c.high) c.high = c.close;
+                    if (c.close < c.low) c.low = c.close;
+                    this.drawChart(ctx, width, height, this.candles);
+                    requestAnimationFrame(tick);
+                };
+                tick();
+            }
+
+            drawChart(ctx, w, h, data) {
+                ctx.clearRect(0, 0, w, h);
+                let min = Infinity, max = -Infinity;
+                data.forEach(c => { if (c.low < min) min = c.low; if (c.high > max) max = c.high; });
+                const range = max - min || 1;
+                const gap = 6;
+                const candleW = (w - (data.length * gap)) / data.length;
+                const isGold = this.state.theme === 'gold';
+                const upColor = isGold ? '#D4AF37' : '#10B981';
+                const downColor = isGold ? '#78350F' : '#EF4444';
+                data.forEach((c, i) => {
+                    const x = i * (candleW + gap);
+                    const yOpen = h - ((c.open - min) / range) * h * 0.8 - (h * 0.1);
+                    const yClose = h - ((c.close - min) / range) * h * 0.8 - (h * 0.1);
+                    const yHigh = h - ((c.high - min) / range) * h * 0.8 - (h * 0.1);
+                    const yLow = h - ((c.low - min) / range) * h * 0.8 - (h * 0.1);
+                    const color = c.close >= c.open ? upColor : downColor;
+                    ctx.strokeStyle = color; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(x + candleW / 2, yHigh); ctx.lineTo(x + candleW / 2, yLow); ctx.stroke();
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, Math.min(yOpen, yClose), candleW, Math.max(1, Math.abs(yClose - yOpen)));
+                });
+            }
+
+            render() {
+                document.getElementById('btn-lang-ja').style.opacity = this.state.lang === 'ja' ? '1' : '0.5';
+                document.getElementById('btn-lang-en').style.opacity = this.state.lang === 'en' ? '1' : '0.5';
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    const isActive = btn.dataset.tab === this.state.tab;
+                    btn.style.opacity = isActive ? '1' : '0.5';
+                    if (isActive) btn.classList.add('text-[var(--primary)]');
+                    else btn.classList.remove('text-[var(--primary)]');
+                    btn.querySelector('span:last-child').innerText = this.t('tab_' + btn.dataset.tab);
+                });
+                const main = document.getElementById('main-content');
+                main.innerHTML = '';
+                if (this.state.page === 'apps') main.appendChild(this.renderAppsPage());
+                else if (this.state.tab === 'home') main.appendChild(this.renderHome());
+                else if (this.state.tab === 'history') main.appendChild(this.renderHistory());
+                else if (this.state.tab === 'settings') main.appendChild(this.renderSettings());
+            }
+
+            renderHome() {
+                const div = document.createElement('div');
+                div.className = "flex flex-col h-full justify-start pb-4 space-y-4 fade-in pt-2";
+                if (!this.state.isLocked) {
+                    div.innerHTML += `
+                        <div class="flex p-1 bg-[var(--card-bg)] rounded-xl border border-[var(--border)] mx-2 mb-2 shadow-sm">
+                            <button onclick="app.setHomeMode('timer')" class="flex-1 py-2 text-sm font-bold rounded-lg transition ${this.state.homeMode === 'timer' ? 'bg-[var(--text-color)] text-[var(--bg-color)] shadow-md' : 'opacity-60'}">⏱ ${this.t('mode_timer')}</button>
+                            <button onclick="app.setHomeMode('secure')" class="flex-1 py-2 text-sm font-bold rounded-lg transition ${this.state.homeMode === 'secure' ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-white shadow-md' : 'opacity-60'}">🏆 ${this.t('mode_secure')}</button>
+                        </div>
+                    `;
+                }
+                if (this.state.homeMode === 'secure' && !this.state.isLocked) {
+                    div.innerHTML += `
+                        <div class="flex-1 flex flex-col items-center justify-center text-center px-4 space-y-6">
+                            <div class="w-40 h-40 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 flex items-center justify-center shadow-2xl animate-pulse"><span class="text-6xl">🏆</span></div>
+                            <div><h2 class="text-2xl font-black mb-2 text-[var(--accent-gold)]">${this.t('secure_profit_btn')}</h2><p class="font-bold opacity-70 text-sm leading-relaxed">${this.t('premium_subhead')}</p></div>
+                            ${this.state.isPremium ? `<button onclick="app.triggerSecureProfit()" class="btn btn-gold w-full text-xl py-6 shadow-2xl border-2 border-white/20">EXECUTE LOCK</button>` : `<div class="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border)] w-full shadow-lg"><p class="text-sm font-bold opacity-60 mb-4">PREMIUM ONLY</p><button onclick="app.showPremiumModal()" class="btn btn-primary w-full shadow-xl">${this.t('upgrade_cta')}</button></div>`}
+                        </div>
+                    `;
+                    return div;
+                }
+                div.innerHTML += `
+                    <div class="flex-1 flex flex-col items-center justify-center relative min-h-[280px]">
+                        <div class="relative w-72 h-72 flex items-center justify-center">
+                            <svg class="w-full h-full transform -rotate-90"><circle cx="144" cy="144" r="130" stroke="var(--border)" stroke-width="12" fill="none" opacity="0.1"></circle><circle id="timer-circle" cx="144" cy="144" r="130" stroke="${this.state.isLocked ? 'var(--danger)' : 'var(--primary)'}" stroke-width="12" fill="none" stroke-dasharray="816" stroke-dashoffset="0"></circle></svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center"><span id="timer-text" class="text-5xl font-black tabular-nums">${this.state.isLocked ? "--:--" : this.formatDuration(this.state.duration)}</span><span class="text-sm font-bold opacity-60 mt-2 tracking-widest">${this.t('time_remain')}</span></div>
+                        </div>
+                    </div>
+                    ${!this.state.isLocked ? `
+                        <div class="bg-[var(--card-bg)]/80 backdrop-blur rounded-2xl p-6 border border-[var(--border)] shadow-lg mx-2"><input type="range" min="5" max="1440" step="5" value="${this.state.duration}" oninput="app.setDuration(this.value)" class="w-full"></div>
+                        <div class="px-2 pb-4"><button onclick="app.showLockConfirm()" class="btn btn-primary shadow-xl text-xl py-5">🔒 ${this.t('lock_btn')}</button></div>
+                    ` : `
+                        <div class="px-2 space-y-4 pb-4"><div class="p-4 bg-red-500/10 border border-red-500 rounded-xl text-center"><p class="text-red-500 font-bold text-lg animate-pulse">LOCKED</p></div><button onclick="app.showPaymentModal()" class="btn bg-gray-800 text-white shadow-xl py-5 text-xl">🔓 ${this.t('force_unlock')}</button></div>
+                    `}
+                `;
+                return div;
+            }
+
+            renderHistory() {
+                const div = document.createElement('div');
+                div.className = "space-y-4 fade-in pt-6";
+                const total = this.state.history.reduce((a, b) => a + b.amount, 0);
+                const cur = this.state.lang === 'ja' ? '¥' : '$';
+                if (!this.state.isPremium) {
+                    div.innerHTML = `<h2 class="text-3xl font-bold px-2 mb-4">${this.t('history_title')}</h2><div class="card p-8 text-center flex flex-col items-center justify-center gap-4 border-2 border-[var(--accent-gold)] border-dashed bg-black/5"><span class="text-5xl">🔒</span><p class="font-bold text-lg opacity-80">${this.t('premium_history_lock')}</p><button onclick="app.showPremiumModal()" class="btn btn-primary mt-4 py-4 px-8 shadow-xl">${this.t('upgrade_cta')}</button></div>`;
+                    return div;
+                }
+                div.innerHTML = `<div class="flex justify-between items-end px-2 mb-2"><h2 class="text-3xl font-bold">${this.t('history_title')}</h2><span class="text-4xl font-black text-[var(--primary)]">${cur}${total.toLocaleString()}</span></div><div class="space-y-3">${this.state.history.length === 0 ? `<p class="text-center opacity-50 py-10 font-bold text-xl">${this.t('no_history')}</p>` : ''}${this.state.history.map(item => `<div class="card flex justify-between items-center py-4 px-6"><span class="font-bold text-lg opacity-80">${item.date}</span><span class="font-black text-2xl">${cur}${item.amount.toLocaleString()}</span></div>`).join('')}</div>`;
+                return div;
+            }
+
+            renderSettings() {
+                const div = document.createElement('div');
+                div.className = "space-y-6 fade-in pt-6 pb-20";
+                const cur = this.state.lang === 'ja' ? '¥' : '$';
+                const themes = ['light', 'dark', 'gold'];
+                const disabled = this.state.isLocked || !this.state.isPremium;
+                div.innerHTML = `
+                    <h2 class="text-3xl font-bold px-2 mb-2">${this.t('settings_title')}</h2>
+                    <div class="card"><p class="text-sm font-bold opacity-60 mb-3 uppercase tracking-wider">${this.t('theme')}</p><div class="flex gap-3">${themes.map(t => `<button onclick="app.toggleTheme('${t}')" class="flex-1 py-4 text-xs font-bold rounded-xl border border-[var(--border)] ${this.state.theme === t ? 'bg-[var(--text-color)] text-[var(--bg-color)]' : 'bg-[var(--card-bg)]'}">${t.toUpperCase()}</button>`).join('')}</div></div>
+                    <div class="card relative overflow-hidden ${disabled ? 'opacity-60 grayscale' : ''}">${!this.state.isPremium ? `<div class="absolute inset-0 z-20 flex items-center justify-center bg-white/5 backdrop-blur-[2px]" onclick="app.showPremiumModal()"><span class="bg-black text-[#D4AF37] px-4 py-2 rounded-full text-sm font-bold shadow-2xl">🔒 Premium Only</span></div>` : ''}<div class="flex justify-between items-center mb-6"><p class="text-sm font-bold opacity-60 uppercase tracking-wider">${this.t('premium_config')}</p><p class="text-3xl font-black text-[var(--accent-gold)]" id="fee-display">${cur}${this.state.fee.toLocaleString()}</p></div><div class="px-2 mb-4"><input id="fee-slider" type="range" min="100" max="100000" step="100" value="${this.state.fee}" oninput="app.updateFeeDisplay(this.value)" ${disabled ? 'disabled' : ''}></div>${!disabled ? `<button onclick="app.saveFee()" class="w-full py-3 rounded-xl bg-[var(--text-color)] text-[var(--bg-color)] font-bold shadow-md">保存</button>` : ''}</div>
+                    <div class="bg-[var(--card-bg)] rounded-xl overflow-hidden border border-[var(--border)] shadow-sm"><button onclick="app.showTutorial()" class="w-full p-4 text-left font-bold flex justify-between items-center border-b border-[var(--border)]"><span>📚 ${this.t('menu_tutorial')}</span><span>›</span></button><button onclick="app.showLegal()" class="w-full p-4 text-left font-bold flex justify-between items-center"><span>⚖️ ${this.t('menu_legal')}</span><span>›</span></button></div>
+                    ${!this.state.isPremium ? `<div onclick="app.showPremiumModal()" class="mt-2 bg-gradient-to-br from-[#111] to-[#333] p-8 rounded-2xl shadow-xl text-center border border-gray-700 cursor-pointer"><p class="text-4xl mb-3">💎</p><h3 class="text-[#D4AF37] font-black text-2xl mb-2">${this.t('premium_title')}</h3><p class="text-gray-400 font-bold">${this.t('upgrade_cta')}</p></div>` : ''}
+                `;
+                return div;
+            }
+
+            showModal(html) {
+                const con = document.getElementById('modal-container');
+                con.innerHTML = `<div class="bg-[var(--card-bg)] w-full max-w-sm rounded-[32px] p-8 shadow-2xl border border-[var(--border)] relative overflow-hidden">${html}</div>`;
+                con.classList.remove('hidden');
+            }
+            closeModal() { document.getElementById('modal-container').classList.add('hidden'); }
+            completeTutorial() { this.state.hasSeenTutorial = true; this.save(); this.closeModal(); }
+            showTutorial() { this.showModal(`<div class="text-center space-y-6"><h3 class="text-2xl font-black mb-4">${this.t('tutorial_title')}</h3><div class="space-y-4 text-left bg-white/5 p-4 rounded-xl border border-white/10"><div><h4 class="font-bold text-[var(--primary)]">${this.t('tutorial_step1_title')}</h4><p class="text-sm opacity-80">${this.t('tutorial_step1_desc')}</p></div><div><h4 class="font-bold text-[var(--primary)]">${this.t('tutorial_step2_title')}</h4><p class="text-sm opacity-80">${this.t('tutorial_step2_desc')}</p></div><div><h4 class="font-bold text-[var(--danger)]">${this.t('tutorial_step3_title')}</h4><p class="text-sm opacity-80">${this.t('tutorial_step3_desc')}</p></div></div><button onclick="app.completeTutorial()" class="btn btn-primary w-full py-4 shadow-xl text-lg">${this.t('start_btn')}</button></div>`); }
+            showLegal() { this.showModal(`<div class="text-left"><h3 class="text-2xl font-black mb-4 text-center">${this.t('legal_title')}</h3><div class="h-64 overflow-y-auto bg-white/5 p-4 rounded-xl border border-white/10 mb-4 prose prose-invert prose-sm">${this.t('legal_text')}</div><button onclick="app.closeModal()" class="btn w-full py-3 opacity-80 bg-[var(--card-bg)] border border-[var(--border)]">${this.t('back')}</button></div>`); }
+            formatDuration(min) { return min < 60 ? min + "m" : Math.floor(min / 60) + "h " + (min % 60) + "m"; }
+            updateTimerUI(ms) { const totalSec = Math.floor(ms / 1000); const m = Math.floor(totalSec / 60); const s = totalSec % 60; const el = document.getElementById('timer-text'); if (el) el.innerText = `${m}:${s.toString().padStart(2, '0')}`; }
+            showPaymentModal() { const cur = this.state.lang === 'ja' ? '¥' : '$'; this.showModal(`<h3 class="text-3xl font-black mb-2 text-center">🔓 ${this.t('unlock_title')}</h3><p class="text-center opacity-60 mb-8 font-bold">${this.t('unlock_fee')}</p><div class="text-center mb-8"><span class="text-5xl font-black text-[var(--danger)]">${cur}${this.state.fee.toLocaleString()}</span></div><button onclick="app.processPayment()" class="btn bg-[var(--text-color)] text-[var(--bg-color)] py-5 text-xl">支払って解除</button><button onclick="app.closeModal()" class="mt-4 w-full py-4 opacity-50">キャンセル</button>`); }
+            processPayment() { const date = new Date().toLocaleString(); this.state.history.unshift({ date: date, amount: this.state.fee }); this.unlock(); this.closeModal(); }
+            showPremiumModal() { this.showModal(`<div class="text-center"><p class="text-6xl mb-4">🏆</p><h3 class="text-2xl font-black mb-1 text-[#D4AF37]">${this.t('premium_headline')}</h3><p class="text-sm font-bold opacity-80 mb-6">${this.t('premium_subhead')}</p><div class="text-left bg-gradient-to-br from-[#111] to-[#222] p-5 rounded-2xl border border-[#D4AF37]/30 mb-6 shadow-inner"><p class="text-sm font-bold text-gray-300 mb-4">${this.t('premium_body')}</p></div><button onclick="app.activatePremium()" class="btn btn-gold w-full text-xl py-4 shadow-2xl animate-pulse">${this.t('upgrade_now')}</button><button onclick="app.closeModal()" class="mt-4 w-full py-3 font-bold opacity-40 text-xs">CANCEL</button></div>`); }
+            activatePremium() { this.state.isPremium = true; this.toggleTheme('gold'); this.closeModal(); alert("WELCOME TO PREMIUM!"); }
+            showLockConfirm() { this.showModal(`<h3 class="text-2xl font-black mb-4">${this.t('confirm_title')}</h3><p class="opacity-70 mb-6 font-bold leading-relaxed">${this.t('confirm_desc')}</p><div class="flex gap-3"><button onclick="app.closeModal()" class="flex-1 py-4 font-bold opacity-60">CANCEL</button><button onclick="app.confirmLock()" class="flex-1 py-4 bg-[var(--danger)] text-white font-bold rounded-xl shadow-lg">LOCK</button></div>`); }
+            confirmLock() { this.state.lockEndTime = Date.now() + (this.state.duration * 60 * 1000); this.state.isLocked = true; this.save(); this.closeModal(); this.render(); }
+            triggerSecureProfit() { if (!this.state.isPremium) { this.showPremiumModal(); return; } if (confirm(this.t('secure_confirm'))) { const now = new Date(); let target = new Date(); target.setHours(CONSTANTS.SECURE_PROFIT_HOUR, 0, 0, 0); if (now >= target) target.setDate(target.getDate() + 1); this.state.lockEndTime = target.getTime(); this.state.isLocked = true; this.save(); this.render(); } }
+        }
+
+        const app = new TradeGuardApp();
+    </script>
+</body>
+
+</html>

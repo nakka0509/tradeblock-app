@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Trade Block</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- BASE STYLES --- */
+        :root {
+            /* Light Theme (Default) */
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-color: #1E293B;
+            --text-sub: #64748B;
+            --primary: #10B981;
+            /* Emerald 500 */
+            --danger: #EF4444;
+            /* Red 500 */
+            --border: #E2E8F0;
+            --accent-gold: #D97706;
+            /* Amber 600 */
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .dark {
+            /* Dark Theme */
+            --bg-color: #111827;
+            --card-bg: #1F2937;
+            --text-color: #F3F4F6;
+            --text-sub: #9CA3AF;
+            --border: #374151;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-gold {
+            /* Gold Theme (Premium) */
+            --bg-color: #000000;
+            --card-bg: #000000;
+            --text-color: #D4AF37;
+            /* Genuine Gold */
+            --text-sub: #A3A3A3;
+            --primary: #D4AF37;
+            --danger: #B91C1C;
+            --border: #D4AF37;
+            --shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            color: var(--text-color);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* --- APP CONTAINER --- */
+        #app-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        /* --- COMPONENTS --- */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 9999px;
+            font-weight: 800;
+            text-align: center;
+            transition: transform 0.1s active;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 1.125rem;
+            /* text-lg */
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .theme-gold .btn-primary {
+            background: linear-gradient(135deg, #FFE082 0%, #B7892B 100%);
+            color: #000000;
+            text-shadow: none;
+            border: 1px solid #FFF;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-gold .btn-gold {
+            background: linear-gradient(135deg, #FFE082 0%, #B7892B 100%);
+            color: black;
+            text-shadow: none;
+            border: 1px solid #FFF;
+        }
+
+        /* Range Slider Customization */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin-top: -10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+            cursor: pointer;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Chart Canvas */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 65%;
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .theme-gold #bg-canvas {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-frame" class="fade-in">
+        <!-- CANVAS BACK -->
+        <canvas id="bg-canvas"></canvas>
+
+        <!-- HEADER -->
+        <header
+            class="relative z-10 p-6 flex justify-between items-start bg-gradient-to-b from-[var(--bg-color)] to-transparent pointer-events-none">
+            <div class="pointer-events-auto">
+                <h1 class="text-3xl font-black italic tracking-tighter leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[var(--text-color)] to-[var(--text-sub)] pr-2 py-1"
+                    style="font-family: 'Inter', sans-serif;">TRADE BLOCK</h1>
+                <p class="text-sm font-bold opacity-60 mt-0 tracking-widest pl-1">トレード ブロック</p>
+            </div>
+        </header>
+
+        <!-- MAIN SCROLLABLE CONTENT -->
+        <main id="main-content" class="relative z-10 flex-1 overflow-y-auto no-scrollbar p-6 pt-0 pb-36">
+            <!-- Dynamic Content -->
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav
+            class="absolute bottom-0 w-full bg-[var(--card-bg)]/95 backdrop-blur-md border-t border-[var(--border)] z-40 pb-4 pt-2 px-6 flex justify-between shadow-lg">
+            <button onclick="app.setTab('home')" class="flex flex-col items-center flex-1 gap-1 group nav-btn"
+                data-tab="home">
+                <span class="text-3xl filter grayscale group-hover:grayscale-0 transition">🏠</span>
+                <span class="text-xs font-bold mt-1">TIMER</span>
+            </button>
+            <button onclick="app.setTab('records')" class="flex flex-col items-center flex-1 gap-1 group nav-btn"
+                data-tab="records">
+                <span class="text-3xl filter grayscale group-hover:grayscale-0 transition">📒</span>
+                <span class="text-xs font-bold mt-1">RECORDS</span>
+            </button>
+            <button onclick="app.setTab('settings')" class="flex flex-col items-center flex-1 gap-1 group nav-btn"
+                data-tab="settings">
+                <span class="text-3xl filter grayscale group-hover:grayscale-0 transition">⚙️</span>
+                <span class="text-xs font-bold mt-1">SETTINGS</span>
+            </button>
+        </nav>
+
+        <!-- MODAL OVERLAY -->
+        <div id="modal-container"
+            class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+            <!-- Injected Modal Content -->
+        </div>
+    </div>
+
+    <script>
+        /*******************************************************
+         * TRADE BLOCK V6.6 - iOS READY
+         *******************************************************/
+
+        // --- FEATURE FLAGS ---
+        // Set this to true before App Store upload to disable cheap dev unblocks and free premium
+        const IS_PRODUCTION = false; // Temporarily false so you can test without App Store Connect setup!
+        // ---------------------
+        const CONSTANTS = {
+            DEFAULT_FEE: 500,
+            MIN_FEE: 100,
+            MAX_FEE: 100000,
+            STEP_FEE: 100,
+            SECURE_PROFIT_HOUR: 7,
+            RECORDS_KEY: 'tradeblock_records_v1'
+        };
+
+        // ─── INVESTOR QUOTES ───────────────────────────────────────
+        const QUOTES = {
+            ja: [
+                { text: "相場は、忍耐できる者のものだ。", author: "ジェシー・リバモア" },
+                { text: "損切りは早く、利食いはゆっくり。", author: "ウォール街の格言" },
+                { text: "リスクなくして報酬なし。しかし管理されたリスクだけが正しいリスクだ。", author: "ポール・チューダー・ジョーンズ" },
+                { text: "相場への恐怖と欲望を制御できた者が勝者となる。", author: "ウォーレン・バフェット" },
+                { text: "最高のトレードは、時として何もしないことだ。", author: "ジェシー・リバモア" },
+                { text: "市場はあなたの意見を聞いてくれない。あなたが市場に従うしかない。", author: "ニコラス・ダービャシャー" },
+                { text: "規律こそが、プロとアマチュアを分ける唯一の壁だ。", author: "マーク・ダグラス" },
+                { text: "感情は最悪のアドバイザーだ。数字だけを信じろ。", author: "ジョージ・ソロス" },
+            ],
+            en: [
+                { text: "The stock market is designed to transfer money from the active to the patient.", author: "Warren Buffett" },
+                { text: "Cut your losses short. Let your profits run.", author: "Wall Street Adage" },
+                { text: "I go for the jugular when I have a conviction.", author: "George Soros" },
+                { text: "The most important quality for an investor is temperament, not intellect.", author: "Warren Buffett" },
+                { text: "The best trade is no trade when conditions aren't right.", author: "Jesse Livermore" },
+                { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
+                { text: "Markets are never wrong, opinions often are.", author: "Jesse Livermore" },
+                { text: "Risk comes from not knowing what you're doing.", author: "Warren Buffett" },
+            ]
+        };
+
+        // ─── UNLOCK QUESTION SETS (RANDOMIZED) ────────────────────
+        const QUESTION_SETS = {
+            ja: [
+                // Set A: Entry criteria
+                [
+                    "エントリールールに完全に則ったトレードを行えますか？",
+                    "衝動的・リベンジ目的でないと確認できますか？",
+                    "現在の相場は、あなたの得意なパターンですか？",
+                    "適切なロットサイズで入る準備ができていますか？",
+                    "損失が出ても冷静に受け入れる精神状態ですか？"
+                ],
+                // Set B: Emotional state
+                [
+                    "今、冷静な判断ができていて、衝動ではないと断言できますか？",
+                    "直近の損失を取り返そうとしていないと誓えますか？",
+                    "トレードプランは今日の朝から準備しましたか？",
+                    "損切りラインは明確に決めていますか？",
+                    "今日のトレードが最後の1回だとしても同じ判断をしますか？"
+                ],
+                // Set C: Post-win overconfidence
+                [
+                    "直近の勝ちを過信せず、常に規律を維持できていますか？",
+                    "今日すでに十分な利益が出ている場合、それでも必要なトレードですか？",
+                    "普段通りのロットサイズでエントリーすると約束できますか？",
+                    "このトレードを逃しても、次のチャンスが必ず来るとわかっていますか？",
+                    "明日も同じチャンスが来ると確信し、今日の欲を抑えられますか？"
+                ],
+                // Set D: Late night / fatigue
+                [
+                    "今、十分に休息が取れた状態ですか？",
+                    "集中力は最高の状態ですか？",
+                    "疲れや焦りでなく、純粋にチャンスを見てトレードしようとしていますか？",
+                    "今日のトレード枚数は規定内に収まっていますか？",
+                    "翌朝まで待てない理由など本当にないと、正直に言えますか？"
+                ]
+            ],
+            en: [
+                // Set A
+                [
+                    "Can you trade strictly according to your entry rules?",
+                    "Can you confirm you are NOT trading impulsively or for revenge?",
+                    "Is the current market your anticipated winning pattern?",
+                    "Are you prepared with proper lot size and risk management?",
+                    "Are you in a state to calmly accept a loss if it occurs?"
+                ],
+                // Set B
+                [
+                    "Are you emotionally calm — not just forcing a trade?",
+                    "Can you confirm you are NOT trying to recover a recent loss?",
+                    "Did you create your trade plan this morning?",
+                    "Have you clearly decided your stop-loss level?",
+                    "Would you make the same decision if this were your only trade today?"
+                ],
+                // Set C
+                [
+                    "Can you confirm you are NOT overconfident after recent wins?",
+                    "If you already hit your target today, is this trade still necessary?",
+                    "Can you commit to using your regular position size only?",
+                    "Do you know the same or better opportunity will come again tomorrow?",
+                    "If you miss this trade, do you trust another chance will come?"
+                ],
+                // Set D
+                [
+                    "Are you well-rested and focused right now?",
+                    "Is your concentration at its peak?",
+                    "Are you trading for a clear reason — not out of boredom or fatigue?",
+                    "Are you within your daily trade limit?",
+                    "Can you honestly say this cannot wait until tomorrow morning?"
+                ]
+            ]
+        };
+
+        const I18N = {
+            ja: {
+                tab_home: "タイマー", tab_history: "記録", tab_settings: "設定", tab_records: "記録",
+                lock_btn: "ロック開始", secure_profit_btn: "勝ち逃げ (翌朝07:00まで)",
+                time_remain: "残り時間",
+                history_title: "強制解除履歴", no_history: "履歴はありません",
+                records_title: "トレード記録", no_records: "まだ記録がありません",
+                record_add: "記録を追加", record_win: "勝ち", record_loss: "負け", record_be: "トン",
+                record_pnl: "損益額", record_note: "メモ", record_save: "保存",
+                record_delete: "削除", record_confirm_delete: "この記録を削除しますか？",
+                memo_label: "ロック時のメモ", memo_placeholder: "一言(市場状況、目標など)を入力...",
+                memo_in_unlock: "ロック時の自分へのメモ",
+                settings_title: "設定", theme: "テーマ", blocked_apps: "ブロックアプリ", select: "選択",
+                premium_title: "プレミアムプラン",
+                secure_subhead: "勝ったまま今日を終了する",
+                sub_monthly: "月額サブスクリプション (7日間無料)",
+                upgrade_cta: "アップグレードして機能を解放",
+                confirm_title: "最終確認", confirm_desc: "以下のリスクに同意してロックします。",
+                chk_risk: "リスクを理解しました", chk_agree: "同意してロックします",
+                cancel: "キャンセル", confirm: "決定",
+                risk_1: "設定時間までアプリを使用できません。", risk_2: "強制解除を行うには質問に答える必要があります。",
+                secure_confirm: "現在時刻から翌朝07:00まで強制ロックします。\n解除できませんがよろしいですか？",
+                locked_alert: "ロック中は設定を変更できません。",
+                back: "戻る", select_apps_title: "アプリを選択", confirm_selection: "選択を確定",
+                app_active: "ブロック有効",
+                premium_history_lock: "履歴機能はプレミアム限定です",
+                premium_headline: "勝ち逃げこそが最強の聖杯",
+                premium_subhead: "マイナス収益の全てのトレーダーへ",
+                premium_body: "「あと少し...」その欲が全ての利益を溶かしていませんか？<br>プロと敗者の差は「勝ち逃げ」ができるか、ただ一点です。<br>利益確定の瞬間に相場から強制隔離される。<br>この「強制力」さえあれば、資産は確実に積み上がる可能性が高まります。",
+                premium_feature1: "トレードを制限し、利益が減るのを物理的に防ぐ",
+                premium_feature2: "心理チェックでポジポジ病を抑制",
+                premium_feature3: "収支記録ノートで分析可能<br>シンプルで直感的に使えるデザイン",
+                sub_monthly: "月額サブスクリプション",
+                sub_annual: "年額サブスクリプション",
+                sub_lifetime: "永久ライセンス（買い切り）",
+                sub_monthly_price: "$9.99 / 月",
+                sub_annual_price: "$90.00 / 年",
+                sub_lifetime_price: "$180.00 / 一括",
+                feat_secure: "感情を排除する「翌朝までの鉄壁ロック」",
+                feat_gold: "成功者だけが知る「黒と金の支配者テーマ」",
+                feat_custom: "トレードブロックの全機能を使用可能",
+                upgrade_now: "追加機能を購入",
+                mode_timer: "トレードブロック", mode_secure: "勝ち逃げモード",
+                execute_lock: "ロック実行",
+                unlock_title: "ロック強制解除", pay_unlock_btn: "ペナルティを受け入れて解除", force_unlock: "強制解除",
+                penalty_desc: "解除ペナルティ", pt_unit: "pt",
+                menu_tutorial: "チュートリアルを見る", menu_legal: "利用規約・免責事項",
+                legal_title: "利用規約・免責事項",
+                legal_text: `
+                    <h4 class="font-bold mb-1">1. 免責事項</h4>
+                    <p class="mb-2 text-sm opacity-80">本アプリは、ユーザーの自己規律を補助するツールであり、投賄助言や利益を保証するものではありません。</p>
+                    <p class="mb-2 text-sm opacity-80">本アプリの機能（ロック機能等）により、特定のタイミングで取引ができず、機会損失や金錢的損失が発生した場合でも、開発者は一切の責任を負いません。</p>
+                    <p class="mb-2 text-sm font-bold text-yellow-400">⚠️ 本アプリのロック機能は「アプリ内表示」を割り当てる自己規律ツールです。iOSのシステムレベルで他のアプリをブロックする機能ではありません。</p>
+
+                    <h4 class="font-bold mb-1">2. 強制解除</h4>
+                    <p class="mb-2 text-sm opacity-80">ロック中の強制解除には、心理的質問への回答が必要です。これはユーザー自身の自己管理のための機能です。</p>
+
+                    <h4 class="font-bold mb-1">3. サブスクリプション</h4>
+                    <p class="mb-2 text-sm opacity-80">プレミアムプランは自動更新型月額サブスクリプションです。解約は「Apple ID → サブスクリプション」からいつでも可能です。無料期間の終了を少なくとも２４時間前まで解約しない場合、想定金額が請求されます。</p>
+
+                    <h4 class="font-bold mb-1">4. 健康上の注意</h4>
+                    <p class="mb-2 text-sm opacity-80">過度なストレスや依存を感じる場合は、直ちにトレードを中止し、専門機関へ相談ください。</p>
+                `,
+                tutorial_title: "ようこそ、Trade Blockへ",
+                tutorial_step1_title: "規律を守る",
+                tutorial_step1_desc: "感情的なトレードは資産を溶かします。このアプリは、物理的にアプリへのアクセスを遮断し、冷静さを取り戻させます。",
+                tutorial_step2_title: "勝ち逃げモード",
+                tutorial_step2_desc: "利益が出たら即座にロック。翌朝まで強制的に市場から離れることで、利益を確実に積み上げます。",
+                tutorial_step3_title: "自己責任",
+                tutorial_step3_desc: "ロック中は一切の操作ができません。このリスクを理解した上でご利用ください。",
+                tutorial_step4_title: "スクリーンタイム許可の<br>手順",
+                tutorial_step4_desc: "この後「スクリーンタイムへのアクセス許可」が求められます。<b>必ず「進む(続ける)」を選択</b>してください。<br><span class='text-red-400'>※間違えて「許可しない」を押した場合：</span><br>iPhoneの設定アプリ &gt; スクリーンタイム &gt; トレードブロック から手動で許可をオンにする必要があります。",
+                tutorial_step5_title: "ブロックするアプリの<br>選び方",
+                tutorial_step5_desc: "ロック中に使えなくしたいアプリを選びます。MT4/MT5や取引所アプリなどは、リスト下部の<b>「検索バー」</b>から探すと便利です。<br><span class='text-[11px] text-red-400 leading-tight mt-1 block'>※警告：Trade Blockは選択しないでください。強制解除が不可能になります。</span>",
+                tutorial_auth_btn: "アクセスを許可して完了",
+                start_btn: "始める",
+                menu_privacy: "プライバシーポリシー",
+                menu_restore: "購入を復元",
+                menu_manage_sub: "サブスクリプション管理",
+                restore_success: "購入を復元しました",
+                restore_none: "復元可能な購入はありません",
+                privacy_title: "プライバシーポリシー",
+                privacy_text: `
+                    <h4 class="font-bold mb-2">1. 収集する情報</h4>
+                    <p class="mb-3 text-sm opacity-80">本アプリは、ユーザーの個人情報を外部サーバーに送信・収集しません。すべてのデータ（設定、履歴等）はデバイス内のローカルストレージにのみ保存されます。</p>
+                    <h4 class="font-bold mb-2">2. 課金情報</h4>
+                    <p class="mb-3 text-sm opacity-80">アプリ内課金（サブスクリプション）はAppleのApp Store決済システムを通じて処理されます。開発者がクレジットカード情報や決済情報にアクセスすることはありません。</p>
+                    <h4 class="font-bold mb-2">3. 第三者への提供</h4>
+                    <p class="mb-3 text-sm opacity-80">本アプリはユーザーの個人情報を第三者に提供、販売、共有しません。</p>
+                    <h4 class="font-bold mb-2">4. データの削除</h4>
+                    <p class="mb-3 text-sm opacity-80">アプリを削除することで、すべてのローカルデータが完全に削除されます。</p>
+                    <h4 class="font-bold mb-2">5. お問い合わせ</h4>
+                    <p class="mb-3 text-sm opacity-80">プライバシーに関するお問い合わせは、App Storeのサポートページよりご連絡ください。</p>
+                `
+            },
+            en: {
+                tab_home: "TIMER", tab_history: "RECORDS", tab_settings: "SETTINGS", tab_records: "RECORDS",
+                lock_btn: "LOCK", secure_profit_btn: "SECURE PROFIT (Until 7AM)",
+                time_remain: "Time Remaining",
+                history_title: "Force Unlock History", no_history: "No History",
+                records_title: "Trade Records", no_records: "No records yet",
+                record_add: "Add Record", record_win: "Win", record_loss: "Loss", record_be: "B/E",
+                record_pnl: "P&L", record_note: "Note", record_save: "Save",
+                record_delete: "Delete", record_confirm_delete: "Delete this record?",
+                memo_label: "Lock Memo", memo_placeholder: "Market conditions, goal, reminder...",
+                memo_in_unlock: "Your note when you locked",
+                settings_title: "Settings", theme: "Theme", blocked_apps: "Blocked Apps", select: "Select",
+                premium_title: "Premium Plan",
+                secure_subhead: "End today as a winner",
+                sub_monthly: "Monthly Subscription ($10)",
+                upgrade_cta: "Upgrade to unlock features",
+                confirm_title: "Final Check", confirm_desc: "Agree to risks to proceed.",
+                chk_risk: "I understand the risks", chk_agree: "I agree to lock",
+                cancel: "Cancel", confirm: "Confirm",
+                risk_1: "Cannot access apps until timer ends.", risk_2: "You must answer a self-check to force unlock.",
+                secure_confirm: "Lock app until 7:00 AM tomorrow?\nThis cannot be undone.",
+                locked_alert: "Settings cannot be changed while locked.",
+                back: "Back", select_apps_title: "Select Apps", confirm_selection: "Confirm Selection",
+                app_active: "Active", save_fee: "Update Fee", fee_saved: "Settings Saved",
+                premium_history_lock: "History is Premium Only",
+                premium_headline: "The Holy Grail of Trading",
+                premium_subhead: "For all traders with negative balance",
+                premium_body: "Greed destroys profits. The difference between pros and amateurs is knowing when to stop.<br>Force yourself away from the market after a win.",
+                premium_feature1: "Restrict trading and physically prevent profit loss",
+                premium_feature2: "Psychological check stops revenge trading impulses",
+                premium_feature3: "Income and expense recording feature included. Simple, intuitive design",
+                sub_monthly: "Monthly Subscription (7-Day Trial)",
+                sub_annual: "Annual Subscription",
+                sub_lifetime: "Lifetime License",
+                sub_monthly_price: "$9.99 / mo",
+                sub_annual_price: "$90.00 / yr",
+                sub_lifetime_price: "$180.00 / once",
+                feat_secure: "Ironclad Lock until next morning",
+                feat_gold: "Exclusive Gold Theme for Winners",
+                feat_custom: "Full access to all Trade Block features",
+                upgrade_now: "GET DISCIPLINE NOW",
+                mode_timer: "Timer Lock", mode_secure: "Secure Profit",
+                execute_lock: "EXECUTE LOCK",
+                unlock_title: "FORCE UNLOCK", pay_unlock_btn: "ACCEPT PENALTY & UNLOCK", force_unlock: "Force Unlock",
+                unlock_q_title: "Before You Unlock", unlock_q_desc: "We do not recommend unlocking if you cannot answer YES to all of the following:",
+                unlock_q1: "1. Can you trade strictly following your entry rules?",
+                unlock_q2: "2. Are you trying to trade impulsively or for revenge?",
+                unlock_q3: "3. Is the current market your anticipated winning pattern?",
+                unlock_q4: "4. Are you prepared with proper lot size / risk management?",
+                unlock_q5: "5. Are you in a state to calmly accept a loss from this trade?",
+                penalty_desc: "Unlock Penalty", pt_unit: "pt",
+                menu_tutorial: "Show Tutorial", menu_legal: "Terms & Disclaimer",
+                legal_title: "Terms & Disclaimer",
+                legal_text: `
+                    <h4 class="font-bold mb-1">1. Disclaimer</h4>
+                    <p class="mb-2 text-sm opacity-80">This app is a discipline tool and does not guarantee profits. Not financial advice.</p>
+                    <p class="mb-2 text-sm opacity-80">The developer is not liable for any losses (financial or opportunity) caused by the inability to trade during a lock.</p>
+                    <p class="mb-2 text-sm font-bold text-yellow-400">⚠️ The lock feature is an in-app self-discipline screen only. It does NOT block other apps at the iOS system level.</p>
+
+                    <h4 class="font-bold mb-1">2. Force Unlock</h4>
+                    <p class="mb-2 text-sm opacity-80">Early unlock requires answering a psychological self-check. This is a self-management feature for the user's own benefit.</p>
+
+                    <h4 class="font-bold mb-1">3. Subscription</h4>
+                    <p class="mb-2 text-sm opacity-80">Premium is an auto-renewing monthly subscription. Cancel anytime via Apple ID → Subscriptions. If not cancelled at least 24 hours before the end of the free trial, the subscription price will be charged.</p>
+
+                    <h4 class="font-bold mb-1">4. Health Notice</h4>
+                    <p class="mb-2 text-sm opacity-80">If you experience excessive stress or dependency, stop trading immediately and seek professional help.</p>
+                `,
+                tutorial_title: "Welcome to Trade Block",
+                tutorial_step1_title: "Discipline First",
+                tutorial_step1_desc: "Emotional trading destroys wealth. Block access to regain cool.",
+                tutorial_step2_title: "Secure Profit",
+                tutorial_step2_desc: "Lock immediately after a win. Force yourself away until tomorrow.",
+                tutorial_step3_title: "Your Responsibility",
+                tutorial_step3_desc: "No access during lock. Use with understanding of risks.",
+                tutorial_step4_title: "How to Allow Screen Time",
+                tutorial_step4_desc: "You will be prompted to allow Screen Time access. <b>Please select 'Continue'.</b><br><span class='text-red-400'>*If you accidentally denied:</span><br>Go to iPhone Settings > Screen Time > Trade Block and turn on access manually.",
+                tutorial_step5_title: "How to Select Apps to Block",
+                tutorial_step5_desc: "Choose apps you want to block during a lock. Use the <b>Search bar</b> at the bottom to easily find trading apps like MT4/MT5.<br><span class='text-[11px] text-red-400 leading-tight mt-1 block'>*WARNING: Do NOT select Trade Block itself, or you will be permanently locked out.</span>",
+                tutorial_auth_btn: "Authorize & Finish",
+                start_btn: "Get Started",
+                menu_privacy: "Privacy Policy",
+                menu_restore: "Restore Purchases",
+                menu_manage_sub: "Manage Subscription",
+                restore_success: "Purchases restored successfully",
+                restore_none: "No purchases to restore",
+                privacy_title: "Privacy Policy",
+                privacy_text: `
+                    <h4 class="font-bold mb-2">1. Information We Collect</h4>
+                    <p class="mb-3 text-sm opacity-80">This app does not collect or transmit any personal information to external servers. All data (settings, history, etc.) is stored locally on your device only.</p>
+                    <h4 class="font-bold mb-2">2. Payment Information</h4>
+                    <p class="mb-3 text-sm opacity-80">In-app purchases (subscriptions) are processed through Apple's App Store payment system. The developer does not access your credit card or payment details.</p>
+                    <h4 class="font-bold mb-2">3. Third-Party Sharing</h4>
+                    <p class="mb-3 text-sm opacity-80">This app does not share, sell, or provide your personal information to any third parties.</p>
+                    <h4 class="font-bold mb-2">4. Data Deletion</h4>
+                    <p class="mb-3 text-sm opacity-80">Deleting the app will permanently remove all locally stored data.</p>
+                    <h4 class="font-bold mb-2">5. Contact</h4>
+                    <p class="mb-3 text-sm opacity-80">For privacy inquiries, please contact us through the App Store support page.</p>
+                `
+            }
+        };
+
+        // Comprehensive translations for ZH, KO, ES
+        I18N.zh = {
+            tab_home: "主页", tab_history: "记录", tab_settings: "设置", tab_records: "交易",
+            lock_btn: "开始锁定", secure_profit_btn: "锁定利润 (至次日07:00)",
+            time_remain: "剩余时间",
+            history_title: "强制解除记录", no_history: "暂无记录",
+            records_title: "交易记录", no_records: "暂无记录",
+            record_add: "添加记录", record_win: "盈利", record_loss: "亏损", record_be: "保本",
+            record_pnl: "盈亏金额", record_note: "备注", record_save: "保存",
+            record_delete: "删除", record_confirm_delete: "确定要删除此记录吗？",
+            memo_label: "锁定备注", memo_placeholder: "输入一句话...",
+            memo_in_unlock: "锁定时的备注",
+            settings_title: "设置", theme: "应用主题", blocked_apps: "阻止的应用", select: "选择",
+            premium_title: "高级版",
+            secure_subhead: "以盈利结束今天",
+            sub_monthly: "包月订阅 (7天免费试用)", sub_annual: "包年订阅", sub_lifetime: "终身买断",
+            sub_monthly_price: "$9.99 / 月", sub_annual_price: "$90.00 / 年", sub_lifetime_price: "$180.00 / 买断",
+            upgrade_cta: "升级以解锁所有功能",
+            confirm_title: "锁定确认", confirm_desc: "同意以下风险并锁定。",
+            chk_risk: "我了解风险", chk_agree: "同意并锁定",
+            cancel: "取消", confirm: "确定",
+            risk_1: "在锁定结束前无法使用应用。", risk_2: "强制解除必须回答心理测试。",
+            secure_confirm: "强制锁定到次日07:00，无法解除。确认继续吗？",
+            locked_alert: "锁定期间无法修改设置。",
+            back: "返回", select_apps_title: "选择应用", confirm_selection: "确认选择",
+            app_active: "已阻止",
+            premium_history_lock: "记录功能仅限高级版",
+            premium_headline: "盈利出局才是最强圣杯",
+            premium_subhead: "致所有亏损的交易者",
+            premium_body: "“就差一点点……”贪婪是否摧毁了你所有的利润？<br>专业人士与失败者的区别仅在于知道何时停止。<br>获取利润后强行脱离市场。<br>有了这层“强制力”，资产肯定能够稳步增加。",
+            premium_feature1: "限制交易，物理级防止利润流失",
+            premium_feature2: "通过心理测试抑制报复性交易",
+            premium_feature3: "内置收支记录功能，设计简单直观",
+            feat_secure: "感情排除的“次日清晨铁壁锁定”",
+            feat_gold: "专为成功者准备的黑金主题",
+            feat_custom: "可使用所有的功能",
+            upgrade_now: "购买附加功能",
+            mode_timer: "普通锁定", mode_secure: "利润锁定",
+            execute_lock: "执行锁定",
+            unlock_title: "强制解除", pay_unlock_btn: "接受惩罚并解除", force_unlock: "直接解除",
+            penalty_desc: "解除惩罚", pt_unit: "pt",
+            menu_tutorial: "查看教程", menu_legal: "服务条款",
+            legal_title: "服务条款",
+            privacy_title: "隐私政策",
+            tutorial_title: "欢迎使用 Trade Block",
+            tutorial_step1_title: "纪律第一",
+            tutorial_step1_desc: "情绪化交易会摧毁财富。通过锁定应用，帮助您恢复冷静。",
+            tutorial_step2_title: "锁定利润",
+            tutorial_step2_desc: "获利后立即锁定，强迫自己远离市场直至明天。",
+            tutorial_step3_title: "自我责任",
+            tutorial_step3_desc: "锁定期间无法进行任何操作。请在理解风险的情况下使用。",
+            tutorial_step4_title: "屏幕使用时间授权",
+            tutorial_step4_desc: "接下来将要求您“允许访问屏幕使用时间”。<b>请务必选择“继续”</b>。<br><span class='text-red-400'>※如果不小心点击了不允许：</span><br>您需要前往iPhone的 设置 > 屏幕使用时间 > Trade Block 手动开启权限。",
+            tutorial_step5_title: "如何选择要阻止的应用",
+            tutorial_step5_desc: "选择您在锁定期间不想使用的应用。您可以使用列表底部的<b>“搜索栏”</b>搜索 MT4 等名称。<br><span class='text-[11px] text-red-400 leading-tight mt-1 block'>※警告：绝对不要选择 Trade Block 本身，否则将导致无法解除锁定并永远被锁定在外。</span>",
+            tutorial_auth_btn: "允许并完成",
+            start_btn: "开始使用", menu_privacy: "隐私政策", menu_restore: "恢复购买", menu_manage_sub: "管理订阅",
+            restore_success: "购买恢复成功", restore_none: "没有可恢复的购买项",
+            privacy_text: `<h4 class="font-bold mb-2">1. 数据收集</h4><p class="mb-3 text-sm opacity-80">本应用不向外部服务器发送任何个人信息。</p>`,
+            legal_text: `<h4 class="font-bold mb-1">1. 免责声明</h4><p class="mb-2 text-sm opacity-80">使用本应用产生的任何损失由用户自行承担。</p>`
+        };
+
+        I18N.ko = {
+            tab_home: "타이머", tab_history: "기록", tab_settings: "설정", tab_records: "거래 기록",
+            lock_btn: "잠금 시작", secure_profit_btn: "수익 보존 (익일 07:00까지)",
+            time_remain: "남은 시간",
+            history_title: "강제 해제 기록", no_history: "기록이 없습니다",
+            records_title: "거래 기록", no_records: "기록이 없습니다",
+            record_add: "기록 추가", record_win: "수익", record_loss: "손실", record_be: "본절",
+            record_pnl: "손익 금액", record_note: "메모", record_save: "저장",
+            record_delete: "삭제", record_confirm_delete: "이 기록을 삭제하시겠습니까?",
+            memo_label: "잠금 시 메모", memo_placeholder: "한마디 입력...",
+            memo_in_unlock: "잠금 시 작성한 메모",
+            settings_title: "설정", theme: "테마", blocked_apps: "차단된 앱", select: "선택",
+            premium_title: "프리미엄",
+            secure_subhead: "수익으로 오늘을 마감하세요",
+            sub_monthly: "월간 구독 (7일 무료 체험)", sub_annual: "연간 구독", sub_lifetime: "평생 라이선스",
+            sub_monthly_price: "$9.99 / 월", sub_annual_price: "$90.00 / 년", sub_lifetime_price: "$180.00 / 일시불",
+            upgrade_cta: "업그레이드하여 모든 기능 잠금 해제",
+            confirm_title: "최종 확인", confirm_desc: "다음 위험 사항에 동의하고 잠금을 시작합니다.",
+            chk_risk: "위험을 이해했습니다", chk_agree: "동의하고 잠금",
+            cancel: "취소", confirm: "확인",
+            risk_1: "잠금 시간 동안 앱을 사용할 수 없습니다.", risk_2: "강제 해제 시 심리 질문에 답해야 합니다.",
+            secure_confirm: "현재부터 내일 07:00까지 강제 잠급니다. 해제 불가. 계속하시겠습니까?",
+            locked_alert: "잠금 중에는 설정을 변경할 수 없습니다.",
+            back: "뒤로", select_apps_title: "앱 선택", confirm_selection: "선택 완료",
+            app_active: "차단 활성화됨",
+            premium_history_lock: "기록 기능은 프리미엄 전용입니다",
+            premium_headline: "수익 실현이 최고의 성배입니다",
+            premium_subhead: "손실로 끝나는 모든 트레이더를 위해",
+            premium_body: "프로와 실패자의 차이는 멈출 때를 아는 것뿐입니다.<br>이 '강제력'만 있다면 자산은 반드시 쌓입니다.",
+            premium_feature1: "거래를 제한하고 손실을 물리적으로 방지",
+            premium_feature2: "심리 체크로 과매매 억제",
+            premium_feature3: "손익 기록 기능 탑재. 직관적인 디자인",
+            feat_secure: "감정을 배제하는 익일 아침까지의 철벽 잠금",
+            feat_gold: "성공자만을 위한 블랙 골드 테마",
+            feat_custom: "모든 기능 사용 가능",
+            upgrade_now: "추가 기능 구매",
+            mode_timer: "타이머 모드", mode_secure: "수익 보존 모드",
+            execute_lock: "잠금 실행",
+            unlock_title: "강제 해제", pay_unlock_btn: "페널티 수용 후 해제", force_unlock: "강제 해제",
+            penalty_desc: "해제 페널티", pt_unit: "pt",
+            menu_tutorial: "튜토리얼 보기", menu_legal: "이용 약관",
+            legal_title: "이용 약관",
+            privacy_title: "개인정보 처리방침",
+            tutorial_title: "Trade Block에 오신 것을 환영합니다",
+            tutorial_step1_title: "규율 우선",
+            tutorial_step1_desc: "감정적인 거래는 자산을 파괴합니다. 앱을 차단하여 냉정함을 되찾으세요.",
+            tutorial_step2_title: "수익 보존",
+            tutorial_step2_desc: "수익 발생 시 즉시 잠급니다. 내일까지 시장에서 강제로 벗어나세요.",
+            tutorial_step3_title: "자기 책임",
+            tutorial_step3_desc: "잠금 중에는 모든 조작이 불가능합니다. 위험을 이해하고 사용하세요.",
+            tutorial_step4_title: "스크린 타임 허용 절차",
+            tutorial_step4_desc: "이후 '스크린 타임 접근 허용'이 요구됩니다. <b>반드시 '계속'을 선택</b>해 주세요.<br><span class='text-red-400'>※실수로 '허용 안 함'을 누른 경우:</span><br>iPhone 설정 > 스크린 타임 > Trade Block에서 직접 허용해야 합니다.",
+            tutorial_step5_title: "차단할 앱 선택 방법",
+            tutorial_step5_desc: "잠금 중 사용할 수 없게 할 앱을 선택합니다. MT4/MT5 등은 리스트 하단의 <b>'검색창'</b>을 이용해 찾으면 편리합니다.<br><span class='text-[11px] text-red-400 leading-tight mt-1 block'>*경고: Trade Block 앱 자체를 선택하지 마십시오. 스스로를 잠그어 영구적으로 해제할 수 없게 됩니다.</span>",
+            tutorial_auth_btn: "허용하고 완료",
+            start_btn: "시작하기", menu_privacy: "개인정보 처리방침", menu_restore: "구매 복원", menu_manage_sub: "구독 관리",
+            restore_success: "구매가 복원되었습니다", restore_none: "복원할 항목이 없습니다",
+            privacy_text: `<h4 class="font-bold mb-2">1. 정보 수집</h4><p class="mb-3 text-sm opacity-80">이 앱은 어떠한 정보도 외부로 전송하지 않습니다.</p>`,
+            legal_text: `<h4 class="font-bold mb-1">1. 면책 조항</h4><p class="mb-2 text-sm opacity-80">이 앱으로 인해 발생한 손실은 책임지지 않습니다.</p>`
+        };
+
+        I18N.es = {
+            tab_home: "Temporizador", tab_history: "Historial", tab_settings: "Ajustes", tab_records: "Registros",
+            lock_btn: "Iniciar Bloqueo", secure_profit_btn: "Asegurar Ganancia",
+            time_remain: "Tiempo Restante",
+            history_title: "Historial de Desbloqueo", no_history: "No hay registros",
+            records_title: "Diario de Trading", no_records: "No hay registros",
+            record_add: "Añadir Registro", record_win: "Ganancia", record_loss: "Pérdida", record_be: "B/E",
+            record_pnl: "Monto", record_note: "Nota", record_save: "Guardar",
+            record_delete: "Eliminar", record_confirm_delete: "¿Estás seguro de eliminar esto?",
+            memo_label: "Nota al Bloquear", memo_placeholder: "Ingresa una nota breve...",
+            memo_in_unlock: "Nota Guardada",
+            settings_title: "Ajustes", theme: "Tema", blocked_apps: "Apps Bloqueadas", select: "Seleccionar",
+            premium_title: "Plan Premium",
+            secure_subhead: "Termina el día con ganancias",
+            sub_monthly: "Suscripción Mensual (7 días gratis)", sub_annual: "Suscripción Anual", sub_lifetime: "Licencia de por vida",
+            sub_monthly_price: "$9.99 / Mes", sub_annual_price: "$90.00 / Año", sub_lifetime_price: "$180.00 / Único",
+            upgrade_cta: "Mejorar a Premium",
+            confirm_title: "Confirmación Final", confirm_desc: "Acepto los siguientes riesgos al bloquear.",
+            chk_risk: "Entiendo los riesgos", chk_agree: "Acepto bloquear",
+            cancel: "Cancelar", confirm: "Confirmar",
+            risk_1: "No podrás acceder a las apps bloqueadas.", risk_2: "El desbloqueo forzado requiere responder preguntas.",
+            secure_confirm: "Bloqueo forzado hasta mañana a las 07:00. No se puede deshacer. ¿Continuar?",
+            locked_alert: "No se pueden cambiar los ajustes durante el bloqueo.",
+            back: "Volver", select_apps_title: "Elegir Apps", confirm_selection: "Confirmar Selección",
+            app_active: "Activo",
+            premium_history_lock: "Historial solo para Premium",
+            premium_headline: "Retirarse con ganancias es el Santo Grial",
+            premium_subhead: "Para traders con balance negativo",
+            premium_body: "La diferencia entre los profesionales y los novatos es saber cuándo parar.<br>Aléjate del mercado después de ganar.",
+            premium_feature1: "Restringe el trading para no perder ganancias",
+            premium_feature2: "Control psicológico contra operar por revancha",
+            premium_feature3: "Diario de PnL incorporado de diseño simple",
+            feat_secure: "Bloqueo invencible hasta el día siguiente",
+            feat_gold: "Tema exclusivo Black & Gold",
+            feat_custom: "Todas las funciones activas",
+            upgrade_now: "Mejorar Ahora",
+            mode_timer: "Temporizador", mode_secure: "Asegurar",
+            execute_lock: "Bloquear",
+            unlock_title: "Desbloqueo Forzado", pay_unlock_btn: "Aceptar penalización y desbloquear", force_unlock: "Desbloqueo Forzado",
+            penalty_desc: "Penalización", pt_unit: "pt",
+            menu_tutorial: "Ver Tutorial", menu_legal: "Términos Legales",
+            legal_title: "Términos Legales",
+            privacy_title: "Política de Privacidad",
+            tutorial_title: "Bienvenido a Trade Block",
+            tutorial_step1_title: "Disciplina Primero",
+            tutorial_step1_desc: "El trading emocional destruye tu riqueza. Reencuentra la calma bloqueando apps.",
+            tutorial_step2_title: "Asegurar Ganancia",
+            tutorial_step2_desc: "Bloquea justo después de ganar. Aléjate del mercado hasta mañana.",
+            tutorial_step3_title: "Tu Responsabilidad",
+            tutorial_step3_desc: "No hay acceso durante el bloqueo. Úsalo con plena consciencia de los riesgos.",
+            tutorial_step4_title: "Configurar Screen Time",
+            tutorial_step4_desc: "Se solicitará permiso para el Tiempo de Uso de Apple. <b>Selecciona 'Continuar'</b>.<br><span class='text-red-400'>*Si denegaste el acceso:</span><br>Ve a Ajustes del iPhone > Tiempo de Uso > Trade Block para activarlo manualmente.",
+            tutorial_step5_title: "Cómo Elegir Apps",
+            tutorial_step5_desc: "Elige las apps a bloquear. Usa la barra de <b>Búsqueda</b> al final de la lista para encontrar MT4/MT5 rápido.<br><span class='text-[11px] text-red-400 leading-tight mt-1 block'>*ADVERTENCIA: NO selecciones el propio Trade Block, o quedarás bloqueado permanentemente.</span>",
+            tutorial_auth_btn: "Autorizar y Finalizar",
+            start_btn: "Empezar", menu_privacy: "Privacidad", menu_restore: "Restaurar Compra", menu_manage_sub: "Gestionar Suscripción",
+            restore_success: "Compras restauradas con éxito", restore_none: "No hay compras que restaurar",
+            privacy_text: `<h4 class="font-bold mb-2">1. Privacidad</h4><p class="mb-3 text-sm opacity-80">La app no envía datos a servidores externos.</p>`,
+            legal_text: `<h4 class="font-bold mb-1">1. Descargo de Responsabilidad</h4><p class="mb-2 text-sm opacity-80">Las pérdidas son responsabilidad exclusiva del usuario.</p>`
+        };
+
+        class TradeGuardApp {
+            constructor() {
+                this.state = {
+                    lang: 'ja', tab: 'home', page: 'main', homeMode: 'timer',
+                    isPremium: false, isLocked: false, lockEndTime: null,
+                    fee: CONSTANTS.DEFAULT_FEE, duration: 60, theme: 'light',
+                    history: [], hasSeenTutorial: false, memo: '',
+                    blockedApps: ['MetaTrader 4', 'MetaTrader 5', 'TradingView']
+                };
+                this.timerInterval = null;
+                this.chartInterval = null;
+                this.candles = [];
+                this.init();
+            }
+
+            init() {
+                try {
+                    const saved = localStorage.getItem('tradeblock_v5');
+                    if (saved) {
+                        let parsed = JSON.parse(saved);
+                        if (!parsed.v6_theme_reset) {
+                            parsed.theme = 'light';
+                            parsed.v6_theme_reset = true;
+                        }
+                        this.state = { ...this.state, ...parsed };
+                    } else {
+                        this.state.v6_theme_reset = true;
+                    }
+                } catch (e) { console.error(e); }
+
+                if (this.state.isLocked && Date.now() > this.state.lockEndTime) {
+                    this.unlock(true);
+                }
+
+                this.applyTheme(this.state.theme);
+                this.setLang(this.state.lang);
+
+                // --- HARD PAYWALL ENFORCEMENT ---
+                if (!this.state.isPremium) {
+                    this.state.page = 'paywall';
+                    this.state.tab = 'home'; // hide other content just in case
+                }
+
+                this.startTimer();
+                this.initChart();
+
+                if (this.state.isPremium && !this.state.hasSeenTutorial) {
+                    this.showTutorial();
+                }
+                this.render();
+            }
+
+            save() { localStorage.setItem('tradeblock_v5', JSON.stringify(this.state)); }
+
+            resetData() {
+                if (confirm("DEBUG: Reset all data?")) {
+                    localStorage.clear(); location.reload();
+                }
+            }
+
+            async requestScreenTimeAuth() {
+                if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
+                    try {
+                        const result = await Capacitor.Plugins.ScreenTime.requestAuthorization();
+                        if (!result.authorized) {
+                            console.warn('Screen Time authorization denied');
+                        }
+                    } catch (e) { console.error('Screen Time auth error:', e); }
+                }
+            }
+
+            async openNativeAppPicker() {
+                if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
+                    try {
+                        await Capacitor.Plugins.ScreenTime.showAppPicker();
+                    } catch (e) {
+                        console.error(e);
+                        alert("NATIVE ERROR: " + (e.message || JSON.stringify(e)) + "\n\n(Did you add the .m files to the Xcode target?)");
+                        this.setPage('apps');
+                    }
+                } else {
+                    alert("PLUGIN NOT FOUND. Capacitor.Plugins.ScreenTime is missing.");
+                    this.setPage('apps');
+                }
+            }
+
+            t(key) { return I18N[this.state.lang][key] || key; }
+
+            startTimer() {
+                if (this.timerInterval) clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    if (this.state.isLocked) {
+                        const now = Date.now();
+                        const diff = this.state.lockEndTime - now;
+                        if (diff <= 0) this.unlock();
+                        else this.updateTimerUI(diff);
+                    }
+                }, 1000);
+            }
+
+            unlock(silent = false) {
+                this.state.isLocked = false;
+                this.state.lockEndTime = null;
+                this.save();
+                // Unblock apps via Screen Time
+                if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
+                    Capacitor.Plugins.ScreenTime.unblockApps();
+                }
+                this.render();
+                if (!silent) alert(this.state.lang === 'ja' ? (this._forceUnlocked ? 'ロックを強制解除しました' : '時間経過により解除されました') : (this._forceUnlocked ? 'Force unlock complete.' : 'UNLOCKED'));
+            }
+
+            applyTheme(theme) {
+                const root = document.documentElement;
+                root.className = '';
+                if (theme === 'dark') root.classList.add('dark');
+                if (theme === 'gold') root.classList.add('theme-gold');
+            }
+
+            setLang(lang) {
+                this.state.lang = lang;
+                // Currently zh, ko, es fall back to English for some dynamic data if not fully loaded, 
+                // but we will use 'en' rules for the fee currency ($, amounts)
+                const isJPY = (lang === 'ja');
+                if (!isJPY) {
+                    if (this.state.fee >= 100) this.state.fee = Math.max(5, Math.floor(this.state.fee / 100));
+                } else {
+                    if (this.state.fee < 100) this.state.fee = Math.max(500, this.state.fee * 100);
+                }
+                this.save();
+                this.render();
+            }
+
+            setHomeMode(mode) { this.state.homeMode = mode; this.render(); }
+            setTab(tab) { this.state.tab = tab; this.state.page = 'main'; this.save(); this.render(); }
+            setPage(page) { this.state.page = page; this.render(); }
+
+            toggleTheme(theme) {
+                if (theme === 'gold' && !this.state.isPremium) {
+                    this.showPremiumModal(); return;
+                }
+                this.state.theme = theme;
+                this.applyTheme(theme);
+                this.save();
+                this.render();
+            }
+
+            updateFeeDisplay(val) {
+                const el = document.getElementById('fee-display');
+                if (el) {
+                    const cur = this.state.lang === 'ja' ? '¥' : '$';
+                    el.innerText = cur + parseInt(val).toLocaleString();
+                }
+            }
+
+            saveFee() {
+                const slider = document.getElementById('fee-slider');
+                if (slider) {
+                    this.state.fee = parseInt(slider.value);
+                    this.save(); alert(this.t('fee_saved')); this.render();
+                }
+            }
+
+            initChart() {
+                const canvas = document.getElementById('bg-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                let width, height;
+                const resize = () => {
+                    width = canvas.parentElement.offsetWidth;
+                    height = canvas.parentElement.offsetHeight * 0.7;
+                    canvas.width = width; canvas.height = height;
+                };
+                window.addEventListener('resize', resize); resize();
+                this.candles = [];
+                let price = 100;
+                for (let i = 0; i < 30; i++) {
+                    const move = (Math.random() - 0.5) * 5;
+                    this.candles.push({ open: price, close: price + move, high: price + Math.abs(move) + 1, low: price - Math.abs(move) - 1 });
+                    price += move;
+                }
+                let lastCandleTime = Date.now();
+                let currentCandle = { ...this.candles[this.candles.length - 1] };
+                const tick = () => {
+                    const now = Date.now();
+                    if (now - lastCandleTime >= 3000) {
+                        this.candles.push(currentCandle);
+                        if (this.candles.length > 40) this.candles.shift();
+                        lastCandleTime = now;
+                        const start = currentCandle.close;
+                        currentCandle = { open: start, close: start, high: start, low: start };
+                    }
+                    const change = (Math.random() - 0.5) * 0.5;
+                    currentCandle.close += change;
+                    if (currentCandle.close > currentCandle.high) currentCandle.high = currentCandle.close;
+                    if (currentCandle.close < currentCandle.low) currentCandle.low = currentCandle.close;
+                    this.drawChart(ctx, width, height, [...this.candles, currentCandle]);
+                    requestAnimationFrame(tick);
+                };
+                tick();
+            }
+
+            drawChart(ctx, w, h, data) {
+                ctx.clearRect(0, 0, w, h);
+                let min = Infinity, max = -Infinity;
+                data.forEach(c => { if (c.low < min) min = c.low; if (c.high > max) max = c.high; });
+                const range = max - min || 1;
+                const gap = 6;
+                const candleW = (w - (data.length * gap)) / data.length;
+                const isGold = this.state.theme === 'gold';
+                const upColor = isGold ? '#D4AF37' : '#10B981';
+                const downColor = isGold ? '#78350F' : '#EF4444';
+                data.forEach((c, i) => {
+                    const x = i * (candleW + gap);
+                    const yOpen = h - ((c.open - min) / range) * h * 0.8 - (h * 0.1);
+                    const yClose = h - ((c.close - min) / range) * h * 0.8 - (h * 0.1);
+                    const yHigh = h - ((c.high - min) / range) * h * 0.8 - (h * 0.1);
+                    const yLow = h - ((c.low - min) / range) * h * 0.8 - (h * 0.1);
+                    const color = c.close >= c.open ? upColor : downColor;
+                    ctx.strokeStyle = color; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(x + candleW / 2, yHigh); ctx.lineTo(x + candleW / 2, yLow); ctx.stroke();
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, Math.min(yOpen, yClose), candleW, Math.max(1, Math.abs(yClose - yOpen)));
+                });
+            }
+
+            setTab(tab) {
+                if (!this.state.isPremium) return; // Block navigation if not premium
+
+                this.state.tab = tab;
+                this.state.page = 'main';
+                this.save();
+                this.render();
+            }
+
+            render() {
+                const isPaywall = this.state.page === 'paywall';
+
+                // Toggle app shell visibility
+                const header = document.querySelector('header');
+                const nav = document.querySelector('nav');
+                const canvas = document.getElementById('bg-canvas');
+
+                if (header) header.style.display = isPaywall ? 'none' : 'flex';
+                if (nav) nav.style.display = isPaywall ? 'none' : 'flex';
+                if (canvas) canvas.style.display = isPaywall ? 'none' : 'block';
+
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    const isActive = btn.dataset.tab === this.state.tab;
+                    Object.assign(btn.style, {
+                        opacity: (isActive && !isPaywall) ? '1' : '0.4',
+                        pointerEvents: isPaywall ? 'none' : 'auto'
+                    });
+
+                    if (isActive && !isPaywall) btn.classList.add('text-[var(--primary)]');
+                    else btn.classList.remove('text-[var(--primary)]');
+                    btn.querySelector('span:last-child').innerText = this.t('tab_' + btn.dataset.tab);
+                });
+                const main = document.getElementById('main-content');
+                main.innerHTML = '';
+
+                // If paywall, remove main padding so it fills screen
+                if (isPaywall) {
+                    main.className = "relative z-10 flex-1 overflow-y-auto no-scrollbar bg-black fixed inset-0 w-full h-full";
+                    main.appendChild(this.renderPaywall());
+                } else {
+                    main.className = "relative z-10 flex-1 overflow-y-auto no-scrollbar p-6 pt-0 pb-32";
+                    if (this.state.page === 'apps') main.appendChild(this.renderAppsPage());
+                    else if (this.state.tab === 'home') main.appendChild(this.renderHome());
+                    else if (this.state.tab === 'records') main.appendChild(this.renderRecords());
+                    else if (this.state.tab === 'settings') main.appendChild(this.renderSettings());
+                }
+            }
+
+            renderHome() {
+                const div = document.createElement('div');
+                div.className = "flex flex-col h-full justify-start pb-4 space-y-4 fade-in pt-2";
+                if (!this.state.isLocked) {
+                    div.innerHTML += `
+                        <div class="flex p-1 bg-[var(--card-bg)] rounded-xl border border-[var(--border)] mx-2 mb-2 shadow-sm">
+                            <button onclick="app.setHomeMode('timer')" class="flex-1 py-2 text-sm font-bold rounded-lg transition ${this.state.homeMode === 'timer' ? 'bg-[var(--text-color)] text-[var(--bg-color)] shadow-md' : 'opacity-60'}">⏱ ${this.t('mode_timer')}</button>
+                            <button onclick="app.setHomeMode('secure')" class="flex-1 py-2 text-sm font-bold rounded-lg transition ${this.state.homeMode === 'secure' ? 'bg-gradient-to-r from-amber-400 to-amber-600 text-white shadow-md' : 'opacity-60'}">🏆 ${this.t('mode_secure')}</button>
+                        </div>
+                    `;
+                }
+                if (this.state.homeMode === 'secure' && !this.state.isLocked) {
+                    div.innerHTML += `
+                        <div class="flex-1 flex flex-col items-center justify-center text-center px-4 space-y-6">
+                            <div class="w-40 h-40 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 flex items-center justify-center shadow-2xl animate-pulse"><span class="text-6xl">🏆</span></div>
+                            <div><h2 class="text-2xl font-black mb-2 text-[var(--accent-gold)]">${this.t('secure_profit_btn')}</h2><p class="font-bold opacity-70 text-sm leading-relaxed">${this.t('secure_subhead')}</p></div>
+                            ${this.state.isPremium ? `<button onclick="app.triggerSecureProfit()" class="btn btn-gold w-full text-xl py-6 shadow-2xl border-2 border-white/20">${this.t('execute_lock')}</button>` : `<div class="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border)] w-full shadow-lg"><p class="text-sm font-bold opacity-60 mb-4">PREMIUM ONLY</p><button onclick="app.showPremiumModal()" class="btn btn-primary w-full shadow-xl">${this.t('upgrade_cta')}</button></div>`}
+                        </div>
+                    `;
+                    return div;
+                }
+                div.innerHTML += `
+                    <div class="flex-1 flex flex-col items-center justify-center relative min-h-[280px]">
+                        <div class="relative w-72 h-72 flex items-center justify-center">
+                            <svg class="w-full h-full transform -rotate-90"><circle cx="144" cy="144" r="130" stroke="var(--border)" stroke-width="12" fill="none" opacity="0.1"></circle><circle id="timer-circle" cx="144" cy="144" r="130" stroke="${this.state.isLocked ? 'var(--danger)' : 'var(--primary)'}" stroke-width="12" fill="none" stroke-dasharray="816" stroke-dashoffset="0"></circle></svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center"><span id="timer-text" class="text-5xl font-black tabular-nums">${this.state.isLocked ? "--:--" : this.formatDuration(this.state.duration)}</span><span class="text-sm font-bold opacity-60 mt-2 tracking-widest">${this.t('time_remain')}</span></div>
+                        </div>
+                    </div>
+                    ${!this.state.isLocked ? `
+                        <div class="bg-[var(--card-bg)]/80 backdrop-blur rounded-2xl p-6 border border-[var(--border)] shadow-lg mx-2"><input type="range" min="5" max="1440" step="5" value="${this.state.duration}" oninput="app.setDuration(this.value)" class="w-full"><div class="flex justify-between text-xs font-bold opacity-60 mt-2 px-1"><span>5m</span><span>24h</span></div></div>
+                        <div class="px-2 pb-4"><button onclick="app.showLockConfirm()" class="btn btn-primary shadow-xl text-xl py-5">🔒 ${this.t('lock_btn')}</button></div>
+                    ` : `
+                        <div class="px-2 space-y-4 pb-4">
+                            <div class="p-4 bg-red-500/10 border border-red-500 rounded-xl text-center"><p class="text-red-500 font-bold text-lg animate-pulse">LOCKED</p></div>
+                            ${this.state.memo ? `<div class="p-3 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl"><p class="text-xs font-bold opacity-50 mb-1">📝 ${this.t('memo_label')}</p><p class="text-sm font-bold leading-relaxed">${this.state.memo.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p><button onclick="app.editMemo()" class="text-xs opacity-40 mt-1 font-bold">${this.state.lang === 'ja' ? '編集' : 'Edit'}</button></div>` : `<button onclick="app.editMemo()" class="w-full py-3 border border-dashed border-[var(--border)] rounded-xl text-sm font-bold opacity-50">📝 ${this.state.lang === 'ja' ? 'メモを追加' : 'Add Memo'}</button>`}
+                            <button onclick="app.showPaymentModal()" class="btn bg-gray-800 text-white shadow-xl py-5 text-xl">🔓 ${this.t('force_unlock')}</button>
+                        </div>
+                    `}
+                `;
+                return div;
+            }
+
+            renderHistory() {
+                const div = document.createElement('div');
+                div.className = "space-y-4 fade-in pt-6";
+                const ja = this.state.lang === 'ja';
+                if (!this.state.isPremium) {
+                    div.innerHTML = `<h2 class="text-3xl font-bold px-2 mb-4">${this.t('history_title')}</h2><div class="card p-8 text-center flex flex-col items-center justify-center gap-4 border-2 border-[var(--accent-gold)] border-dashed bg-black/5"><span class="text-5xl">🔒</span><p class="font-bold text-lg opacity-80">${this.t('premium_history_lock')}</p><button onclick="app.showPremiumModal()" class="btn btn-primary mt-4 py-4 px-8 shadow-xl">${this.t('upgrade_cta')}</button></div>`;
+                    return div;
+                }
+                div.innerHTML = `<div class="flex justify-between items-end px-2 mb-2"><h2 class="text-3xl font-bold">${this.t('history_title')}</h2></div><div class="space-y-3">${this.state.history.length === 0 ? `<p class="text-center opacity-50 py-10 font-bold text-xl">${this.t('no_history')}</p>` : ''}${this.state.history.map(item => {
+                    const label = item.type === 'force_unlock'
+                        ? `<span class="text-sm font-black text-[var(--danger)] bg-red-500/10 px-3 py-1 rounded-full">⚠️ ${ja ? '強制解除' : 'Force Unlock'}</span>`
+                        : `<span class="text-sm font-bold opacity-60">${item.amount !== undefined ? item.amount + ' pt' : '-'}</span>`;
+                    return `<div class="card flex justify-between items-center py-4 px-6"><span class="font-bold text-sm opacity-60">${item.date}</span>${label}</div>`;
+                }).join('')}</div>`;
+                return div;
+            }
+
+            renderRecords() {
+                const div = document.createElement('div');
+                div.className = 'fade-in pb-28';
+                const ja = this.state.lang === 'ja';
+                let records = [];
+                try { records = JSON.parse(localStorage.getItem(CONSTANTS.RECORDS_KEY) || '[]'); } catch (e) { }
+
+                const now = new Date();
+                if (!this._calYear) { this._calYear = now.getFullYear(); this._calMonth = now.getMonth(); }
+                if (this._selectedDay === undefined) this._selectedDay = now.getDate();
+                const year = this._calYear, month = this._calMonth, selDay = this._selectedDay;
+
+                const mNamesJa = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+                const mNamesEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const monthLabel = ja ? `${year}年 ${mNamesJa[month]}` : `${mNamesEn[month]} ${year}`;
+                const dayLabels = ja ? ['日', '月', '火', '水', '木', '金', '土'] : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                const cur = ja ? '¥' : '$';
+
+                const dayMap = {};
+                let monthPnl = 0;
+                records.filter(r => r.year === year && r.month === month).forEach(r => {
+                    if (!dayMap[r.day]) dayMap[r.day] = [];
+                    dayMap[r.day].push(r);
+                    monthPnl += (r.pnl || 0);
+                });
+
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                // Build header rows
+                let grid = dayLabels.map((d, i) => {
+                    const col = i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'opacity-40';
+                    return `<div class="text-center text-xs font-black ${col} pb-2">${d}</div>`;
+                }).join('');
+                for (let i = 0; i < firstDay; i++) grid += `<div></div>`;
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const isToday = (d === now.getDate() && month === now.getMonth() && year === now.getFullYear());
+                    const isSel = d === selDay;
+                    const dayRecs = dayMap[d] || [];
+                    const dayPnl = dayRecs.reduce((s, r) => s + (r.pnl || 0), 0);
+                    const hasPnl = dayRecs.length > 0;
+                    const amtColor = dayPnl > 0 ? 'text-emerald-500' : dayPnl < 0 ? 'text-red-500' : 'opacity-40';
+                    const circleClass = isSel
+                        ? 'day-circle w-8 h-8 rounded-full bg-[var(--accent-gold)] text-white flex items-center justify-center'
+                        : isToday
+                            ? 'day-circle w-8 h-8 rounded-full ring-2 ring-[var(--primary)] flex items-center justify-center'
+                            : 'day-circle w-8 h-8 flex items-center justify-center';
+                    grid += `<div id="cal-day-${d}" data-istoday="${isToday ? '1' : '0'}" onclick="app.selectDay(${d})" class="flex flex-col items-center py-1 cursor-pointer active:scale-95 transition-all">
+                        <div class="${circleClass}"><span class="text-sm font-black">${d}</span></div>
+                        ${hasPnl ? `<span class="text-[9px] font-black ${amtColor} leading-tight mt-0.5">${dayPnl >= 0 ? '+' : ''}${dayPnl.toLocaleString()}</span>` : '<span class="text-[9px] opacity-0">-</span>'}
+                    </div>`;
+                }
+
+                // Selected day records panel
+                const selRecs = dayMap[selDay] || [];
+                const selPnl = selRecs.reduce((s, r) => s + (r.pnl || 0), 0);
+                const selPnlColor = selPnl > 0 ? 'text-emerald-500' : selPnl < 0 ? 'text-red-500' : 'opacity-60';
+                const selDateLabel = ja ? `${year}年${month + 1}月${selDay}日` : `${mNamesEn[month]} ${selDay}, ${year}`;
+                const pnlColor = monthPnl > 0 ? 'text-emerald-500' : monthPnl < 0 ? 'text-red-500' : 'opacity-60';
+
+                let recRows = '';
+                if (selRecs.length === 0) {
+                    recRows = `<p class="text-center opacity-40 font-bold py-5 text-sm">${this.t('no_records')}</p>`;
+                } else {
+                    recRows = selRecs.map(r => {
+                        const pnl = r.pnl || 0;
+                        const col = pnl > 0 ? 'text-emerald-500' : pnl < 0 ? 'text-red-500' : 'opacity-60';
+                        const sign = pnl >= 0 ? '+' : '-';
+                        return `<div class="flex justify-between items-center py-3 border-b border-[var(--border)] last:border-0">
+                            <div class="flex flex-col">
+                                <span class="font-black text-base ${col}">${sign}${cur}${Math.abs(pnl).toLocaleString()}</span>
+                                ${r.note ? `<span class="text-xs opacity-50 mt-0.5">${r.note.replace(/</g, '&lt;')}</span>` : ''}
+                            </div>
+                            <button onclick="app.deleteRecord(${r.id})" class="text-xs opacity-30 active:opacity-80 font-bold px-2 py-1">×</button>
+                        </div>`;
+                    }).join('');
+                }
+
+                div.innerHTML = `
+                    <!-- Month nav + P&L -->
+                    <div class="flex items-center justify-between px-4 py-3 bg-[var(--card-bg)] border-b border-[var(--border)]">
+                        <button onclick="app.calNav(-1)" class="w-9 h-9 rounded-full border border-[var(--border)] font-black text-lg flex items-center justify-center bg-[var(--bg-color)]">‹</button>
+                        <div class="text-center">
+                            <div class="relative inline-flex items-center justify-center cursor-pointer">
+                                <p class="font-black text-xl flex items-center gap-1">
+                                    <span>${monthLabel}</span>
+                                    <span class="text-[10px] opacity-60">▼</span>
+                                </p>
+                                <input type="month" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer" value="${year}-${String(month + 1).padStart(2, '0')}" onchange="app.jumpToYearMonth(this.value)">
+                            </div>
+                            <p class="text-2xl font-black ${pnlColor}">${monthPnl > 0 ? '+' : monthPnl < 0 ? '-' : ''}${cur}${Math.abs(monthPnl).toLocaleString()}</p>
+                        </div>
+                        <button onclick="app.calNav(1)" class="w-9 h-9 rounded-full border border-[var(--border)] font-black text-lg flex items-center justify-center bg-[var(--bg-color)]">›</button>
+                    </div>
+                    <!-- Calendar -->
+                    <div class="bg-[var(--card-bg)] px-3 pb-3">
+                        <div class="grid grid-cols-7 gap-y-1">${grid}</div>
+                    </div>
+                    <!-- Add button — fixed below calendar, above records -->
+                    <div class="bg-[var(--bg-color)] px-4 pt-3 pb-2">
+                        <button id="add-rec-btn" onclick="app.showAddRecord(${year},${month},${selDay})" class="w-full py-3 rounded-xl bg-[var(--accent-gold)] text-white font-black text-base shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"><span class="text-xl">+</span> ${this.t('record_add')}</button>
+                    </div>
+                    <!-- Selected day panel -->
+                    <!-- Selected day panel -->
+                    <div id="sel-day-panel" class="bg-[var(--bg-color)] px-4 pt-0">
+                        ${this._buildSelDayHTML()}
+                    </div>
+                    <!-- no floating FAB -->
+                `;
+                return div;
+            }
+
+            calNav(dir) {
+                // Fix: `_calMonth` can be 0 (January), which is falsy — use explicit null check
+                if (this._calYear == null) { const n = new Date(); this._calYear = n.getFullYear(); this._calMonth = n.getMonth(); }
+                this._calMonth += dir;
+                if (this._calMonth > 11) { this._calMonth = 0; this._calYear++; }
+                if (this._calMonth < 0) { this._calMonth = 11; this._calYear--; }
+                this._selectedDay = undefined; // reset selected day on month change
+                this.render();
+            }
+
+            jumpToYearMonth(val) {
+                if (!val) return;
+                const [y, m] = val.split('-');
+                this._calYear = parseInt(y, 10);
+                this._calMonth = parseInt(m, 10) - 1;
+                this._selectedDay = undefined;
+                this.render();
+            }
+
+            selectDay(d) {
+                const prev = this._selectedDay;
+                this._selectedDay = d;
+
+                // Remove gold from previous cell
+                if (prev != null && prev !== d) {
+                    const prevEl = document.getElementById('cal-day-' + prev);
+                    if (prevEl) {
+                        const circle = prevEl.querySelector('.day-circle');
+                        if (circle) {
+                            const isToday = prevEl.dataset.istoday === '1';
+                            circle.className = isToday
+                                ? 'day-circle w-8 h-8 rounded-full ring-2 ring-[var(--primary)] flex items-center justify-center'
+                                : 'day-circle w-8 h-8 flex items-center justify-center';
+                        }
+                    }
+                }
+                // Apply gold to new cell
+                const newEl = document.getElementById('cal-day-' + d);
+                if (newEl) {
+                    const circle = newEl.querySelector('.day-circle');
+                    if (circle) circle.className = 'day-circle w-8 h-8 rounded-full bg-[var(--accent-gold)] text-white flex items-center justify-center';
+                }
+                // Update the day records panel in-place
+                const panel = document.getElementById('sel-day-panel');
+                if (panel) {
+                    panel.innerHTML = this._buildSelDayHTML();
+                } else {
+                    this.render(); // fallback
+                }
+                // CRITICAL: update the add-record button so it targets the newly selected day
+                const addBtn = document.getElementById('add-rec-btn');
+                if (addBtn) addBtn.setAttribute('onclick', `app.showAddRecord(${this._calYear},${this._calMonth},${d})`);
+            }
+
+            _buildSelDayHTML() {
+                const ja = this.state.lang === 'ja';
+                const cur = ja ? '¥' : '$';
+                const mNamesEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                let records = [];
+                try { records = JSON.parse(localStorage.getItem(CONSTANTS.RECORDS_KEY) || '[]'); } catch (e) { }
+                const year = this._calYear, month = this._calMonth, selDay = this._selectedDay;
+                const selRecs = records.filter(r => r.year === year && r.month === month && r.day === selDay);
+
+                const selPnl = selRecs.reduce((s, r) => s + (r.pnl || 0), 0);
+                const selPnlColor = selPnl > 0 ? 'text-emerald-500' : selPnl < 0 ? 'text-red-500' : 'opacity-60';
+                const selDateLabel = ja ? `${year}年${month + 1}月${selDay}日` : `${mNamesEn[month]} ${selDay}, ${year}`;
+                let recRows = '';
+                if (selRecs.length === 0) {
+                    recRows = `<p class="text-center opacity-40 font-bold py-5 text-sm">${this.t('no_records')}</p>`;
+                } else {
+                    recRows = selRecs.map(r => {
+                        const pnl = r.pnl || 0;
+                        const col = pnl > 0 ? 'text-emerald-500' : pnl < 0 ? 'text-red-500' : 'opacity-60';
+                        const sign = pnl >= 0 ? '+' : '-';
+                        return `<div class="flex justify-between items-center py-3 border-b border-[var(--border)] last:border-0">
+                            <div class="flex flex-col">
+                                <span class="font-black text-base ${col}">${sign}${cur}${Math.abs(pnl).toLocaleString()}</span>
+                                ${r.note ? `<span class="text-xs opacity-50 mt-0.5">${r.note.replace(/</g, '&lt;')}</span>` : ''}
+                            </div>
+                            <button onclick="app.deleteRecord(${r.id})" class="text-xs opacity-30 active:opacity-80 font-bold px-3 py-2">×</button>
+                        </div>`;
+                    }).join('');
+                }
+                return `
+                    <div class="flex justify-between items-end mb-3 mt-4">
+                        <span class="font-black text-base leading-none">${selDateLabel}</span>
+                        <div class="flex flex-col items-end gap-2">
+                            <span class="font-black text-base leading-none ${selPnlColor}">${selRecs.length > 0 ? (selPnl >= 0 ? '+' : '-') + cur + Math.abs(selPnl).toLocaleString() : cur + '0'}</span>
+                            ${selRecs.length > 0 ? `<button onclick="app.deleteAllRecords(${year},${month},${selDay})" class="text-[10px] font-black tracking-widest text-[#EF4444] border border-[#EF4444]/30 bg-[#EF4444]/10 rounded px-2 py-1 mt-1 active:opacity-60 transition-colors uppercase">${ja ? '全削除' : 'Clear All'}</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="bg-[var(--card-bg)] rounded-2xl px-4 py-1 border border-[var(--border)] shadow-sm">${recRows}</div>
+                `;
+            }
+
+            showAddRecord(year, month, day) {
+                const ja = this.state.lang === 'ja';
+                const cur = ja ? '¥' : '$';
+                const mNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const dateLabel = ja ? `${year}年${month + 1}月${day}日` : `${mNames[month]} ${day}, ${year}`;
+                this._recSign = 1; // default: profit
+                this.showModal(`
+                    <h3 class="text-xl font-black mb-1">${this.t('record_add')}</h3>
+                    <p class="text-xs opacity-50 font-bold mb-4">${dateLabel}</p>
+                    <div class="space-y-3">
+                        <div class="flex rounded-xl overflow-hidden border border-[var(--border)]">
+                            <button id="sign-plus" onclick="app._setSign(1)" class="flex-1 py-3 font-black text-sm bg-emerald-500 text-white transition">${ja ? '利益 (+)' : 'Profit (+)'}</button>
+                            <button id="sign-minus" onclick="app._setSign(-1)" class="flex-1 py-3 font-black text-sm bg-[var(--bg-color)] text-red-400 transition">${ja ? '損失 (−)' : 'Loss (−)'}</button>
+                        </div>
+                        <div>
+                            <label class="text-xs font-black opacity-60 block mb-1">${this.t('record_pnl')} (${cur})</label>
+                            <input id="rec-pnl" type="number" min="0" placeholder="10000" class="w-full p-3 rounded-xl border border-[var(--border)] bg-[var(--bg-color)] font-bold text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                        </div>
+                        <div>
+                            <label class="text-xs font-black opacity-60 block mb-1">${this.t('record_note')}</label>
+                            <input id="rec-note" type="text" placeholder="${ja ? 'メモ（任意）' : 'Note (optional)'}" class="w-full p-3 rounded-xl border border-[var(--border)] bg-[var(--bg-color)] font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="app.closeModal();app.render();" class="flex-1 py-3 font-bold opacity-60 border border-[var(--border)] rounded-xl">${this.t('cancel')}</button>
+                            <button onclick="app.saveRecord(${year},${month},${day})" class="flex-1 py-3 font-bold bg-[var(--primary)] text-white rounded-xl shadow-lg">${this.t('record_save')}</button>
+                        </div>
+                    </div>
+                `);
+            }
+
+            _setSign(s) {
+                this._recSign = s;
+                const plus = document.getElementById('sign-plus');
+                const minus = document.getElementById('sign-minus');
+                const ja = this.state.lang === 'ja';
+                if (!plus || !minus) return;
+                if (s === 1) {
+                    plus.className = 'flex-1 py-3 font-black text-sm bg-emerald-500 text-white transition';
+                    minus.className = 'flex-1 py-3 font-black text-sm bg-[var(--bg-color)] text-red-400 transition';
+                } else {
+                    plus.className = 'flex-1 py-3 font-black text-sm bg-[var(--bg-color)] text-emerald-500 transition';
+                    minus.className = 'flex-1 py-3 font-black text-sm bg-red-500 text-white transition';
+                }
+            }
+
+            _pickResult(r) {
+                this._pickedResult = r;
+                ['win', 'loss', 'be'].forEach(v => {
+                    const btn = document.getElementById('rb-' + v);
+                    if (!btn) return;
+                    if (v === r) btn.classList.add('border-current', 'shadow-md', 'scale-105');
+                    else btn.classList.remove('border-current', 'shadow-md', 'scale-105');
+                });
+            }
+
+            saveRecord(year, month, day) {
+                const pnlEl = document.getElementById('rec-pnl');
+                const noteEl = document.getElementById('rec-note');
+                const rawAmt = Math.abs(parseFloat(pnlEl ? pnlEl.value : '0') || 0);
+                const sign = this._recSign != null ? this._recSign : 1;
+                const pnl = rawAmt * sign;
+                const note = noteEl ? noteEl.value.trim() : '';
+                let records = [];
+                try { records = JSON.parse(localStorage.getItem(CONSTANTS.RECORDS_KEY) || '[]'); } catch (e) { }
+                records.push({ id: Date.now(), year, month, day, pnl, note });
+                localStorage.setItem(CONSTANTS.RECORDS_KEY, JSON.stringify(records));
+                this._recSign = 1;
+                this.closeModal(); this.render();
+            }
+
+            deleteRecord(id) {
+                if (!confirm(this.t('record_confirm_delete'))) return;
+                let records = [];
+                try { records = JSON.parse(localStorage.getItem(CONSTANTS.RECORDS_KEY) || '[]'); } catch (e) { }
+                records = records.filter(r => r.id !== id);
+                localStorage.setItem(CONSTANTS.RECORDS_KEY, JSON.stringify(records));
+                this.render();
+            }
+
+            deleteAllRecords(year, month, day) {
+                const ja = this.state.lang === 'ja';
+                const msg = ja ? `${year}\u5e74${month + 1}\u6708${day}\u65e5\u306e\u8a18\u9332\u3092\u5168\u3066\u524a\u9664\u3057\u307e\u3059\u304b\uff1f` : `Delete all records for ${year}/${month + 1}/${day}?`;
+                if (!confirm(msg)) return;
+                let records = [];
+                try { records = JSON.parse(localStorage.getItem(CONSTANTS.RECORDS_KEY) || '[]'); } catch (e) { }
+                records = records.filter(r => !(r.year === year && r.month === month && r.day === day));
+                localStorage.setItem(CONSTANTS.RECORDS_KEY, JSON.stringify(records));
+                this.render();
+            }
+
+            renderSettings() {
+                const div = document.createElement('div');
+                div.className = "space-y-6 fade-in pt-6 pb-20";
+                const cur = this.state.lang === 'ja' ? '¥' : '$';
+                const themes = ['light', 'dark', 'gold'];
+                const disabled = this.state.isLocked || !this.state.isPremium;
+                div.innerHTML = `
+                    <h2 class="text-3xl font-bold px-2 mb-2">${this.t('settings_title')}</h2>
+                    <div class="card"><p class="text-sm font-bold opacity-60 mb-3 uppercase tracking-wider">${this.state.lang === 'ja' ? '言語 / LANGUAGE' : 'LANGUAGE'}</p>
+                        <select onchange="app.setLang(this.value);" class="w-full bg-[var(--bg-color)] text-[var(--text-color)] font-bold px-4 py-3 rounded-xl border border-[var(--border)] focus:outline-none shadow-sm">
+                            <option value="ja" ${this.state.lang === 'ja' ? 'selected' : ''}>🇯🇵 日本語</option>
+                            <option value="en" ${this.state.lang === 'en' ? 'selected' : ''}>🇺🇸 English</option>
+                            <option value="zh" ${this.state.lang === 'zh' ? 'selected' : ''}>🇨🇳 中文</option>
+                            <option value="ko" ${this.state.lang === 'ko' ? 'selected' : ''}>🇰🇷 한국어</option>
+                            <option value="es" ${this.state.lang === 'es' ? 'selected' : ''}>🇪🇸 Español</option>
+                        </select>
+                    </div>
+                    <div class="card"><p class="text-sm font-bold opacity-60 mb-3 uppercase tracking-wider">${this.t('theme')}</p><div class="flex gap-3">${themes.map(t => `<button onclick="app.toggleTheme('${t}')" class="flex-1 py-4 text-xs font-bold rounded-xl border border-[var(--border)] ${this.state.theme === t ? 'bg-[var(--text-color)] text-[var(--bg-color)]' : 'bg-[var(--card-bg)]'}">${t.toUpperCase()}</button>`).join('')}</div></div>
+                    <div>
+                        <div class="card cursor-pointer" onclick="app.openNativeAppPicker()"><div class="flex justify-between items-center"><div><p class="font-bold text-xl mb-1">${this.t('blocked_apps')}</p><p class="text-sm opacity-60">${this.t('select')}</p></div><span class="text-4xl">📱</span></div></div>
+                        <p class="text-[11px] text-red-500 font-bold px-4 mt-2 leading-tight">${this.state.lang === 'ja' ? '※警告：Trade Blockは選択しないでください。強制解除が不可能になります。' : '⚠️ WARNING: Do NOT select Trade Block itself, or you will be permanently locked out.'}</p>
+                    </div>
+                    <div class="bg-[var(--card-bg)] rounded-xl overflow-hidden border border-[var(--border)] shadow-sm"><button onclick="app.showTutorial()" class="w-full p-4 text-left font-bold flex justify-between items-center border-b border-[var(--border)]"><span>📚 ${this.t('menu_tutorial')}</span><span>›</span></button><button onclick="app.showLegal()" class="w-full p-4 text-left font-bold flex justify-between items-center border-b border-[var(--border)]"><span>⚖️ ${this.t('menu_legal')}</span><span>›</span></button><button onclick="app.showPrivacyPolicy()" class="w-full p-4 text-left font-bold flex justify-between items-center"><span>🔏 ${this.t('menu_privacy')}</span><span>›</span></button></div>
+                    <div class="bg-[var(--card-bg)] rounded-xl overflow-hidden border border-[var(--border)] shadow-sm"><button onclick="app.restorePurchases()" class="w-full p-4 text-left font-bold flex justify-between items-center border-b border-[var(--border)]"><span>🔄 ${this.t('menu_restore')}</span><span>›</span></button><button onclick="app.openSubscriptionManagement()" class="w-full p-4 text-left font-bold flex justify-between items-center"><span>📱 ${this.t('menu_manage_sub')}</span><span>›</span></button></div>
+                    ${!this.state.isPremium ? `<div onclick="app.showPremiumModal()" class="mt-2 bg-gradient-to-br from-[#111] to-[#333] p-8 rounded-2xl shadow-xl text-center border border-gray-700 cursor-pointer"><p class="text-4xl mb-3">💎</p><h3 class="text-[#D4AF37] font-black text-2xl mb-2">${this.t('premium_title')}</h3><p class="text-gray-400 font-bold">${this.t('upgrade_cta')}</p></div>` : ''}
+                `;
+                return div;
+            }
+
+            renderAppsPage() {
+                const div = document.createElement('div');
+                div.className = "flex flex-col h-full fade-in pb-20";
+                div.innerHTML = `
+                    <div class="flex items-center gap-4 mb-8 pt-4 px-2">
+                        <button onclick="app.setPage('main')" class="w-12 h-12 rounded-full bg-[var(--card-bg)] border border-[var(--border)] flex items-center justify-center shadow-sm">
+                            <span class="text-2xl font-bold">←</span>
+                        </button>
+                        <h2 class="text-3xl font-black">${this.t('select_apps_title')}</h2>
+                    </div>
+                    <div class="space-y-4 overflow-y-auto px-1">
+                        ${this.renderAppItem('MetaTrader 4', 'MetaQuotes', 'blue-500', 'MT4')}
+                        ${this.renderAppItem('MetaTrader 5', 'MetaQuotes', 'blue-700', 'MT5')}
+                        ${this.renderAppItem('TradingView', 'TradingView Inc.', 'black', 'TV')}
+                        ${this.renderAppItem('cTrader', 'Spotware', 'emerald-600', 'cT')}
+                        ${this.renderAppItem('Thinkorswim', 'Charles Schwab', 'green-700', 'ToS')}
+                        ${this.renderAppItem('OANDA', 'OANDA Corp.', 'gray-700', 'OA')}
+                        ${this.renderAppItem('IG Trading', 'IG Group', 'red-600', 'IG')}
+                        ${this.renderAppItem('Plus500', 'Plus500 Ltd.', 'cyan-600', 'P5')}
+                        ${this.renderAppItem('eToro', 'eToro Group', 'green-500', 'eT')}
+                        ${this.renderAppItem('Robinhood', 'Robinhood Markets', 'green-400', 'RH')}
+                        ${this.renderAppItem('Webull', 'Webull Corp.', 'orange-500', 'WB')}
+                        ${this.renderAppItem('Interactive Brokers', 'IBKR', 'red-800', 'IB')}
+                        ${this.renderAppItem('Coinbase', 'Coinbase Inc.', 'blue-600', 'CB')}
+                        ${this.renderAppItem('Binance', 'Binance Holdings', 'yellow-500', 'BN')}
+                        ${this.renderAppItem('bybit', 'Bybit', 'orange-400', 'BB')}
+                        ${this.renderAppItem('bitFlyer', 'bitFlyer Inc.', 'blue-400', 'bF')}
+                        ${this.renderAppItem('GMOクリック証券', 'GMO', 'blue-800', 'GMO')}
+                        ${this.renderAppItem('DMM FX', 'DMM.com', 'red-500', 'DM')}
+                        ${this.renderAppItem('SBI証券', 'SBI Group', 'blue-900', 'SBI')}
+                        ${this.renderAppItem('楽天証券', 'Rakuten', 'red-700', '楽天')}
+                        ${this.renderAppItem('X / Twitter', 'Social', 'gray-800', 'X')}
+                        ${this.renderAppItem('Instagram', 'Social', 'pink-500', 'IG')}
+                    </div>
+                `;
+                return div;
+            }
+
+            renderAppItem(name, sub, color, icon) {
+                const isOn = this.state.blockedApps.includes(name);
+                return `
+                <div class="card flex justify-between items-center border-l-4 ${isOn ? 'border-l-[var(--primary)]' : 'border-l-transparent opacity-60'}" onclick="app.toggleApp('${name.replace(/'/g, "\\'")}')"
+                     style="cursor:pointer; transition: all 0.2s">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 rounded-2xl bg-${color} flex items-center justify-center text-white font-bold text-xl shadow-md">
+                            ${icon}
+                        </div>
+                        <div>
+                            <p class="font-bold text-xl text-[var(--text-color)]">${name}</p>
+                            <p class="text-sm opacity-60">${sub}</p>
+                        </div>
+                    </div>
+                    <div class="w-12 h-7 rounded-full relative transition-colors ${isOn ? 'bg-[var(--primary)]' : 'bg-gray-400'}" style="min-width: 48px">
+                        <div class="absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all ${isOn ? 'left-[22px]' : 'left-0.5'}"></div>
+                    </div>
+                </div>`;
+            }
+
+            toggleApp(name) {
+                const idx = this.state.blockedApps.indexOf(name);
+                if (idx >= 0) this.state.blockedApps.splice(idx, 1);
+                else this.state.blockedApps.push(name);
+                this.save(); this.render();
+            }
+
+            showModal(html) {
+                const con = document.getElementById('modal-container');
+                con.innerHTML = `<div class="bg-[var(--card-bg)] w-full max-w-sm rounded-[32px] p-8 shadow-2xl border border-[var(--border)] relative overflow-hidden">${html}</div>`;
+                con.classList.remove('hidden');
+            }
+            closeModal() { document.getElementById('modal-container').classList.add('hidden'); }
+            completeTutorial() {
+                this.state.hasSeenTutorial = true;
+                this.save();
+                this.closeModal();
+                this.requestScreenTimeAuth();
+            }
+            showTutorial(page = 1) {
+                let contentHTML = '';
+                const isJa = this.state.lang === 'ja';
+
+                if (page === 1) {
+                    contentHTML = `
+                        <div class="text-center mb-6">
+                            <p class="text-4xl mb-2">🛡️</p>
+                            <h4 class="font-bold text-xl text-[var(--primary)] mb-2">${this.t('tutorial_step1_title')}</h4>
+                            <p class="text-xs opacity-80">${this.t('tutorial_step1_desc')}</p>
+                        </div>
+                        <div class="text-center mb-6">
+                            <p class="text-4xl mb-2">🏆</p>
+                            <h4 class="font-bold text-xl text-[var(--primary)] mb-2">${this.t('tutorial_step2_title')}</h4>
+                            <p class="text-xs opacity-80">${this.t('tutorial_step2_desc')}</p>
+                        </div>
+                        <div class="text-center mb-6">
+                            <p class="text-4xl mb-2">⚠️</p>
+                            <h4 class="font-bold text-xl text-[var(--danger)] mb-2">${this.t('tutorial_step3_title')}</h4>
+                            <p class="text-xs opacity-80">${this.t('tutorial_step3_desc')}</p>
+                        </div>
+                        <button onclick="app.showTutorial(2)" class="btn btn-primary w-full py-4 shadow-xl text-lg mt-2">${isJa ? '次へ' : 'Next'}</button>
+                    `;
+                } else if (page === 2) {
+                    contentHTML = `
+                        <div class="text-center mb-6 mt-4">
+                            <p class="text-5xl mb-4">📱</p>
+                            <h4 class="font-bold text-2xl text-[var(--primary)] mb-4">${this.t('tutorial_step5_title')}</h4>
+                            <p class="text-sm opacity-90 leading-relaxed text-left bg-[var(--bg-color)] p-5 rounded-xl border border-[var(--border)] shadow-inner">${this.t('tutorial_step5_desc')}</p>
+                        </div>
+                        <div class="flex gap-3 mt-8">
+                            <button onclick="app.showTutorial(1)" class="btn flex-1 py-4 opacity-70 bg-[var(--bg-color)] border border-[var(--border)] rounded-xl shadow">${this.t('back')}</button>
+                            <button onclick="app.showTutorial(3)" class="btn btn-primary flex-[2] py-4 shadow-xl text-lg">${isJa ? '次へ' : 'Next'}</button>
+                        </div>
+                    `;
+                } else {
+                    contentHTML = `
+                        <div class="text-center mb-6 mt-4">
+                            <p class="text-5xl mb-4">🔐</p>
+                            <h4 class="font-bold text-2xl text-blue-500 mb-4">${this.t('tutorial_step4_title')}</h4>
+                            <p class="text-sm opacity-90 leading-relaxed text-left bg-[var(--bg-color)] p-5 rounded-xl border border-[var(--border)] shadow-inner">${this.t('tutorial_step4_desc')}</p>
+                            <p class="text-xs text-[var(--accent-gold)] mt-6 font-bold bg-[var(--accent-gold)]/10 p-3 rounded-lg border border-[var(--accent-gold)]/30">${isJa ? '※この画面を閉じると設定のポップアップが表示されます' : '*A system popup will appear after closing this screen.'}</p>
+                        </div>
+                        <div class="flex gap-3 mt-8">
+                            <button onclick="app.showTutorial(2)" class="btn flex-1 py-4 opacity-70 bg-[var(--bg-color)] border border-[var(--border)] rounded-xl shadow">${this.t('back')}</button>
+                            <button onclick="app.completeTutorial()" class="btn btn-primary flex-[2] py-4 shadow-xl text-lg animate-pulse">${isJa ? '閉じて進む' : 'Close & Continue'}</button>
+                        </div>
+                    `;
+                }
+
+                this.showModal(`
+                    <div class="space-y-4 pb-2">
+                        <h3 class="text-2xl font-black text-center mb-4">${this.t('tutorial_title')}</h3>
+                        <div class="flex justify-center gap-2 mb-6 px-4">
+                            <div class="h-1.5 flex-1 rounded-full ${page >= 1 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'} transition-colors"></div>
+                            <div class="h-1.5 flex-1 rounded-full ${page >= 2 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'} transition-colors"></div>
+                            <div class="h-1.5 flex-1 rounded-full ${page >= 3 ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'} transition-colors"></div>
+                        </div>
+                        ${contentHTML}
+                    </div>
+                `);
+            }
+            showLegal() { this.showModal(`<div class="text-left"><h3 class="text-2xl font-black mb-4 text-center">${this.t('legal_title')}</h3><div class="h-64 overflow-y-auto bg-white/5 p-4 rounded-xl border border-white/10 mb-4 prose prose-invert prose-sm">${this.t('legal_text')}</div><button onclick="app.closeModal()" class="btn w-full py-3 opacity-80 bg-[var(--card-bg)] border border-[var(--border)]">${this.t('back')}</button></div>`); }
+            showPrivacyPolicy() { this.showModal(`<div class="text-left"><h3 class="text-2xl font-black mb-4 text-center">${this.t('privacy_title')}</h3><div class="h-64 overflow-y-auto bg-white/5 p-4 rounded-xl border border-white/10 mb-4 prose prose-invert prose-sm">${this.t('privacy_text')}</div><button onclick="app.closeModal()" class="btn w-full py-3 opacity-80 bg-[var(--card-bg)] border border-[var(--border)]">${this.t('back')}</button></div>`); }
+            async restorePurchases() {
+                try {
+                    if (window.Capacitor && Capacitor.Plugins.StoreKit) {
+                        const result = await Capacitor.Plugins.StoreKit.restorePurchases();
+                        if (result.restored) {
+                            this.state.isPremium = true;
+                            this.state.page = 'main'; // Dismiss paywall on restore
+                            document.getElementById('paywall-container')?.remove();
+                            if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
+                            this.save(); this.render(); alert(this.t('restore_success'));
+                        }
+                        else { alert(this.t('restore_none')); }
+                    } else if (!IS_PRODUCTION) {
+                        // Dev fallback
+                        this.state.isPremium = true; this.state.page = 'main';
+                        document.getElementById('paywall-container')?.remove();
+                        if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
+                        this.save(); this.render(); alert('[DEV] Premium Restored.');
+                    } else { alert(this.t('restore_none')); }
+                } catch (e) { alert(this.t('restore_none')); }
+            }
+            openSubscriptionManagement() {
+                if (window.Capacitor && Capacitor.Plugins.StoreKit) {
+                    Capacitor.Plugins.StoreKit.openSubscriptionManagement();
+                } else {
+                    window.open('https://apps.apple.com/account/subscriptions', '_blank');
+                }
+            }
+            formatDuration(min) {
+                if (this.state.lang === 'en') {
+                    if (min < 60) return min + "m";
+                    const h = Math.floor(min / 60);
+                    const m = min % 60;
+                    return `${h}h ${m}m`;
+                } else {
+                    if (min < 60) return min + "分";
+                    const h = Math.floor(min / 60);
+                    const m = min % 60;
+                    return `${h}時間${m}分`;
+                }
+            }
+            setDuration(val) {
+                this.state.duration = parseInt(val);
+                this.save();
+                const el = document.getElementById('timer-text');
+                if (el) el.innerText = this.formatDuration(this.state.duration);
+            }
+            updateTimerUI(ms) {
+                const totalSec = Math.floor(ms / 1000);
+                const h = Math.floor(totalSec / 3600);
+                const m = Math.floor((totalSec % 3600) / 60);
+                const s = totalSec % 60;
+                const el = document.getElementById('timer-text');
+                if (el) {
+                    if (h > 0) el.innerText = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    else el.innerText = `${m}:${s.toString().padStart(2, '0')}`;
+                }
+            }
+            showPaymentModal() {
+                // Pick a random question set
+                const sets = QUESTION_SETS[this.state.lang];
+                this._currentQSet = sets[Math.floor(Math.random() * sets.length)];
+                this.showUnlockQuestion(0);
+            }
+            showUnlockQuestion(step) {
+                const qs = this._currentQSet;
+                const total = qs.length;
+                const isLast = step === total - 1;
+                const ja = this.state.lang === 'ja';
+                const waitSec = 5;
+                const emojis = ['🤔', '😰', '📊', '💰', '🧠'];
+
+                let html = `<div class="text-center mb-2 text-xs font-bold opacity-50 tracking-widest uppercase">${ja ? '冷却期間チェック' : 'Discipline Check'} ${step + 1} / ${total}</div>`;
+                html += `<div class="w-full bg-black/10 rounded-full h-1 mb-5"><div class="bg-[var(--danger)] h-1 rounded-full transition-all duration-500" style="width:${((step + 1) / total) * 100}%"></div></div>`;
+
+                // 5th question: if memo exists, skip question — show memo + quote only
+                const skipQuestion = isLast && !!this.state.memo;
+                if (!skipQuestion) {
+                    html += `<div class="text-center py-4 mb-3"><p class="text-4xl mb-3">${emojis[step]}</p><p class="font-black text-base leading-relaxed">${qs[step]}</p></div>`;
+                }
+
+                if (isLast) {
+                    // Show user memo if set
+                    if (this.state.memo) {
+                        html += `<div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl mb-3 text-left"><p class="text-xs font-black opacity-60 mb-1">📝 ${this.t('memo_in_unlock')}</p><p class="text-sm font-bold leading-relaxed">${this.state.memo.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p></div>`;
+                    }
+                    // Always show a random investor quote on last step
+                    const qPool = QUOTES[this.state.lang];
+                    const quote = qPool[Math.floor(Math.random() * qPool.length)];
+                    html += `<div class="p-3 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl mb-3 text-center"><p class="text-sm italic opacity-80 mb-1">“${quote.text}”</p><p class="text-xs font-black opacity-50">— ${quote.author}</p></div>`;
+                }
+
+                const noLabel = ja ? 'いいえ（中止）' : 'No (Cancel)';
+                const yesBase = isLast ? (ja ? 'はい — 解除する' : 'Yes — Unlock') : (ja ? 'はい — 次へ' : 'Yes — Next');
+                html += `<div class="flex gap-3 mt-2">`;
+                html += `<button onclick="app.closeModal()" class="flex-1 py-4 font-bold opacity-70 border border-[var(--border)] rounded-xl">${noLabel}</button>`;
+                html += `<button id="q-yes-btn" disabled onclick="${isLast ? 'app.processQuestionUnlock()' : `app.showUnlockQuestion(${step + 1})`}" class="flex-1 py-4 font-bold bg-[var(--danger)] text-white rounded-xl opacity-40 cursor-not-allowed transition-all"><span id="q-yes-label">${ja ? `確認中... (${waitSec})` : `Reading... (${waitSec})`}</span></button>`;
+                html += `</div>`;
+
+                this.showModal(html);
+
+                let remaining = waitSec;
+                const tick = setInterval(() => {
+                    remaining--;
+                    const lbl = document.getElementById('q-yes-label');
+                    const btn = document.getElementById('q-yes-btn');
+                    if (!lbl || !btn) { clearInterval(tick); return; }
+                    if (remaining > 0) {
+                        lbl.textContent = ja ? `確認中... (${remaining})` : `Reading... (${remaining})`;
+                    } else {
+                        clearInterval(tick);
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-40', 'cursor-not-allowed');
+                        btn.classList.add('shadow-lg');
+                        lbl.textContent = yesBase;
+                    }
+                }, 1000);
+            }
+            async processQuestionUnlock() {
+                const date = new Date().toLocaleString();
+                this.state.history.unshift({ date, type: 'force_unlock' });
+                this.state.memo = ''; // clear memo after unlock
+                this.save();
+                this._forceUnlocked = true;
+                this.unlock(); this.closeModal();
+                this._forceUnlocked = false;
+            }
+            editMemo() {
+                const ja = this.state.lang === 'ja';
+                const cur = this.state.memo || '';
+                this.showModal(`
+                    <h3 class="text-xl font-black mb-4">📝 ${this.t('memo_label')}</h3>
+                    <textarea id="memo-input" rows="4" placeholder="${this.t('memo_placeholder')}" class="w-full p-3 rounded-xl border border-[var(--border)] bg-[var(--bg-color)] text-[var(--text-color)] font-bold text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">${cur.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                    <div class="flex gap-3 mt-4">
+                        <button onclick="app.closeModal()" class="flex-1 py-4 font-bold opacity-70 border border-[var(--border)] rounded-xl">${this.t('cancel')}</button>
+                        <button onclick="app.saveMemo()" class="flex-1 py-4 font-bold bg-[var(--primary)] text-white rounded-xl shadow-lg">${ja ? '保存' : 'Save'}</button>
+                    </div>
+                `);
+            }
+            saveMemo() {
+                const el = document.getElementById('memo-input');
+                if (el) { this.state.memo = el.value.trim(); this.save(); }
+                this.closeModal(); this.render();
+            }
+            renderPaywall() {
+                const div = document.createElement('div');
+                div.className = "fixed inset-0 z-50 flex flex-col h-full bg-gradient-to-br from-[#000] to-[#1a1a1a] text-white p-4 justify-center fade-in bg-black overflow-y-auto no-scrollbar";
+                div.style.paddingTop = "calc(env(safe-area-inset-top) + 0.5rem)";
+                div.style.paddingBottom = "calc(env(safe-area-inset-bottom) + 1rem)";
+
+                const ja = this.state.lang === 'ja';
+                const sub_notice = ja
+                    ? `※サブスクリプションは自動更新されます。解約はアップル設定画面からいつでも可能`
+                    : `*Subscriptions auto-renew. Cancel anytime in Apple ID settings.`;
+                div.innerHTML = `
+                    <div class="flex-1 flex flex-col justify-start items-center text-center max-w-md mx-auto w-full pt-4">
+                        <div class="w-full flex justify-end pb-4">
+                            <select onchange="app.setLang(this.value); app.renderPaywallAndMount()" class="bg-black/50 text-white text-xs px-3 py-1.5 rounded-full border border-white/20 focus:outline-none shadow-sm">
+                                <option value="ja" ${ja ? 'selected' : ''}>🇯🇵 日本語</option>
+                                <option value="en" ${!ja && this.state.lang !== 'zh' && this.state.lang !== 'es' && this.state.lang !== 'ko' ? 'selected' : ''}>🇺🇸 English</option>
+                                <option value="zh" ${this.state.lang === 'zh' ? 'selected' : ''}>🇨🇳 中文</option>
+                                <option value="ko" ${this.state.lang === 'ko' ? 'selected' : ''}>🇰🇷 한국어</option>
+                                <option value="es" ${this.state.lang === 'es' ? 'selected' : ''}>🇪🇸 Español</option>
+                            </select>
+                        </div>
+                        <p class="text-6xl mt-0 mb-3 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]">&#x1F3C6;</p>
+                        <h3 class="text-3xl font-black mb-2 text-[#D4AF37] tracking-tight drop-shadow-md">${this.t('premium_headline')}</h3>
+                        <p class="text-sm font-bold opacity-90 mb-6">${this.t('premium_subhead')}</p>
+                        
+                        <div class="text-left bg-gradient-to-br from-[#111] to-[#222] p-5 rounded-xl border border-[#D4AF37]/50 mb-8 shadow-[0_0_20px_rgba(212,175,55,0.15)] w-full relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37] opacity-5 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
+                            <ul class="text-xs text-gray-200 space-y-4 font-bold relative z-10">
+                                <li class="flex items-start gap-3"><span class="text-[#D4AF37] text-base drop-shadow-[0_0_5px_rgba(212,175,55,0.8)]">✓</span> <span class="leading-snug">${this.t('premium_feature1')}</span></li>
+                                <li class="flex items-start gap-3"><span class="text-[#D4AF37] text-base drop-shadow-[0_0_5px_rgba(212,175,55,0.8)]">✓</span> <span class="leading-snug">${this.t('premium_feature2')}</span></li>
+                                <li class="flex items-start gap-3"><span class="text-[#D4AF37] text-base drop-shadow-[0_0_5px_rgba(212,175,55,0.8)]">✓</span> <span class="leading-snug">${this.t('premium_feature3')}</span></li>
+                            </ul>
+                        </div>
+
+                        <div class="space-y-4 w-full mb-8 relative">
+                            <button id="plan-monthly" onclick="app.selectPremiumPlan('com.shota.tradeblock.premium.monthly')" class="w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left ${this._selPlan === 'com.shota.tradeblock.premium.monthly' ? 'border-2 border-[#D4AF37] scale-[1.02] shadow-[0_0_15px_rgba(212,175,55,0.3)] bg-[#222]' : 'border border-gray-700 hover:border-gray-500 bg-[#1f1f1f] scale-100 opacity-80'}">
+                                <span class="absolute top-0 right-0 bg-blue-600 shadow-sm text-[10px] text-white font-black py-1 px-3 rounded-bl-xl tracking-wider z-10">${ja ? '7日間無料' : '7-DAY FREE TRIAL'}</span>
+                                <span class="font-bold text-sm text-white flex-1">${this.t('sub_monthly')}</span>
+                                <span class="font-black text-xl text-[#D4AF37] drop-shadow-sm">${this.t('sub_monthly_price')}</span>
+                            </button>
+                            <button id="plan-annual" onclick="app.selectPremiumPlan('com.shota.tradeblock.premium.annual')" class="w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left ${this._selPlan === 'com.shota.tradeblock.premium.annual' ? 'border-2 border-[#D4AF37] scale-[1.02] shadow-[0_0_20px_rgba(212,175,55,0.4)] bg-gradient-to-br from-[#332a15] to-[#111]' : 'border border-gray-700 hover:border-gray-500 bg-gradient-to-br from-[#2a2211] to-[#111] scale-100 opacity-80'}">
+                                <div class="absolute top-0 right-0 bg-red-600 shadow-sm text-[10px] font-black py-1 px-3 rounded-bl-xl tracking-wider z-10 animate-pulse">BEST VALUE</div>
+                                <span class="font-bold text-sm text-white flex-1">${this.t('sub_annual')}</span>
+                                <span class="font-black text-xl text-[#D4AF37] drop-shadow-md">${this.t('sub_annual_price')}</span>
+                            </button>
+                            <button id="plan-lifetime" onclick="app.selectPremiumPlan('com.shota.tradeblock.premium.lifetime')" class="w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left ${this._selPlan === 'com.shota.tradeblock.premium.lifetime' ? 'border-2 border-[#D4AF37] scale-[1.02] shadow-[0_0_15px_rgba(212,175,55,0.3)] bg-[#1a1a1a]' : 'border border-gray-700 hover:border-gray-500 bg-[#1a1a1a] scale-100 opacity-80'}">
+                                <span class="font-bold text-sm text-white flex-1">${this.t('sub_lifetime')}</span>
+                                <span class="font-black text-xl text-[#D4AF37] drop-shadow-sm">${this.t('sub_lifetime_price')}</span>
+                            </button>
+                            
+                            <button onclick="app.activatePremium(app._selPlan)" class="w-full mt-8 py-5 rounded-2xl font-black text-2xl tracking-wide text-[#000] bg-gradient-to-r from-[#FFE082] via-[#E2B743] to-[#B7892B] shadow-[0_0_25px_rgba(212,175,55,0.6)] active:scale-95 transition-transform animate-[pulse_2s_ease-in-out_infinite] border border-white/40">${ja ? '選択したプランで始める' : 'Subscribe Now'}</button>
+                        </div>
+
+                        <div class="text-[9px] opacity-40 mb-4 leading-relaxed px-4 w-full">${sub_notice}</div>
+                        
+                        <div class="flex flex-col gap-3 w-full px-8 mt-auto">
+                            <button onclick="app.restorePurchases()" class="btn w-full py-1.5 font-bold opacity-60 text-[10px] bg-transparent border border-white/20">${this.t('menu_restore')}</button>
+                            <div class="flex justify-center gap-4 text-[10px] font-bold opacity-40">
+                                <span onclick="app.showPrivacyPolicy()" class="cursor-pointer underline leading-none py-1">${this.t('menu_privacy')}</span>
+                                <span onclick="app.showLegal()" class="cursor-pointer underline leading-none py-1">Terms</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return div;
+            }
+            selectPremiumPlan(planId) {
+                this._selPlan = planId;
+                const plans = ['monthly', 'annual', 'lifetime'];
+                plans.forEach(p => {
+                    const el = document.getElementById('plan-' + p);
+                    if (!el) return;
+                    if ('com.shota.tradeblock.premium.' + p === planId) {
+                        el.className = `w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left border-2 border-[#D4AF37] scale-[1.02] shadow-[0_0_20px_rgba(212,175,55,0.4)] ${p === 'annual' ? 'bg-gradient-to-br from-[#332a15] to-[#111]' : 'bg-[#222]'}`;
+                    } else {
+                        el.className = `w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left border border-gray-700 hover:border-gray-500 scale-100 opacity-80 ${p === 'annual' ? 'bg-gradient-to-br from-[#2a2211] to-[#111]' : 'bg-[#1f1f1f]'}`;
+                    }
+                });
+            }
+            renderPaywallAndMount() {
+                if (!this._selPlan) this._selPlan = 'com.shota.tradeblock.premium.annual';
+                const modalWrapper = document.getElementById('paywall-container') || (() => {
+                    const el = document.createElement('div');
+                    el.id = 'paywall-container';
+                    document.body.appendChild(el);
+                    return el;
+                })();
+                modalWrapper.innerHTML = '';
+                modalWrapper.appendChild(this.renderPaywall());
+            }
+            showPremiumModal() {
+                this.render(); // If called from within the app, just reload state which triggers paywall if not premium
+            }
+            async activatePremium(productId) {
+                try {
+                    if (window.Capacitor && Capacitor.Plugins.StoreKit) {
+                        const result = await Capacitor.Plugins.StoreKit.purchase({ productId: productId });
+                        if (result.success) {
+                            this.state.isPremium = true; this.state.page = 'main'; this.save(); this.render(); this.closeModal();
+                            document.getElementById('paywall-container')?.remove();
+                            setTimeout(() => {
+                                if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
+                                else { alert(this.state.lang === 'ja' ? 'PREMIUMへようこそ！' : 'WELCOME TO PREMIUM!'); }
+                            }, 500);
+                        } else {
+                            if (!IS_PRODUCTION) {
+                                this.state.isPremium = true; this.state.page = 'main'; this.save(); this.render(); this.closeModal();
+                                document.getElementById('paywall-container')?.remove();
+                                if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
+                                alert('[DEV BYPASS] Request failed but IS_PRODUCTION is false. Unlocking.');
+                            }
+                        }
+                    } else if (!IS_PRODUCTION) {
+                        this.state.isPremium = true; this.state.page = 'main'; this.save(); this.render(); this.closeModal();
+                        document.getElementById('paywall-container')?.remove();
+                        if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
+                        alert('[DEV] Premium activated without Store.');
+                    }
+                } catch (e) {
+                    if (!IS_PRODUCTION) {
+                        this.state.isPremium = true; this.state.page = 'main'; this.save(); this.render(); this.closeModal();
+                        document.getElementById('paywall-container')?.remove();
+                        if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
+                        alert('[DEV BYPASS CAUGHT ERR] Unlocking. Error: ' + e.message);
+                    } else {
+                        alert('Purchase error: ' + e.message);
+                    }
+                }
+            }
+            showLockConfirm() {
+                if (!this.state.isPremium) { this.showPremiumModal(); return; }
+                const ja = this.state.lang === 'ja';
+                this.showModal(`
+                    <h3 class="text-2xl font-black mb-4">${this.t('confirm_title')}</h3>
+                    <p class="opacity-70 mb-4 font-bold leading-relaxed text-sm">${this.t('confirm_desc')}</p>
+                    <div class="space-y-3 bg-[var(--bg-color)] p-4 rounded-xl mb-4">
+                        <div class="flex items-center gap-3"><span class="text-2xl">🚫</span><span class="font-bold text-sm">${this.t('risk_1')}</span></div>
+                        <div class="flex items-center gap-3"><span class="text-2xl">⚠️</span><span class="font-bold text-sm">${this.t('risk_2')}</span></div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="text-xs font-black opacity-60 block mb-2">📝 ${this.t('memo_label')} (${ja ? '任意' : 'Optional'})</label>
+                        <textarea id="lock-memo-input" rows="3" placeholder="${this.t('memo_placeholder')}" class="w-full p-3 rounded-xl border border-[var(--border)] bg-[var(--bg-color)] text-[var(--text-color)] font-bold text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">${(this.state.memo || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="app.closeModal()" class="flex-1 py-4 font-bold opacity-60">${this.t('cancel')}</button>
+                        <button onclick="app.confirmLock()" class="flex-1 py-4 bg-[var(--danger)] text-white font-bold rounded-xl shadow-lg">${this.t('confirm')}</button>
+                    </div>
+                `);
+            }
+            async confirmLock() {
+                // Save memo from lock-confirm textarea if present
+                const memoEl = document.getElementById('lock-memo-input');
+                if (memoEl) this.state.memo = memoEl.value.trim();
+                this.state.lockEndTime = Date.now() + (this.state.duration * 60 * 1000);
+                this.state.isLocked = true; this.save(); this.closeModal();
+                if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
+                    try { await Capacitor.Plugins.ScreenTime.blockApps(); } catch (e) { console.error(e); }
+                }
+                this.render();
+            }
+            async triggerSecureProfit() {
+                if (!this.state.isPremium) { this.showPremiumModal(); return; }
+                if (confirm(this.t('secure_confirm'))) {
+                    const now = new Date(); let target = new Date();
+                    target.setHours(CONSTANTS.SECURE_PROFIT_HOUR, 0, 0, 0);
+                    if (now >= target) target.setDate(target.getDate() + 1);
+                    this.state.lockEndTime = target.getTime();
+                    this.state.isLocked = true; this.save();
+                    // Block apps via Screen Time
+                    if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
+                        try { await Capacitor.Plugins.ScreenTime.blockApps(); } catch (e) { console.error(e); }
+                    }
+                    this.render();
+                }
+            }
+        }
+
+        const app = new TradeGuardApp();
+    </script>
+</body>
+
+</html>
