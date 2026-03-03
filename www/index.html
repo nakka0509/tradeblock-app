@@ -262,7 +262,7 @@
 
         // --- FEATURE FLAGS ---
         // Set this to true before App Store upload to disable cheap dev unblocks and free premium
-        const IS_PRODUCTION = false; // Temporarily false so you can test without App Store Connect setup!
+        const IS_PRODUCTION = true; // Set to true for App Store submission
         // ---------------------
         const CONSTANTS = {
             DEFAULT_FEE: 500,
@@ -806,6 +806,27 @@
                     this.showTutorial();
                 }
                 this.render();
+
+                // Check actual StoreKit subscription status on startup
+                // This fixes the bug where isPremium resets and Apple shows "already subscribed" dialog
+                this.checkAndSyncSubscriptionStatus();
+            }
+
+            async checkAndSyncSubscriptionStatus() {
+                if (window.Capacitor && Capacitor.Plugins.StoreKit) {
+                    try {
+                        const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
+                        if (result.isPremium && !this.state.isPremium) {
+                            this.state.isPremium = true;
+                            this.state.page = 'main';
+                            this.save();
+                            this.render();
+                            document.getElementById('paywall-container')?.remove();
+                        }
+                    } catch (e) {
+                        console.error('Subscription status check failed:', e);
+                    }
+                }
             }
 
             save() { localStorage.setItem('tradeblock_v5', JSON.stringify(this.state)); }
