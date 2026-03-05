@@ -1783,17 +1783,24 @@
                 this._selPlan = planId;
                 const plans = ['monthly', 'annual'];
                 plans.forEach(p => {
-                    const el = document.getElementById('plan-' + p);
-                    if (!el) return;
-                    if ('com.shota.tradeblock.premium.' + p === planId) {
-                        el.className = `w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left border-2 border-[#D4AF37] scale-[1.02] shadow-[0_0_20px_rgba(212,175,55,0.4)] ${p === 'annual' ? 'bg-gradient-to-br from-[#332a15] to-[#111]' : 'bg-[#222]'}`;
-                    } else {
-                        el.className = `w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left border border-gray-700 hover:border-gray-500 scale-100 opacity-80 ${p === 'annual' ? 'bg-gradient-to-br from-[#2a2211] to-[#111]' : 'bg-[#1f1f1f]'}`;
-                    }
+                    const els = document.querySelectorAll('#plan-' + p);
+                    els.forEach(el => {
+                        if ('com.shota.tradeblock.premium.' + p === planId) {
+                            el.className = `w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left border-2 border-[#D4AF37] scale-[1.02] shadow-[0_0_20px_rgba(212,175,55,0.4)] ${p === 'annual' ? 'bg-gradient-to-br from-[#332a15] to-[#111]' : 'bg-[#222]'}`;
+                        } else {
+                            el.className = `w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left border border-gray-700 hover:border-gray-500 scale-100 opacity-80 ${p === 'annual' ? 'bg-gradient-to-br from-[#2a2211] to-[#111]' : 'bg-[#1f1f1f]'}`;
+                        }
+                    });
                 });
             }
             renderPaywallAndMount() {
                 if (!this._selPlan) this._selPlan = 'com.shota.tradeblock.premium.monthly';
+                if (this.state.page === 'paywall') {
+                    this.render();
+                    const existing = document.getElementById('paywall-container');
+                    if (existing) existing.remove();
+                    return;
+                }
                 const modalWrapper = document.getElementById('paywall-container') || (() => {
                     const el = document.createElement('div');
                     el.id = 'paywall-container';
