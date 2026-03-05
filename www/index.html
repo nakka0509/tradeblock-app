@@ -1719,6 +1719,7 @@
                 this.closeModal(); this.render();
             }
             renderPaywall() {
+                if (!this._selPlan) { this._selPlan = 'com.shota.tradeblock.premium.monthly'; }
                 const div = document.createElement('div');
                 div.className = "fixed inset-0 z-50 flex flex-col h-full bg-gradient-to-br from-[#000] to-[#1a1a1a] text-white p-4 justify-center fade-in bg-black overflow-y-auto no-scrollbar";
                 div.style.paddingTop = "calc(env(safe-area-inset-top) + 0.5rem)";
@@ -1730,7 +1731,8 @@
                     : `*Subscriptions auto-renew. Cancel anytime in Apple ID settings.`;
                 div.innerHTML = `
                     <div class="flex-1 flex flex-col justify-start items-center text-center max-w-md mx-auto w-full pt-4">
-                        <div class="w-full flex justify-end pb-4">
+                        <div class="w-full flex justify-between pb-4 items-center">
+                            ${this.state.page === 'main' ? '<button onclick="document.getElementById(\'paywall-container\')?.remove()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 active:scale-90"><span class="text-white opacity-80 font-bold text-lg">✕</span></button>' : '<div></div>'}
                             <select onchange="app.setLang(this.value); app.renderPaywallAndMount()" class="bg-black/50 text-white text-xs px-3 py-1.5 rounded-full border border-white/20 focus:outline-none shadow-sm">
                                 <option value="ja" ${ja ? 'selected' : ''}>🇯🇵 日本語</option>
                                 <option value="en" ${!ja && this.state.lang !== 'zh' && this.state.lang !== 'es' && this.state.lang !== 'ko' ? 'selected' : ''}>🇺🇸 English</option>
@@ -1764,7 +1766,7 @@
                                 <span class="font-black text-xl text-[#D4AF37] drop-shadow-md">${this.t('sub_annual_price')}</span>
                             </button>
                             
-                            <button onclick="app.activatePremium(app._selPlan)" class="w-full mt-8 py-5 rounded-2xl font-black text-2xl tracking-wide text-[#000] bg-gradient-to-r from-[#FFE082] via-[#E2B743] to-[#B7892B] shadow-[0_0_25px_rgba(212,175,55,0.6)] active:scale-95 transition-transform animate-[pulse_2s_ease-in-out_infinite] border border-white/40">${ja ? '選択したプランで始める' : 'Subscribe Now'}</button>
+                            <button id="subscribe-btn" onclick="app.activatePremium(app._selPlan)" class="w-full mt-8 py-5 rounded-2xl font-black text-2xl tracking-wide text-[#000] bg-gradient-to-r from-[#FFE082] via-[#E2B743] to-[#B7892B] shadow-[0_0_25px_rgba(212,175,55,0.6)] active:scale-95 transition-transform animate-[pulse_2s_ease-in-out_infinite] border border-white/40">${ja ? '選択したプランで始める' : 'Subscribe Now'}</button>
                         </div>
 
                         <div class="text-[9px] opacity-40 mb-4 leading-relaxed px-4 w-full">${sub_notice}</div>
@@ -1805,9 +1807,16 @@
                 modalWrapper.appendChild(this.renderPaywall());
             }
             showPremiumModal() {
-                this.render(); // If called from within the app, just reload state which triggers paywall if not premium
+                this.renderPaywallAndMount();
             }
             async activatePremium(productId) {
+                const btn = document.getElementById('subscribe-btn');
+                const origText = btn ? btn.innerHTML : '';
+                if (btn) {
+                    btn.innerHTML = '<span class="animate-pulse">⏳ Loading...</span>';
+                    btn.style.opacity = '0.7';
+                    btn.style.pointerEvents = 'none';
+                }
                 try {
                     if (window.Capacitor && Capacitor.Plugins.StoreKit) {
                         const result = await Capacitor.Plugins.StoreKit.purchase({ productId: productId });
@@ -1840,6 +1849,12 @@
                         alert('[DEV BYPASS CAUGHT ERR] Unlocking. Error: ' + e.message);
                     } else {
                         alert('Purchase error: ' + e.message);
+                    }
+                } finally {
+                    if (btn) {
+                        btn.innerHTML = origText;
+                        btn.style.opacity = '1';
+                        btn.style.pointerEvents = 'auto';
                     }
                 }
             }
