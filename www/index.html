@@ -791,8 +791,13 @@
 
                 // --- HARD PAYWALL ENFORCEMENT ---
                 if (!this.state.isPremium) {
-                    this.state.page = 'paywall';
-                    this.state.tab = 'home'; // hide other content just in case
+                    if (this.state.isLocked) {
+                        this.state.page = 'main';
+                        this.state.tab = 'home';
+                    } else {
+                        this.state.page = 'paywall';
+                        this.state.tab = 'home'; // hide other content just in case
+                    }
                 }
 
                 this.startTimer();
@@ -818,6 +823,14 @@
                             this.save();
                             this.render();
                             document.getElementById('paywall-container')?.remove();
+                        } else if (!result.isPremium && this.state.isPremium) {
+                            this.state.isPremium = false;
+                            if (!this.state.isLocked) {
+                                this.state.page = 'paywall';
+                                this.state.tab = 'home';
+                            }
+                            this.save();
+                            this.render();
                         }
                     } catch (e) {
                         console.error('Subscription status check failed:', e);
@@ -876,6 +889,10 @@
             unlock(silent = false) {
                 this.state.isLocked = false;
                 this.state.lockEndTime = null;
+                if (!this.state.isPremium) {
+                    this.state.page = 'paywall';
+                    this.state.tab = 'home';
+                }
                 this.save();
                 // Unblock apps via Screen Time
                 if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
