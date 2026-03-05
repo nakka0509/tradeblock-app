@@ -403,10 +403,8 @@
                 premium_feature3: "収支記録ノートで分析可能<br>シンプルで直感的に使えるデザイン",
                 sub_monthly: "月額サブスクリプション",
                 sub_annual: "年額サブスクリプション",
-                sub_lifetime: "永久ライセンス（買い切り）",
-                sub_monthly_price: "$9.99 / 月",
-                sub_annual_price: "$90.00 / 年",
-                sub_lifetime_price: "$180.00 / 一括",
+                sub_monthly_price: "¥900 / 月",
+                sub_annual_price: "¥5,000 / 年",
                 feat_secure: "感情を排除する「翌朝までの鉄壁ロック」",
                 feat_gold: "成功者だけが知る「黒と金の支配者テーマ」",
                 feat_custom: "トレードブロックの全機能を使用可能",
@@ -498,12 +496,10 @@
                 premium_feature1: "Restrict trading and physically prevent profit loss",
                 premium_feature2: "Psychological check stops revenge trading impulses",
                 premium_feature3: "Income and expense recording feature included. Simple, intuitive design",
-                sub_monthly: "Monthly Subscription (7-Day Trial)",
+                sub_monthly: "Monthly Subscription",
                 sub_annual: "Annual Subscription",
-                sub_lifetime: "Lifetime License",
                 sub_monthly_price: "$9.99 / mo",
-                sub_annual_price: "$90.00 / yr",
-                sub_lifetime_price: "$180.00 / once",
+                sub_annual_price: "$49.99 / yr",
                 feat_secure: "Ironclad Lock until next morning",
                 feat_gold: "Exclusive Gold Theme for Winners",
                 feat_custom: "Full access to all Trade Block features",
@@ -587,8 +583,8 @@
             settings_title: "设置", theme: "应用主题", blocked_apps: "阻止的应用", select: "选择",
             premium_title: "高级版",
             secure_subhead: "以盈利结束今天",
-            sub_monthly: "包月订阅 (7天免费试用)", sub_annual: "包年订阅", sub_lifetime: "终身买断",
-            sub_monthly_price: "$9.99 / 月", sub_annual_price: "$90.00 / 年", sub_lifetime_price: "$180.00 / 买断",
+            sub_monthly: "包月订阅 (7天免费试用)", sub_annual: "包年订阅",
+            sub_monthly_price: "$9.99 / 月", sub_annual_price: "$49.99 / 年",
             upgrade_cta: "升级以解锁所有功能",
             confirm_title: "锁定确认", confirm_desc: "同意以下风险并锁定。",
             chk_risk: "我了解风险", chk_agree: "同意并锁定",
@@ -648,8 +644,8 @@
             settings_title: "설정", theme: "테마", blocked_apps: "차단된 앱", select: "선택",
             premium_title: "프리미엄",
             secure_subhead: "수익으로 오늘을 마감하세요",
-            sub_monthly: "월간 구독 (7일 무료 체험)", sub_annual: "연간 구독", sub_lifetime: "평생 라이선스",
-            sub_monthly_price: "$9.99 / 월", sub_annual_price: "$90.00 / 년", sub_lifetime_price: "$180.00 / 일시불",
+            sub_monthly: "월간 구독 (7일 무료 체험)", sub_annual: "연간 구독",
+            sub_monthly_price: "$9.99 / 월", sub_annual_price: "₩49,000 / 년",
             upgrade_cta: "업그레이드하여 모든 기능 잠금 해제",
             confirm_title: "최종 확인", confirm_desc: "다음 위험 사항에 동의하고 잠금을 시작합니다.",
             chk_risk: "위험을 이해했습니다", chk_agree: "동의하고 잠금",
@@ -709,8 +705,8 @@
             settings_title: "Ajustes", theme: "Tema", blocked_apps: "Apps Bloqueadas", select: "Seleccionar",
             premium_title: "Plan Premium",
             secure_subhead: "Termina el día con ganancias",
-            sub_monthly: "Suscripción Mensual (7 días gratis)", sub_annual: "Suscripción Anual", sub_lifetime: "Licencia de por vida",
-            sub_monthly_price: "$9.99 / Mes", sub_annual_price: "$90.00 / Año", sub_lifetime_price: "$180.00 / Único",
+            sub_monthly: "Suscripción Mensual (7 días gratis)", sub_annual: "Suscripción Anual",
+            sub_monthly_price: "$9.99 / Mes", sub_annual_price: "$49.99 / Año",
             upgrade_cta: "Mejorar a Premium",
             confirm_title: "Confirmación Final", confirm_desc: "Acepto los siguientes riesgos al bloquear.",
             chk_risk: "Entiendo los riesgos", chk_agree: "Acepto bloquear",
@@ -1767,10 +1763,6 @@
                                 <span class="font-bold text-sm text-white flex-1">${this.t('sub_annual')}</span>
                                 <span class="font-black text-xl text-[#D4AF37] drop-shadow-md">${this.t('sub_annual_price')}</span>
                             </button>
-                            <button id="plan-lifetime" onclick="app.selectPremiumPlan('com.shota.tradeblock.premium.lifetime')" class="w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left ${this._selPlan === 'com.shota.tradeblock.premium.lifetime' ? 'border-2 border-[#D4AF37] scale-[1.02] shadow-[0_0_15px_rgba(212,175,55,0.3)] bg-[#1a1a1a]' : 'border border-gray-700 hover:border-gray-500 bg-[#1a1a1a] scale-100 opacity-80'}">
-                                <span class="font-bold text-sm text-white flex-1">${this.t('sub_lifetime')}</span>
-                                <span class="font-black text-xl text-[#D4AF37] drop-shadow-sm">${this.t('sub_lifetime_price')}</span>
-                            </button>
                             
                             <button onclick="app.activatePremium(app._selPlan)" class="w-full mt-8 py-5 rounded-2xl font-black text-2xl tracking-wide text-[#000] bg-gradient-to-r from-[#FFE082] via-[#E2B743] to-[#B7892B] shadow-[0_0_25px_rgba(212,175,55,0.6)] active:scale-95 transition-transform animate-[pulse_2s_ease-in-out_infinite] border border-white/40">${ja ? '選択したプランで始める' : 'Subscribe Now'}</button>
                         </div>
@@ -1790,7 +1782,7 @@
             }
             selectPremiumPlan(planId) {
                 this._selPlan = planId;
-                const plans = ['monthly', 'annual', 'lifetime'];
+                const plans = ['monthly', 'annual'];
                 plans.forEach(p => {
                     const el = document.getElementById('plan-' + p);
                     if (!el) return;
