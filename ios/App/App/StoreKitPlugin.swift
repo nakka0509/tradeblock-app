@@ -18,14 +18,13 @@ public class StoreKitPlugin: CAPPlugin, CAPBridgedPlugin {
     private let unlockProductId = "com.shota.tradeblock.unlock"
     private let premiumMonthlyId = "com.shota.tradeblock.premium.monthly"
     private let premiumAnnualId = "com.shota.tradeblock.premium.annual"
-        private let premiumLifetimeId = "com.shota.tradeblock.premium.lifetime"
 
     // MARK: - Get Products
 
     @objc func getProducts(_ call: CAPPluginCall) {
         Task {
             do {
-                let productIds: Set<String> = [unlockProductId, premiumMonthlyId, premiumAnnualId, premiumLifetimeId]
+                let productIds: Set<String> = [unlockProductId, premiumMonthlyId, premiumAnnualId]
                 let products = try await Product.products(for: productIds)
 
                 var result: [[String: Any]] = []
@@ -99,7 +98,7 @@ public class StoreKitPlugin: CAPPlugin, CAPBridgedPlugin {
             // Check for active subscription
             for await result in Transaction.currentEntitlements {
                 if let transaction = try? checkVerified(result) {
-                    if transaction.productID == premiumMonthlyId || transaction.productID == premiumAnnualId || transaction.productID == premiumLifetimeId {
+                    if transaction.productID == premiumMonthlyId || transaction.productID == premiumAnnualId {
                         restored = true
                     }
                     await transaction.finish()
@@ -118,7 +117,7 @@ public class StoreKitPlugin: CAPPlugin, CAPBridgedPlugin {
 
             for await result in Transaction.currentEntitlements {
                 if let transaction = try? checkVerified(result) {
-                    if transaction.productID == premiumMonthlyId || transaction.productID == premiumAnnualId || transaction.productID == premiumLifetimeId {
+                    if transaction.productID == premiumMonthlyId || transaction.productID == premiumAnnualId {
                         isPremium = true
                     }
                 }
