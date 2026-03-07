@@ -767,9 +767,15 @@
                 this.init();
             }
 
+            // ═══════════════════════════════════════════════════
+            // SUBSCRIPTION SYSTEM
+            // Version 1.0 Architecture Restored:
+            // - Trust localStorage on startup for immediate UI rendering.
+            // - Manual restore or purchase required to change state with Apple.
+            // ═══════════════════════════════════════════════════
+
             init() {
-                // 1. Load saved settings (lock state, history, etc.)
-                //    isPremium from localStorage is IGNORED — verified below via Apple.
+                // 1. Load saved settings (lock state, history, isPremium, etc.)
                 try {
                     const saved = localStorage.getItem('tradeblock_v5');
                     if (saved) {
@@ -781,7 +787,7 @@
                     }
                 } catch (e) { console.error('[TB] State load error:', e); }
 
-                // 2. Handle lock that expired while the app was closed
+                // 2. Handle lock expired while app closed
                 if (this.state.isLocked && Date.now() > this.state.lockEndTime) {
                     this.state.isLocked = false;
                     this.state.lockEndTime = null;
@@ -790,156 +796,63 @@
                     }
                 }
 
-                // 3. Apply theme and language silently (no render yet)
+                // 3. Apply theme and language silently
                 this.applyTheme(this.state.theme);
                 const isJPY = (this.state.lang === 'ja');
                 if (!isJPY && this.state.fee >= 100) this.state.fee = Math.max(5, Math.floor(this.state.fee / 100));
                 if (isJPY && this.state.fee < 100) this.state.fee = Math.max(500, this.state.fee * 100);
 
-                // 4. Start timers/chart
+                // 4. Hard Paywall Enforcement (v1.0 logic)
+                if (!this.state.isPremium) {
+                    if (this.state.isLocked) {
+                        // Allow lock screen to render
+                        this.state.page = 'main';
+                        this.state.tab = 'home';
+                    } else {
+                        // Not premium, not locked: block access
+                        this.state.page = 'paywall';
+                        this.state.tab = 'home';
+                    }
+                }
+
+                // 5. Start timers/chart
                 this.startTimer();
                 this.initChart();
 
-                // 5. Show loading screen (no content visible yet)
-                this.renderLoading();
+                // 6. Render
+                this.render();
 
-                // 6. Verify subscription with Apple, then route to correct screen
-                this.verifyAndRoute();
+                // 7. Silent background check (ONLY to revoke expired subs, NEVER to auto-grant)
+                this.silentSubscriptionSync();
             }
 
+            async silentSubscriptionSync() {
+                // If they are premium in localStorage, verify with Apple if it's still active
+                if (this.state.isPremium && window.Capacitor && Capacitor.Plugins.StoreKit) {
+                    try {
+                        const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
+                        if (result.isPremium === false) {
+                            console.log('[TB] Sync: Apple reports subscription ended. Revoking access.');
+                            this.state.isPremium = false;
 
-            renderLoading() {
-                const main = document.getElementById('main-content');
-                const header = document.querySelector('header');
-                const nav = document.querySelector('nav');
-                const canvas = document.getElementById('bg-canvas');
-                if (header) header.style.display = 'none';
-                if (nav) nav.style.display = 'none';
-                if (canvas) canvas.style.display = 'none';
-                if (main) {
-                    main.className = 'fixed inset-0 z-50 flex flex-col items-center justify-center';
-                    main.innerHTML = `
-                        <style>
-                            @keyframes tb-fade-in { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
-                            @keyframes tb-spin { to { transform: rotate(360deg); } }
-                            @keyframes tb-pulse-ring { 0%,100% { opacity:0.2; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.12); } }
-                            .tb-loading-bg { background: radial-gradient(ellipse at 50% 30%, #1a1f3a 0%, #0a0a0a 70%); }
-                            .tb-logo-anim { animation: tb-fade-in 0.6s ease both; }
-                            .tb-ring { animation: tb-pulse-ring 2s ease-in-out infinite; }
-                            .tb-spinner { animation: tb-spin 0.9s linear infinite; }
-                        </style>
-                        <div class="tb-loading-bg fixed inset-0 flex flex-col items-center justify-center gap-8">
-                            <div class="tb-logo-anim flex flex-col items-center gap-5">
-                                <div class="relative">
-                                    <div class="tb-ring absolute inset-0 w-28 h-28 rounded-full border-2 border-[#D4AF37]/40 -m-3"></div>
-                                    <div class="w-24 h-24 rounded-3xl bg-gradient-to-br from-[#1e3a5f] to-[#0d1b2a] flex items-center justify-center shadow-[0_0_40px_rgba(212,175,55,0.3)] border border-[#D4AF37]/20">
-                                        <span style="font-size:48px;">🔒</span>
-                                    </div>
-                                </div>
-                                <div class="text-center">
-                                    <p class="text-white text-2xl font-black tracking-widest" style="letter-spacing:0.15em;">TRADE BLOCK</p>
-                                    <p class="text-[#D4AF37] text-xs font-bold tracking-widest mt-1 opacity-70">TRADER'S DISCIPLINE APP</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2 opacity-50">
-                                <div class="tb-spinner w-5 h-5 border-2 border-white/20 border-t-[#D4AF37] rounded-full"></div>
-                                <span class="text-white/40 text-xs font-bold tracking-wider">LOADING...</span>
-                            </div>
-                        </div>
-                    `;
+                            // Immediately enforce paywall unless actively locked
+                            if (!this.state.isLocked) {
+                                this.state.page = 'paywall';
+                                this.state.tab = 'home';
+                            }
+                            this.save();
+                            this.render();
+                        }
+                    } catch (e) { console.error('[TB] Silent sync failed:', e); }
                 }
-            }
 
-            // ─── 1. Orchestrates subscription check and routing ────────────
-            async verifyAndRoute() {
-                const isPremium = await this.verifySubscriptionWithApple();
-                this.applySubscriptionState(isPremium);
-
-                // Register visibility listener exactly ONCE
                 if (!this._visibilityListenerAdded) {
                     this._visibilityListenerAdded = true;
                     document.addEventListener('visibilitychange', () => {
                         if (document.visibilityState === 'visible') {
-                            this.checkAndSyncSubscriptionStatus();
+                            this.silentSubscriptionSync();
                         }
                     });
-                }
-            }
-
-            // ─── 2. Ask Apple if subscription is active ───────────────────
-            async verifySubscriptionWithApple() {
-                console.log('[TB] verifySubscriptionWithApple() start');
-                if (!window.Capacitor || !Capacitor.Plugins.StoreKit) {
-                    console.log('[TB] StoreKit not available, defaulting to non-premium');
-                    return false;
-                }
-                try {
-                    const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
-                    const isPremium = result.isPremium === true;
-                    console.log('[TB] StoreKit result:', JSON.stringify(result), '| isPremium:', isPremium);
-                    return isPremium;
-                } catch (e) {
-                    console.error('[TB] StoreKit error:', e);
-                    return false;
-                }
-            }
-
-            // ─── 3. Apply verified status and navigate to correct screen ──
-            applySubscriptionState(isPremium) {
-                console.log('[TB] applySubscriptionState(', isPremium, ') | isLocked:', this.state.isLocked);
-                this.state.isPremium = isPremium;
-
-                if (!isPremium) {
-                    if (this.state.isLocked) {
-                        // Allow active lock to continue; unlock() redirects to paywall after
-                        this.state.page = 'main';
-                        this.state.tab = 'home';
-                        console.log('[TB] → lock screen (non-premium mid-lock)');
-                    } else {
-                        this.state.page = 'paywall';
-                        this.state.tab = 'home';
-                        console.log('[TB] → paywall');
-                    }
-                } else {
-                    this.state.page = 'main';
-                    console.log('[TB] → main (premium confirmed)');
-                }
-
-                this.save();
-                this.render();
-            }
-
-            // ─── 4. Re-check on app resume (handles cancellation) ─────────
-            async checkAndSyncSubscriptionStatus() {
-                console.log('[TB] checkAndSyncSubscriptionStatus() (app resumed)');
-                const isPremium = await this.verifySubscriptionWithApple();
-
-                if (isPremium) {
-                    // Still subscribed
-                    if (!this.state.isPremium) {
-                        console.log('[TB] Sync: premium restored/activated');
-                        this.state.isPremium = true;
-                        this.state.page = 'main';
-                        this.state.tab = 'home';
-                        this.save();
-                        this.render();
-                        document.getElementById('paywall-container')?.remove();
-                    }
-                } else {
-                    // Subscription gone
-                    if (this.state.isPremium || this.state.page !== 'paywall') {
-                        console.log('[TB] Sync: subscription ended, enforcing paywall. isLocked:', this.state.isLocked);
-                        this.state.isPremium = false;
-                        if (this.state.isLocked) {
-                            // Lock continues; paywall enforced after timer ends via unlock()
-                            this.save();
-                        } else {
-                            this.state.page = 'paywall';
-                            this.state.tab = 'home';
-                            this.save();
-                            this.render();
-                        }
-                    }
                 }
             }
 
@@ -1947,7 +1860,12 @@
                     if (window.Capacitor && Capacitor.Plugins.StoreKit) {
                         const result = await Capacitor.Plugins.StoreKit.purchase({ productId: productId });
                         if (result.success) {
-                            this.state.isPremium = true; this.state.page = 'main'; this.save(); this.render(); this.closeModal();
+                            this.state.isPremium = true;
+                            this.state.page = 'main';
+                            this.state.tab = 'home';
+                            this.save();
+                            this.render();
+                            this.closeModal();
                             document.getElementById('paywall-container')?.remove();
                             setTimeout(() => {
                                 if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
@@ -1955,21 +1873,36 @@
                             }, 500);
                         } else {
                             if (!IS_PRODUCTION) {
-                                this.state.isPremium = true; this.state.page = 'main'; this.save(); this.render(); this.closeModal();
+                                this.state.isPremium = true;
+                                this.state.page = 'main';
+                                this.state.tab = 'home';
+                                this.save();
+                                this.render();
+                                this.closeModal();
                                 document.getElementById('paywall-container')?.remove();
                                 if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
                                 alert('[DEV BYPASS] Request failed but IS_PRODUCTION is false. Unlocking.');
                             }
                         }
                     } else if (!IS_PRODUCTION) {
-                        this.state.isPremium = true; this.state.page = 'main'; this.save(); this.render(); this.closeModal();
+                        this.state.isPremium = true;
+                        this.state.page = 'main';
+                        this.state.tab = 'home';
+                        this.save();
+                        this.render();
+                        this.closeModal();
                         document.getElementById('paywall-container')?.remove();
                         if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
                         alert('[DEV] Premium activated without Store.');
                     }
                 } catch (e) {
                     if (!IS_PRODUCTION) {
-                        this.state.isPremium = true; this.state.page = 'main'; this.save(); this.render(); this.closeModal();
+                        this.state.isPremium = true;
+                        this.state.page = 'main';
+                        this.state.tab = 'home';
+                        this.save();
+                        this.render();
+                        this.closeModal();
                         document.getElementById('paywall-container')?.remove();
                         if (!this.state.hasSeenTutorial) { this.showTutorial(1); }
                         alert('[DEV BYPASS CAUGHT ERR] Unlocking. Error: ' + e.message);
