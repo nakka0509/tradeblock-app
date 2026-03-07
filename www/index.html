@@ -906,15 +906,6 @@
                 if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
                     Capacitor.Plugins.ScreenTime.unblockApps();
                 }
-                
-                // Prompt for review if lock completed naturally
-                if (!this._forceUnlocked && window.Capacitor && Capacitor.Plugins.RateApp) {
-                    try {
-                        await Capacitor.Plugins.RateApp.requestReview();
-                    } catch (e) {
-                        console.error('Failed to request app review', e);
-                    }
-                }
 
                 this.render();
                 if (!silent) alert(this.state.lang === 'ja' ? (this._forceUnlocked ? 'ロックを強制解除しました' : '時間経過により解除されました') : (this._forceUnlocked ? 'Force unlock complete.' : 'UNLOCKED'));
@@ -1926,6 +1917,7 @@
                 if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
                     try { await Capacitor.Plugins.ScreenTime.blockApps(); } catch (e) { console.error(e); }
                 }
+                this.requestReviewWithThrottle();
                 this.render();
             }
             async triggerSecureProfit() {
@@ -1940,7 +1932,25 @@
                     if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
                         try { await Capacitor.Plugins.ScreenTime.blockApps(); } catch (e) { console.error(e); }
                     }
+                    this.requestReviewWithThrottle();
                     this.render();
+                }
+            }
+
+            async requestReviewWithThrottle() {
+                if (window.Capacitor && Capacitor.Plugins.RateApp) {
+                    const lastReviewReq = localStorage.getItem('tradeblock_last_review_request') || '0';
+                    const now = Date.now();
+                    const threeDaysMs = 72 * 60 * 60 * 1000;
+
+                    if (now - parseInt(lastReviewReq) > threeDaysMs) {
+                        try {
+                            localStorage.setItem('tradeblock_last_review_request', now.toString());
+                            await Capacitor.Plugins.RateApp.requestReview();
+                        } catch (e) {
+                            console.error('Failed to request app review', e);
+                        }
+                    }
                 }
             }
         }
