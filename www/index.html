@@ -768,21 +768,20 @@
             }
 
             init() {
+                // 1. Load saved settings (lock state, history, etc.)
+                //    isPremium from localStorage is IGNORED — verified below via Apple.
                 try {
                     const saved = localStorage.getItem('tradeblock_v5');
                     if (saved) {
                         let parsed = JSON.parse(saved);
-                        if (!parsed.v6_theme_reset) {
-                            parsed.theme = 'light';
-                            parsed.v6_theme_reset = true;
-                        }
+                        if (!parsed.v6_theme_reset) { parsed.theme = 'light'; parsed.v6_theme_reset = true; }
                         this.state = { ...this.state, ...parsed };
                     } else {
                         this.state.v6_theme_reset = true;
                     }
-                } catch (e) { console.error(e); }
+                } catch (e) { console.error('[TB] State load error:', e); }
 
-                // Handle expired lock
+                // 2. Handle lock that expired while the app was closed
                 if (this.state.isLocked && Date.now() > this.state.lockEndTime) {
                     this.state.isLocked = false;
                     this.state.lockEndTime = null;
@@ -791,25 +790,23 @@
                     }
                 }
 
+                // 3. Apply theme and language silently (no render yet)
                 this.applyTheme(this.state.theme);
-
-                // Apply language fee conversion silently
                 const isJPY = (this.state.lang === 'ja');
-                if (!isJPY) {
-                    if (this.state.fee >= 100) this.state.fee = Math.max(5, Math.floor(this.state.fee / 100));
-                } else {
-                    if (this.state.fee < 100) this.state.fee = Math.max(500, this.state.fee * 100);
-                }
+                if (!isJPY && this.state.fee >= 100) this.state.fee = Math.max(5, Math.floor(this.state.fee / 100));
+                if (isJPY && this.state.fee < 100) this.state.fee = Math.max(500, this.state.fee * 100);
 
+                // 4. Start timers/chart
                 this.startTimer();
                 this.initChart();
 
-                // Show loading screen while checking subscription
+                // 5. Show loading screen (no content visible yet)
                 this.renderLoading();
 
-                // Async: check subscription then render correct screen
-                this.initAsync();
+                // 6. Verify subscription with Apple, then route to correct screen
+                this.verifyAndRoute();
             }
+
 
             renderLoading() {
                 const main = document.getElementById('main-content');
@@ -853,79 +850,95 @@
                 }
             }
 
-            async initAsync() {
-                // ALWAYS default to non-premium first.
-                // We do NOT trust localStorage for isPremium — only StoreKit can confirm.
-                this.state.isPremium = false;
+            // ─── 1. Orchestrates subscription check and routing ────────────
+            async verifyAndRoute() {
+                const isPremium = await this.verifySubscriptionWithApple();
+                this.applySubscriptionState(isPremium);
 
-                if (window.Capacitor && Capacitor.Plugins.StoreKit) {
-                    try {
-                        const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
-                        this.state.isPremium = result.isPremium === true;
-                    } catch (e) {
-                        console.error('Subscription status check failed:', e);
-                        // isPremium remains false on error
-                    }
+                // Register visibility listener exactly ONCE
+                if (!this._visibilityListenerAdded) {
+                    this._visibilityListenerAdded = true;
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.visibilityState === 'visible') {
+                            this.checkAndSyncSubscriptionStatus();
+                        }
+                    });
                 }
+            }
 
-                if (!this.state.isPremium) {
+            // ─── 2. Ask Apple if subscription is active ───────────────────
+            async verifySubscriptionWithApple() {
+                console.log('[TB] verifySubscriptionWithApple() start');
+                if (!window.Capacitor || !Capacitor.Plugins.StoreKit) {
+                    console.log('[TB] StoreKit not available, defaulting to non-premium');
+                    return false;
+                }
+                try {
+                    const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
+                    const isPremium = result.isPremium === true;
+                    console.log('[TB] StoreKit result:', JSON.stringify(result), '| isPremium:', isPremium);
+                    return isPremium;
+                } catch (e) {
+                    console.error('[TB] StoreKit error:', e);
+                    return false;
+                }
+            }
+
+            // ─── 3. Apply verified status and navigate to correct screen ──
+            applySubscriptionState(isPremium) {
+                console.log('[TB] applySubscriptionState(', isPremium, ') | isLocked:', this.state.isLocked);
+                this.state.isPremium = isPremium;
+
+                if (!isPremium) {
                     if (this.state.isLocked) {
-                        // Non-premium but still locked: show lock screen.
-                        // unlock() will redirect to paywall when timer ends.
+                        // Allow active lock to continue; unlock() redirects to paywall after
                         this.state.page = 'main';
                         this.state.tab = 'home';
+                        console.log('[TB] → lock screen (non-premium mid-lock)');
                     } else {
-                        // Not subscribed, not locked: show paywall
                         this.state.page = 'paywall';
                         this.state.tab = 'home';
+                        console.log('[TB] → paywall');
                     }
                 } else {
-                    // Premium confirmed: show main app
                     this.state.page = 'main';
+                    console.log('[TB] → main (premium confirmed)');
                 }
 
                 this.save();
                 this.render();
-
-                // Re-check subscription every time the app comes back into view
-                document.addEventListener('visibilitychange', () => {
-                    if (document.visibilityState === 'visible') {
-                        this.checkAndSyncSubscriptionStatus();
-                    }
-                });
             }
 
+            // ─── 4. Re-check on app resume (handles cancellation) ─────────
             async checkAndSyncSubscriptionStatus() {
-                if (window.Capacitor && Capacitor.Plugins.StoreKit) {
-                    try {
-                        const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
-                        if (result.isPremium) {
-                            // Subscription is active → allow access
-                            if (!this.state.isPremium) {
-                                this.state.isPremium = true;
-                                this.state.page = 'main';
-                                this.state.tab = 'home';
-                                this.save();
-                                this.render();
-                                document.getElementById('paywall-container')?.remove();
-                            }
+                console.log('[TB] checkAndSyncSubscriptionStatus() (app resumed)');
+                const isPremium = await this.verifySubscriptionWithApple();
+
+                if (isPremium) {
+                    // Still subscribed
+                    if (!this.state.isPremium) {
+                        console.log('[TB] Sync: premium restored/activated');
+                        this.state.isPremium = true;
+                        this.state.page = 'main';
+                        this.state.tab = 'home';
+                        this.save();
+                        this.render();
+                        document.getElementById('paywall-container')?.remove();
+                    }
+                } else {
+                    // Subscription gone
+                    if (this.state.isPremium || this.state.page !== 'paywall') {
+                        console.log('[TB] Sync: subscription ended, enforcing paywall. isLocked:', this.state.isLocked);
+                        this.state.isPremium = false;
+                        if (this.state.isLocked) {
+                            // Lock continues; paywall enforced after timer ends via unlock()
+                            this.save();
                         } else {
-                            // Subscription is NOT active
-                            this.state.isPremium = false;
-                            if (this.state.isLocked) {
-                                // Allow lock to continue until timer ends.
-                                // unlock() will redirect to paywall when it finishes.
-                                this.save();
-                            } else {
-                                // Not locked → go to paywall immediately
-                                this.state.page = 'paywall';
-                                this.state.tab = 'home';
-                                this.save();
-                                this.render();
-                            }
+                            this.state.page = 'paywall';
+                            this.state.tab = 'home';
+                            this.save();
+                            this.render();
                         }
-                    } catch (e) {
-                        console.error('Subscription status check failed:', e);
                     }
                 }
             }
