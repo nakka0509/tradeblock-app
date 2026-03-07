@@ -838,10 +838,6 @@
                                 this.save();
                                 this.render();
                                 document.getElementById('paywall-container')?.remove();
-                                // Show tutorial for first-time premium users
-                                if (!this.state.hasSeenTutorial) {
-                                    this.showTutorial();
-                                }
                             }
                         } else {
                             // Subscription is NOT active → force paywall
@@ -853,7 +849,6 @@
                         }
                     } catch (e) {
                         console.error('Subscription status check failed:', e);
-                        // On error, keep current state (paywall stays if it was showing)
                     }
                 }
             }
