@@ -811,6 +811,14 @@
                 // Check actual StoreKit subscription status on startup
                 // This fixes the bug where isPremium resets and Apple shows "already subscribed" dialog
                 this.checkAndSyncSubscriptionStatus();
+
+                // Re-check subscription every time the app comes back into view
+                // This ensures cancellations in iOS Settings are immediately enforced
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible') {
+                        this.checkAndSyncSubscriptionStatus();
+                    }
+                });
             }
 
             async checkAndSyncSubscriptionStatus() {
