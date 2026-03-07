@@ -767,7 +767,7 @@
                 this.init();
             }
 
-            init() {
+            async init() {
                 try {
                     const saved = localStorage.getItem('tradeblock_v5');
                     if (saved) {
@@ -783,11 +783,39 @@
                 } catch (e) { console.error(e); }
 
                 if (this.state.isLocked && Date.now() > this.state.lockEndTime) {
-                    this.unlock(true);
+                    this.state.isLocked = false;
+                    this.state.lockEndTime = null;
+                    // Unblock apps
+                    if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
+                        Capacitor.Plugins.ScreenTime.unblockApps();
+                    }
                 }
 
+                // Apply theme (no render)
                 this.applyTheme(this.state.theme);
-                this.setLang(this.state.lang);
+
+                // Apply language silently (no save, no render)
+                const lang = this.state.lang;
+                const isJPY = (lang === 'ja');
+                if (!isJPY) {
+                    if (this.state.fee >= 100) this.state.fee = Math.max(5, Math.floor(this.state.fee / 100));
+                } else {
+                    if (this.state.fee < 100) this.state.fee = Math.max(500, this.state.fee * 100);
+                }
+
+                // --- Check actual subscription status BEFORE rendering ---
+                if (window.Capacitor && Capacitor.Plugins.StoreKit) {
+                    try {
+                        const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
+                        if (result.isPremium) {
+                            this.state.isPremium = true;
+                        } else {
+                            this.state.isPremium = false;
+                        }
+                    } catch (e) {
+                        console.error('Subscription status check failed:', e);
+                    }
+                }
 
                 // --- HARD PAYWALL ENFORCEMENT ---
                 if (!this.state.isPremium) {
@@ -796,10 +824,12 @@
                         this.state.tab = 'home';
                     } else {
                         this.state.page = 'paywall';
-                        this.state.tab = 'home'; // hide other content just in case
+                        this.state.tab = 'home';
                     }
                 }
 
+                // Save and render ONCE after all state is determined
+                this.save();
                 this.startTimer();
                 this.initChart();
 
@@ -808,12 +838,7 @@
                 }
                 this.render();
 
-                // Check actual StoreKit subscription status on startup
-                // This fixes the bug where isPremium resets and Apple shows "already subscribed" dialog
-                this.checkAndSyncSubscriptionStatus();
-
                 // Re-check subscription every time the app comes back into view
-                // This ensures cancellations in iOS Settings are immediately enforced
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'visible') {
                         this.checkAndSyncSubscriptionStatus();
