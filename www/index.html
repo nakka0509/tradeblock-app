@@ -782,7 +782,7 @@
                     }
                 } catch (e) { console.error(e); }
 
-                // Handle expired lock silently
+                // Handle expired lock
                 if (this.state.isLocked && Date.now() > this.state.lockEndTime) {
                     this.state.isLocked = false;
                     this.state.lockEndTime = null;
@@ -791,10 +791,9 @@
                     }
                 }
 
-                // Apply theme (no render)
                 this.applyTheme(this.state.theme);
 
-                // Apply language fee conversion silently (no save, no render)
+                // Apply language fee conversion silently
                 const isJPY = (this.state.lang === 'ja');
                 if (!isJPY) {
                     if (this.state.fee >= 100) this.state.fee = Math.max(5, Math.floor(this.state.fee / 100));
@@ -802,20 +801,61 @@
                     if (this.state.fee < 100) this.state.fee = Math.max(500, this.state.fee * 100);
                 }
 
-                // --- PAYWALL FIRST: Always start with paywall ---
-                // Even if localStorage says isPremium=true, we do NOT trust it.
-                // We force paywall and only dismiss it after StoreKit confirms.
-                this.state.isPremium = false;
-                this.state.page = 'paywall';
-                this.state.tab = 'home';
-                this.save();
-
                 this.startTimer();
                 this.initChart();
-                this.render(); // First render = always paywall
 
-                // Now asynchronously verify subscription with Apple
-                this.checkAndSyncSubscriptionStatus();
+                // Show loading screen while checking subscription
+                this.renderLoading();
+
+                // Async: check subscription then render correct screen
+                this.initAsync();
+            }
+
+            renderLoading() {
+                const main = document.getElementById('main-content');
+                const header = document.querySelector('header');
+                const nav = document.querySelector('nav');
+                const canvas = document.getElementById('bg-canvas');
+                if (header) header.style.display = 'none';
+                if (nav) nav.style.display = 'none';
+                if (canvas) canvas.style.display = 'none';
+                if (main) {
+                    main.className = 'fixed inset-0 z-50 flex flex-col items-center justify-center bg-black';
+                    main.innerHTML = `
+                        <div class="flex flex-col items-center gap-6">
+                            <span class="text-7xl">🔒</span>
+                            <p class="text-white text-xl font-black tracking-widest opacity-70">Trade Block</p>
+                            <div class="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                        </div>
+                    `;
+                }
+            }
+
+            async initAsync() {
+                // Check subscription with Apple
+                if (window.Capacitor && Capacitor.Plugins.StoreKit) {
+                    try {
+                        const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
+                        this.state.isPremium = result.isPremium;
+                    } catch (e) {
+                        console.error('Subscription status check failed:', e);
+                        // On error, default to non-premium to be safe
+                        this.state.isPremium = false;
+                    }
+                }
+
+                // Enforce paywall for non-premium (who are not locked)
+                if (!this.state.isPremium) {
+                    this.state.page = 'paywall';
+                    this.state.tab = 'home';
+                } else if (this.state.page === 'paywall') {
+                    // Was on paywall before (e.g. cached state), now confirmed premium
+                    this.state.page = 'main';
+                    this.state.tab = 'home';
+                }
+
+                this.save();
+                this.render();
 
                 // Re-check subscription every time the app comes back into view
                 document.addEventListener('visibilitychange', () => {
