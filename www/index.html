@@ -840,12 +840,19 @@
                                 document.getElementById('paywall-container')?.remove();
                             }
                         } else {
-                            // Subscription is NOT active → force paywall
+                            // Subscription is NOT active
                             this.state.isPremium = false;
-                            this.state.page = 'paywall';
-                            this.state.tab = 'home';
-                            this.save();
-                            this.render();
+                            if (this.state.isLocked) {
+                                // Allow lock to continue until timer ends.
+                                // unlock() will redirect to paywall when it finishes.
+                                this.save();
+                            } else {
+                                // Not locked → go to paywall immediately
+                                this.state.page = 'paywall';
+                                this.state.tab = 'home';
+                                this.save();
+                                this.render();
+                            }
                         }
                     } catch (e) {
                         console.error('Subscription status check failed:', e);
