@@ -831,7 +831,7 @@
                             this.save();
                             this.render();
                             document.getElementById('paywall-container')?.remove();
-                        } else if (!result.isPremium && this.state.isPremium) {
+                        } else if (!result.isPremium) {
                             this.state.isPremium = false;
                             if (!this.state.isLocked) {
                                 this.state.page = 'paywall';
