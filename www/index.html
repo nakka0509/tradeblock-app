@@ -1629,12 +1629,12 @@
                     if (min < 60) return min + "m";
                     const h = Math.floor(min / 60);
                     const m = min % 60;
-                    return `${h}h ${m}m`;
+                    return m === 0 ? `${h}h` : `${h}h ${m}m`;
                 } else {
                     if (min < 60) return min + "分";
                     const h = Math.floor(min / 60);
                     const m = min % 60;
-                    return `${h}時間${m}分`;
+                    return m === 0 ? `${h}時間` : `${h}時間${m}分`;
                 }
             }
             setDuration(val) {
