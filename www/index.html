@@ -868,16 +868,19 @@
                     }
                 }
 
-                // Determine correct page based on confirmed subscription status
                 if (!this.state.isPremium) {
-                    // Non-premium: always go to paywall (unless currently locked)
-                    if (!this.state.isLocked) {
+                    if (this.state.isLocked) {
+                        // Non-premium but still locked: show lock screen.
+                        // unlock() will redirect to paywall when timer ends.
+                        this.state.page = 'main';
+                        this.state.tab = 'home';
+                    } else {
+                        // Not subscribed, not locked: show paywall
                         this.state.page = 'paywall';
                         this.state.tab = 'home';
                     }
-                    // If locked: stay on main (lock screen), unlock() handles paywall redirect
                 } else {
-                    // Premium confirmed: go to main
+                    // Premium confirmed: show main app
                     this.state.page = 'main';
                 }
 
@@ -1989,6 +1992,8 @@
                 `);
             }
             async confirmLock() {
+                // Security guard: only premium users can lock
+                if (!this.state.isPremium) { this.showPremiumModal(); return; }
                 // Save memo from lock-confirm textarea if present
                 const memoEl = document.getElementById('lock-memo-input');
                 if (memoEl) this.state.memo = memoEl.value.trim();
