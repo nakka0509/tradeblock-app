@@ -2,21 +2,27 @@ PODS:
   - Capacitor (5.7.8):
     - CapacitorCordova
   - CapacitorCordova (5.7.8)
+  - CapacitorRateApp (4.0.3):
+    - Capacitor
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
   - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+  - CapacitorRateApp (from `../../node_modules/capacitor-rate-app`)
 
 EXTERNAL SOURCES:
   Capacitor:
     :path: "../../node_modules/@capacitor/ios"
   CapacitorCordova:
     :path: "../../node_modules/@capacitor/ios"
+  CapacitorRateApp:
+    :path: "../../node_modules/capacitor-rate-app"
 
 SPEC CHECKSUMS:
   Capacitor: 747aadb4fa786f460d8cd9d0557cb81440a13747
   CapacitorCordova: 31ab98dca2ddcee051027a1afe7e8c85c82f7297
+  CapacitorRateApp: 896df7ec6a237fea72d1955e0cb26394654b00db
 
-PODFILE CHECKSUM: 8ab55909c5de2b217f9841e5e5b329f5ec901553
+PODFILE CHECKSUM: 40d7843bdb31d4379c8193b46fa7d3660bbd6e53
 
 COCOAPODS: 1.12.1

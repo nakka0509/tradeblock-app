@@ -894,7 +894,7 @@
                 }, 1000);
             }
 
-            unlock(silent = false) {
+            async unlock(silent = false) {
                 this.state.isLocked = false;
                 this.state.lockEndTime = null;
                 if (!this.state.isPremium) {
@@ -906,6 +906,16 @@
                 if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
                     Capacitor.Plugins.ScreenTime.unblockApps();
                 }
+                
+                // Prompt for review if lock completed naturally
+                if (!this._forceUnlocked && window.Capacitor && Capacitor.Plugins.RateApp) {
+                    try {
+                        await Capacitor.Plugins.RateApp.requestReview();
+                    } catch (e) {
+                        console.error('Failed to request app review', e);
+                    }
+                }
+
                 this.render();
                 if (!silent) alert(this.state.lang === 'ja' ? (this._forceUnlocked ? 'ロックを強制解除しました' : '時間経過により解除されました') : (this._forceUnlocked ? 'Force unlock complete.' : 'UNLOCKED'));
             }
