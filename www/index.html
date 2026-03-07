@@ -767,7 +767,7 @@
                 this.init();
             }
 
-            async init() {
+            init() {
                 try {
                     const saved = localStorage.getItem('tradeblock_v5');
                     if (saved) {
@@ -782,10 +782,10 @@
                     }
                 } catch (e) { console.error(e); }
 
+                // Handle expired lock silently
                 if (this.state.isLocked && Date.now() > this.state.lockEndTime) {
                     this.state.isLocked = false;
                     this.state.lockEndTime = null;
-                    // Unblock apps
                     if (window.Capacitor && Capacitor.Plugins.ScreenTime) {
                         Capacitor.Plugins.ScreenTime.unblockApps();
                     }
@@ -794,49 +794,28 @@
                 // Apply theme (no render)
                 this.applyTheme(this.state.theme);
 
-                // Apply language silently (no save, no render)
-                const lang = this.state.lang;
-                const isJPY = (lang === 'ja');
+                // Apply language fee conversion silently (no save, no render)
+                const isJPY = (this.state.lang === 'ja');
                 if (!isJPY) {
                     if (this.state.fee >= 100) this.state.fee = Math.max(5, Math.floor(this.state.fee / 100));
                 } else {
                     if (this.state.fee < 100) this.state.fee = Math.max(500, this.state.fee * 100);
                 }
 
-                // --- Check actual subscription status BEFORE rendering ---
-                if (window.Capacitor && Capacitor.Plugins.StoreKit) {
-                    try {
-                        const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
-                        if (result.isPremium) {
-                            this.state.isPremium = true;
-                        } else {
-                            this.state.isPremium = false;
-                        }
-                    } catch (e) {
-                        console.error('Subscription status check failed:', e);
-                    }
-                }
-
-                // --- HARD PAYWALL ENFORCEMENT ---
-                if (!this.state.isPremium) {
-                    if (this.state.isLocked) {
-                        this.state.page = 'main';
-                        this.state.tab = 'home';
-                    } else {
-                        this.state.page = 'paywall';
-                        this.state.tab = 'home';
-                    }
-                }
-
-                // Save and render ONCE after all state is determined
+                // --- PAYWALL FIRST: Always start with paywall ---
+                // Even if localStorage says isPremium=true, we do NOT trust it.
+                // We force paywall and only dismiss it after StoreKit confirms.
+                this.state.isPremium = false;
+                this.state.page = 'paywall';
+                this.state.tab = 'home';
                 this.save();
+
                 this.startTimer();
                 this.initChart();
+                this.render(); // First render = always paywall
 
-                if (this.state.isPremium && !this.state.hasSeenTutorial) {
-                    this.showTutorial();
-                }
-                this.render();
+                // Now asynchronously verify subscription with Apple
+                this.checkAndSyncSubscriptionStatus();
 
                 // Re-check subscription every time the app comes back into view
                 document.addEventListener('visibilitychange', () => {
@@ -850,23 +829,31 @@
                 if (window.Capacitor && Capacitor.Plugins.StoreKit) {
                     try {
                         const result = await Capacitor.Plugins.StoreKit.getSubscriptionStatus();
-                        if (result.isPremium && !this.state.isPremium) {
-                            this.state.isPremium = true;
-                            this.state.page = 'main';
-                            this.save();
-                            this.render();
-                            document.getElementById('paywall-container')?.remove();
-                        } else if (!result.isPremium) {
-                            this.state.isPremium = false;
-                            if (!this.state.isLocked) {
-                                this.state.page = 'paywall';
+                        if (result.isPremium) {
+                            // Subscription is active → allow access
+                            if (!this.state.isPremium) {
+                                this.state.isPremium = true;
+                                this.state.page = 'main';
                                 this.state.tab = 'home';
+                                this.save();
+                                this.render();
+                                document.getElementById('paywall-container')?.remove();
+                                // Show tutorial for first-time premium users
+                                if (!this.state.hasSeenTutorial) {
+                                    this.showTutorial();
+                                }
                             }
+                        } else {
+                            // Subscription is NOT active → force paywall
+                            this.state.isPremium = false;
+                            this.state.page = 'paywall';
+                            this.state.tab = 'home';
                             this.save();
                             this.render();
                         }
                     } catch (e) {
                         console.error('Subscription status check failed:', e);
+                        // On error, keep current state (paywall stays if it was showing)
                     }
                 }
             }
@@ -957,9 +944,8 @@
                 this.render();
             }
 
-            setHomeMode(mode) { this.state.homeMode = mode; this.render(); }
-            setTab(tab) { this.state.tab = tab; this.state.page = 'main'; this.save(); this.render(); }
-            setPage(page) { this.state.page = page; this.render(); }
+            setHomeMode(mode) { if (!this.state.isPremium) return; this.state.homeMode = mode; this.render(); }
+            setPage(page) { if (!this.state.isPremium) return; this.state.page = page; this.render(); }
 
             toggleTheme(theme) {
                 if (theme === 'gold' && !this.state.isPremium) {
