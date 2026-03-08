@@ -45,7 +45,8 @@ jobs:
       env:
         IG_USER_ID: ${{ secrets.IG_USER_ID }}
         IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-      run: npx tsx scripts/post_to_instagram.ts out/video.mp4 "感情で負けるな。Trade Blockで強制ロック ✅ プロフィールから今すぐダウンロード #FX #デイトレ #ポジポジ病 #投資家と繋がりたい #株式投資"
+      run: |
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "感情で負けるな。Trade Blockで強制ロック ✅ プロフィールから今すぐダウンロード #FX #デイトレ #ポジポジ病 #投資家と繋がりたい #株式投資"
 
   # ===== 英語アカウント（Account 2）=====
   post-english:
@@ -84,7 +85,8 @@ jobs:
       env:
         IG_USER_ID: ${{ secrets.IG_USER_ID_2 }}
         IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN_2 }}
-      run: npx tsx scripts/post_to_instagram.ts out/video.mp4 "Stop overtrading. Trade Block forces you to step away 🔒 Download now from profile link. #daytrading #forex #trading #stockmarket #tradingpsychology"
+      run: |
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "Stop overtrading. Trade Block forces you to step away 🔒 Download now from profile link. #daytrading #forex #trading #stockmarket #tradingpsychology"
 
   # ===== 中国語アカウント（Account 3）=====
   post-chinese:
@@ -123,4 +125,5 @@ jobs:
       env:
         IG_USER_ID: ${{ secrets.IG_USER_ID_3 }}
         IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN_3 }}
-      run: npx tsx scripts/post_to_instagram.ts out/video.mp4 "停止过度交易。Trade Block强制锁定帮助你冷静 🔒 点击主页链接立即下载 #交易 #外汇 #日内交易 #股票 #交易心理"
+      run: |
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "停止过度交易。Trade Block强制锁定帮助你冷静 🔒 点击主页链接立即下载 #交易 #外汇 #日内交易 #股票 #交易心理"
