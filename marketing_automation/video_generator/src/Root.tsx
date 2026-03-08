@@ -24,8 +24,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_loss_phone_1.png',
           bgImageSrc2B: 'assets/part2/trading_despair_6.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -44,8 +44,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_5.png',
           bgImageSrc2A: 'assets/part2/trading_despair_4.png',
           bgImageSrc2B: 'assets/part2/trading_despair_2.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -64,8 +64,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_despair_3.png',
           bgImageSrc2B: 'assets/part2/trading_despair_7.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -84,8 +84,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_loss_phone_1.png',
           bgImageSrc2B: 'assets/part2/trading_despair_7.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
 
@@ -106,8 +106,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_loss_phone_1.png',
           bgImageSrc2B: 'assets/part2/trading_despair_6.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -126,8 +126,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_5.png',
           bgImageSrc2A: 'assets/part2/trading_despair_4.png',
           bgImageSrc2B: 'assets/part2/trading_despair_2.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -146,8 +146,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_despair_3.png',
           bgImageSrc2B: 'assets/part2/trading_despair_7.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -166,8 +166,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_loss_phone_1.png',
           bgImageSrc2B: 'assets/part2/trading_despair_7.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       {/* --- CHINESE (SIMPLIFIED) VERSIONS --- */}
@@ -187,8 +187,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_loss_phone_1.png',
           bgImageSrc2B: 'assets/part2/trading_despair_6.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -207,8 +207,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_5.png',
           bgImageSrc2A: 'assets/part2/trading_despair_4.png',
           bgImageSrc2B: 'assets/part2/trading_despair_2.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -227,8 +227,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_despair_3.png',
           bgImageSrc2B: 'assets/part2/trading_despair_7.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
       <Composition
@@ -247,8 +247,8 @@ export const RemotionRoot: React.FC = () => {
           bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
           bgImageSrc2A: 'assets/part2/trading_loss_phone_1.png',
           bgImageSrc2B: 'assets/part2/trading_despair_7.png',
-          bgImageSrc4: 'assets/part4/ScreenRecording_03-08-2026 14-36-25_1.mov',
-          videoSrc: 'assets/part3/ScreenRecording_03-08-2026 14-38-49_1.mov'
+          bgImageSrc4: 'assets/part4/part4.mov',
+          videoSrc: 'assets/part3/part3.mov'
         }}
       />
     </>
