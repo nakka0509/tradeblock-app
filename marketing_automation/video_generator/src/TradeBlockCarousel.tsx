@@ -49,21 +49,31 @@ export const TradeBlockCarousel: React.FC<{
         const meta3 = await getVideoMetadata(staticFile(videoSrc));
         if (unmounted) return;
         setPart3Duration(meta3.durationInSeconds);
+      } catch (err) {
+        console.warn('Failed to load part3 video metadata. Using fallback 5s.', err);
+        if (unmounted) return;
+        setPart3Duration(5);
+      }
 
-        if (isPart4Video) {
+      if (isPart4Video) {
+        try {
           const meta4 = await getVideoMetadata(staticFile(bgImageSrc4));
           if (unmounted) return;
           setPart4Duration(meta4.durationInSeconds);
+        } catch (err) {
+          console.warn('Failed to load part4 video metadata. Using fallback 5s.', err);
+          if (unmounted) return;
+          setPart4Duration(5);
         }
-        continueRender(handle);
-      } catch (err) {
-        console.error('Metadata load error:', err);
-        continueRender(handle);
+      } else {
+        setPart4Duration(slide4Duration / fps);
       }
+
+      continueRender(handle);
     };
     loadMetadata();
     return () => { unmounted = true; };
-  }, [videoSrc, bgImageSrc4, isPart4Video, handle]);
+  }, [videoSrc, bgImageSrc4, isPart4Video, handle, fps, slide4Duration]);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#121212', color: 'white', fontFamily: 'sans-serif' }}>
