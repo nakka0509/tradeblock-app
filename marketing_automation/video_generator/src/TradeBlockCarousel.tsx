@@ -1,39 +1,99 @@
+import React, { useState, useEffect } from 'react';
+import { loadDefaultJapaneseParser } from 'budoux';
 import {
+  continueRender,
+  delayRender,
   AbsoluteFill,
   interpolate,
   Sequence,
   useCurrentFrame,
   useVideoConfig,
   Img,
-  Video,
-  staticFile
+  staticFile,
+  spring,
+  Video
 } from 'remotion';
+import { getVideoMetadata } from '@remotion/media-utils';
 
 export const TradeBlockCarousel: React.FC<{
   hookText: string;
   empathyText: string;
   appRevealText: string;
   ctaText: string;
-}> = ({ hookText, empathyText, appRevealText, ctaText }) => {
+  bgImageSrc1A: string;
+  bgImageSrc1B: string;
+  bgImageSrc2A: string;
+  bgImageSrc2B: string;
+  bgImageSrc4: string;
+  videoSrc: string;
+}> = ({ hookText, empathyText, appRevealText, ctaText, bgImageSrc1A, bgImageSrc1B, bgImageSrc2A, bgImageSrc2B, bgImageSrc4, videoSrc }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  // Timing constants (in frames, assuming 30fps) - Fast-paced tempo for TikTok/Reels
-  const slide1Duration = Math.floor(1.5 * fps); // 1.5 seconds
-  const slide2Duration = Math.floor(1.5 * fps); // 1.5 seconds
-  const slide3Duration = 4 * fps;               // 4 seconds
-  const slide4Duration = Math.floor(1.5 * fps); // 1.5 seconds
+  // Timing constants (in frames, assuming 30fps) - User requested 3s, 3s, 4s, 4s
+  const slide1Duration = 3 * fps;
+  const slide2Duration = 3 * fps;
+  const slide3Duration = 4 * fps;
+  const slide4Duration = 4 * fps;
+
+  const [handle] = useState(() => delayRender());
+  const [part3Duration, setPart3Duration] = useState<number | null>(null);
+  const [part4Duration, setPart4Duration] = useState<number | null>(null);
+
+  const isPart4Video = bgImageSrc4.toLowerCase().endsWith('.mov') || bgImageSrc4.toLowerCase().endsWith('.mp4');
+
+  useEffect(() => {
+    let unmounted = false;
+    const loadMetadata = async () => {
+      try {
+        const meta3 = await getVideoMetadata(staticFile(videoSrc));
+        if (unmounted) return;
+        setPart3Duration(meta3.durationInSeconds);
+
+        if (isPart4Video) {
+          const meta4 = await getVideoMetadata(staticFile(bgImageSrc4));
+          if (unmounted) return;
+          setPart4Duration(meta4.durationInSeconds);
+        }
+        continueRender(handle);
+      } catch (err) {
+        console.error('Metadata load error:', err);
+        continueRender(handle);
+      }
+    };
+    loadMetadata();
+    return () => { unmounted = true; };
+  }, [videoSrc, bgImageSrc4, isPart4Video, handle]);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#121212', color: 'white', fontFamily: 'sans-serif' }}>
       {/* Slide 1: Hook */}
       <Sequence from={0} durationInFrames={slide1Duration}>
-        <SlideText text={hookText} />
+        <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
+          {/* 2 Medias per slide (approx 1.5s each = 45 frames) */}
+          <Sequence from={0} durationInFrames={fps * 1.5}>
+            <AnimatedMedia src={bgImageSrc1A} type={'zoomIn'} />
+          </Sequence>
+          <Sequence from={fps * 1.5} durationInFrames={fps * 1.5}>
+            <AnimatedMedia src={bgImageSrc1B} type={'zoomOut'} />
+          </Sequence>
+
+          <SlideText text={hookText} />
+        </AbsoluteFill>
       </Sequence>
 
       {/* Slide 2: Empathy */}
       <Sequence from={slide1Duration} durationInFrames={slide2Duration}>
-        <SlideText text={empathyText} />
+        <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Sequence from={0} durationInFrames={fps * 1.5}>
+            <AnimatedMedia src={bgImageSrc2A} type={'zoomOut'} />
+          </Sequence>
+          <Sequence from={fps * 1.5} durationInFrames={fps * 1.5}>
+            <AnimatedMedia src={bgImageSrc2B} type={'panRight'} />
+          </Sequence>
+
+          <SlideText text={empathyText} />
+        </AbsoluteFill>
       </Sequence>
 
       {/* Slide 3: App Reveal */}
@@ -58,69 +118,195 @@ export const TradeBlockCarousel: React.FC<{
               boxShadow: '0 0 100px rgba(255, 255, 255, 0.1)',
             }}
           >
-            {/* 
-              Placeholder for the actual screen recording video.
-              In a real setup, you'd pass the file path or import it.
-              For now we use a placeholder styling matching the Canva design.
-            */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(180deg, #1e293b 0%, #0f172a 100%)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <div style={{ fontSize: 160, marginBottom: 40 }}>🔒</div>
-              <div style={{ fontSize: 80, fontWeight: 'bold' }}>00:15:00</div>
-              <div style={{ fontSize: 30, color: '#94a3b8' }}>REMAINING</div>
-            </div>
+            <Video
+              src={staticFile(videoSrc)}
+              playbackRate={(part3Duration || (slide3Duration / fps)) / (slide3Duration / fps)}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+              muted
+            />
           </div>
         </AbsoluteFill>
       </Sequence>
 
       {/* Slide 4: CTA */}
       <Sequence from={slide1Duration + slide2Duration + slide3Duration} durationInFrames={slide4Duration}>
-        <SlideText text={ctaText} isCta />
+        <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
+          {isPart4Video ? (
+            <Video
+              src={staticFile(bgImageSrc4)}
+              playbackRate={(part4Duration || (slide4Duration / fps)) / (slide4Duration / fps)}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                opacity: 0.6,
+              }}
+              muted
+            />
+          ) : (
+            <Img
+              src={staticFile(bgImageSrc4)}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                opacity: 0.6,
+              }}
+            />
+          )}
+
+          {/* Dark gradient overlay so text doesn't clash with video */}
+          <AbsoluteFill style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.9) 100%)' }} />
+
+          <SlideText text={ctaText} isCta />
+        </AbsoluteFill>
       </Sequence>
     </AbsoluteFill>
   );
 };
 
-// Helper component for text slides with a simple fast fade-in
+// Helper component for background images with varied animations
+const AnimatedMedia: React.FC<{ src: string; type: 'zoomIn' | 'zoomOut' | 'panRight' }> = ({ src, type }) => {
+  const frame = useCurrentFrame();
+
+  // Calculate different animations
+  const zoomIn = interpolate(frame, [0, 60], [1, 1.15], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const zoomOut = interpolate(frame, [0, 60], [1.15, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const panX = interpolate(frame, [0, 60], [0, -20], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+
+  let transform = '';
+  if (type === 'zoomIn') transform = `scale(${zoomIn})`;
+  if (type === 'zoomOut') transform = `scale(${zoomOut})`;
+  if (type === 'panRight') transform = `scale(1.15) translateX(${panX}px)`;
+
+  return (
+    <Img
+      src={staticFile(src)}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        opacity: 0.35,
+        transform,
+      }}
+    />
+  );
+};
+
+// Helper component for advanced TikTok-style text animations
 const SlideText: React.FC<{ text: string, isCta?: boolean }> = ({ text, isCta }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Fade in over the first 10 frames (0.33s) for a snappier feel
-  const opacity = interpolate(frame, [0, 10], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+  // Split text into lines if user provided manual \n or literal \n
+  const lines = text.replace(/\\n/g, '\n').split('\n');
 
-  // Slide up slightly
-  const translateY = interpolate(frame, [0, 15], [50, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+  // Use BudouX ML parser for flawless Japanese typographic line splitting
+  // This computationally detects valid phrases and prevents breaking Katakana/Kanji/Punctuation at line ends
+  const parser = React.useMemo(() => loadDefaultJapaneseParser(), []);
+
+  let globalLetterIndex = 0;
 
   return (
-    <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', opacity, transform: `translateY(${translateY}px)` }}>
-      <h1
-        style={{
-          fontSize: isCta ? 70 : 80,
-          fontWeight: 'bold',
-          textAlign: 'center',
-          lineHeight: 1.4,
-          padding: '0 80px',
-          whiteSpace: 'pre-wrap',
-        }}
-      >
-        {text}
-      </h1>
+    <AbsoluteFill style={{
+      justifyContent: isCta ? 'flex-end' : 'center',
+      alignItems: 'center',
+      paddingBottom: isCta ? 250 : 0
+    }}>
+      <div style={{
+        textAlign: 'center',
+        width: '95%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        {lines.map((line, lineIdx) => {
+          // Semantically tokenize the text into unbreakable phrase chunks using BudouX
+          const words = parser.parse(line);
+
+          return (
+            <div key={lineIdx} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 15, width: '100%' }}>
+              {words.map((word: string, wordIdx: number) => (
+                <span key={wordIdx} style={{ display: 'inline-block', whiteSpace: 'pre' }}>
+                  {word.split('').map((char: string, charIdx: number) => {
+                    // Stagger animation based on letter index - Much faster now (0.8 instead of 1.5)
+                    const delay = globalLetterIndex * 0.8; // frames delay per letter
+                    if (char.trim() !== '') {
+                      globalLetterIndex++; // Only increment delay for visible characters
+                    } else {
+                      globalLetterIndex += 0.3; // smaller delay for spaces
+                    }
+
+                    // Spring animation for popping up
+                    const scale = spring({
+                      fps,
+                      frame: frame - delay,
+                      config: {
+                        damping: 12,
+                        stiffness: 150,
+                      },
+                    });
+
+                    // Opacity fade in
+                    const opacity = interpolate(
+                      frame - delay,
+                      [0, 5],
+                      [0, 1],
+                      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+                    );
+
+                    // Slide up effect
+                    const translateY = interpolate(
+                      frame - delay,
+                      [0, 10],
+                      [40, 0],
+                      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+                    );
+
+                    return (
+                      <span
+                        key={charIdx}
+                        style={{
+                          display: 'inline-block',
+                          opacity,
+                          transform: `translateY(${translateY}px) scale(${scale})`,
+                          fontSize: isCta ? 60 : 70, // Slightly reduced to ensure wide fits
+                          fontWeight: 'bold',
+                          color: 'white',
+                          // Add text shadow to ensure visibility over backgrounds
+                          textShadow: '0px 4px 15px rgba(0,0,0,0.8), 0px 0px 40px rgba(0,0,0,0.6)',
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {char}
+                      </span>
+                    );
+                  })}
+                </span>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+
       {isCta && (
-        <div style={{ marginTop: 80, fontSize: 150 }}>
+        <div style={{
+          marginTop: 60,
+          fontSize: 150,
+          opacity: Math.max(0, interpolate(frame, [30, 45], [0, 1])),
+          transform: `translateY(${interpolate(frame, [30, 45], [50, 0], { extrapolateRight: 'clamp' })}px)`
+        }}>
           ⬇️
         </div>
       )}

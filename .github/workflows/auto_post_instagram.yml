@@ -1,0 +1,47 @@
+name: Daily Instagram Auto-Post
+
+on:
+  schedule:
+    # 毎日 日本時間 20:00 (UTC 11:00) に自動実行
+    - cron: '0 11 * * *'
+  workflow_dispatch: # GitHubの画面から手動でテスト実行できるボタン
+
+jobs:
+  generate-and-post:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      working-directory: ./marketing_automation/video_generator
+      run: npm install
+
+    - name: Pick a random composition for variety
+      id: pick
+      run: |
+        # 8種類のパターンをランダムに選ぶ（日本語4パターン + 英語4パターン）
+        COMPOSITIONS=("Feature1-TimeLock" "Feature2-TradeLog" "Feature3-SecureProfit" "Feature4-Questionnaire" "Feature1-TimeLock-EN" "Feature2-TradeLog-EN" "Feature3-SecureProfit-EN" "Feature4-Questionnaire-EN")
+        INDEX=$(( RANDOM % ${#COMPOSITIONS[@]} ))
+        SELECTED="${COMPOSITIONS[$INDEX]}"
+        echo "Selected composition: $SELECTED"
+        echo "composition=$SELECTED" >> $GITHUB_OUTPUT
+
+    - name: Render Video with Remotion
+      working-directory: ./marketing_automation/video_generator
+      run: |
+        npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4
+
+    - name: Post to Instagram Reels
+      working-directory: ./marketing_automation/video_generator
+      env:
+        IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      run: |
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "感情で負けるな。Trade Blockで強制ロック ✅ プロフィールから今すぐダウンロード #FX #デイトレ #ポジポジ病 #投資家と繋がりたい #株式投資"

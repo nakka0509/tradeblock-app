@@ -1,0 +1,38 @@
+name: Auto-Refresh Instagram Token
+
+on:
+  schedule:
+    # 毎月1日 日本時間 9:00 (UTC 0:00) に自動実行（60日の有効期限に対して30日ごとに更新するため安全）
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # 手動実行ボタン
+
+jobs:
+  refresh-token:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Refresh Instagram Long-Lived Token
+      id: refresh
+      run: |
+        # Instagram Graph APIのトークン更新エンドポイントを呼び出す
+        RESPONSE=$(curl -s "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${{ secrets.IG_ACCESS_TOKEN }}")
+        echo "Response: $RESPONSE"
+        
+        # 新しいトークンを抽出する
+        NEW_TOKEN=$(echo $RESPONSE | python3 -c "import sys, json; data=json.load(sys.stdin); print(data.get('access_token', ''))")
+        
+        if [ -z "$NEW_TOKEN" ]; then
+          echo "::error::Failed to refresh token! Response: $RESPONSE"
+          exit 1
+        fi
+        
+        echo "Token refreshed successfully!"
+        echo "new_token=$NEW_TOKEN" >> $GITHUB_OUTPUT
+
+    - name: Update GitHub Secret with new token
+      uses: gliech/create-github-secret-action@v1
+      with:
+        # GitHub個人アクセストークン（GITHUB_TOKEN）を使ってSecretsを更新する
+        pa_token: ${{ secrets.GH_PAT }}
+        name: IG_ACCESS_TOKEN
+        value: ${{ steps.refresh.outputs.new_token }}
