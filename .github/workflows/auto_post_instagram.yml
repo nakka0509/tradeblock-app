@@ -7,41 +7,90 @@ on:
   workflow_dispatch: # GitHubの画面から手動でテスト実行できるボタン
 
 jobs:
-  generate-and-post:
+
+  # ===== 日本語アカウント（Account 1）=====
+  post-japanese:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: '20'
-
     - name: Install dependencies
       working-directory: ./marketing_automation/video_generator
       run: npm install
 
-    - name: Pick a random composition for variety
+    - name: Pick a random Japanese composition
       id: pick
       run: |
-        # 8種類のパターンをランダムに選ぶ（日本語4パターン + 英語4パターン）
-        COMPOSITIONS=("Feature1-TimeLock" "Feature2-TradeLog" "Feature3-SecureProfit" "Feature4-Questionnaire" "Feature1-TimeLock-EN" "Feature2-TradeLog-EN" "Feature3-SecureProfit-EN" "Feature4-Questionnaire-EN")
+        COMPOSITIONS=("Feature1-TimeLock" "Feature2-TradeLog" "Feature3-SecureProfit" "Feature4-Questionnaire")
         INDEX=$(( RANDOM % ${#COMPOSITIONS[@]} ))
-        SELECTED="${COMPOSITIONS[$INDEX]}"
-        echo "Selected composition: $SELECTED"
-        echo "composition=$SELECTED" >> $GITHUB_OUTPUT
+        echo "composition=${COMPOSITIONS[$INDEX]}" >> $GITHUB_OUTPUT
 
-    - name: Render Video with Remotion
+    - name: Render Video
       working-directory: ./marketing_automation/video_generator
-      run: |
-        npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4
 
-    - name: Post to Instagram Reels
+    - name: Post to Instagram (Japanese account)
       working-directory: ./marketing_automation/video_generator
       env:
         IG_USER_ID: ${{ secrets.IG_USER_ID }}
         IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      run: npx tsx scripts/post_to_instagram.ts out/video.mp4 "感情で負けるな。Trade Blockで強制ロック ✅ プロフィールから今すぐダウンロード #FX #デイトレ #ポジポジ病 #投資家と繋がりたい #株式投資"
+
+  # ===== 英語アカウント（Account 2）=====
+  post-english:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      working-directory: ./marketing_automation/video_generator
+      run: npm install
+
+    - name: Pick a random English composition
+      id: pick
       run: |
-        npx tsx scripts/post_to_instagram.ts out/video.mp4 "感情で負けるな。Trade Blockで強制ロック ✅ プロフィールから今すぐダウンロード #FX #デイトレ #ポジポジ病 #投資家と繋がりたい #株式投資"
+        COMPOSITIONS=("Feature1-TimeLock-EN" "Feature2-TradeLog-EN" "Feature3-SecureProfit-EN" "Feature4-Questionnaire-EN")
+        INDEX=$(( RANDOM % ${#COMPOSITIONS[@]} ))
+        echo "composition=${COMPOSITIONS[$INDEX]}" >> $GITHUB_OUTPUT
+
+    - name: Render Video
+      working-directory: ./marketing_automation/video_generator
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4
+
+    - name: Post to Instagram (English account)
+      working-directory: ./marketing_automation/video_generator
+      env:
+        IG_USER_ID: ${{ secrets.IG_USER_ID_2 }}
+        IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN_2 }}
+      run: npx tsx scripts/post_to_instagram.ts out/video.mp4 "Stop overtrading. Trade Block forces you to step away 🔒 Download now from profile link. #daytrading #forex #trading #stockmarket #tradingpsychology"
+
+  # ===== 中国語アカウント（Account 3）- IGアカウント作成後に有効化 =====
+  # post-chinese:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - uses: actions/setup-node@v4
+  #     with:
+  #       node-version: '20'
+  #   - name: Install dependencies
+  #     working-directory: ./marketing_automation/video_generator
+  #     run: npm install
+  #   - name: Pick a random Chinese composition
+  #     id: pick
+  #     run: |
+  #       COMPOSITIONS=("Feature1-TimeLock-CN" "Feature2-TradeLog-CN" "Feature3-SecureProfit-CN" "Feature4-Questionnaire-CN")
+  #       INDEX=$(( RANDOM % ${#COMPOSITIONS[@]} ))
+  #       echo "composition=${COMPOSITIONS[$INDEX]}" >> $GITHUB_OUTPUT
+  #   - name: Render Video
+  #     working-directory: ./marketing_automation/video_generator
+  #     run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4
+  #   - name: Post to Instagram (Chinese account)
+  #     working-directory: ./marketing_automation/video_generator
+  #     env:
+  #       IG_USER_ID: ${{ secrets.IG_USER_ID_3 }}
+  #       IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN_3 }}
+  #     run: npx tsx scripts/post_to_instagram.ts out/video.mp4 "停止过度交易。Trade Block强制锁定帮助你冷静 🔒 点击主页链接立即下载 #交易 #外汇 #日内交易 #股票 #交易心理"
