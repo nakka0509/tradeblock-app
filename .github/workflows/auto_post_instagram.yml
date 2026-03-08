@@ -29,7 +29,7 @@ jobs:
 
     - name: Render Video
       working-directory: ./marketing_automation/video_generator
-      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --timeout=120000
 
     - name: Post to Instagram (Japanese account)
       working-directory: ./marketing_automation/video_generator
@@ -59,7 +59,7 @@ jobs:
 
     - name: Render Video
       working-directory: ./marketing_automation/video_generator
-      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --timeout=120000
 
     - name: Post to Instagram (English account)
       working-directory: ./marketing_automation/video_generator
@@ -89,7 +89,7 @@ jobs:
 
     - name: Render Video
       working-directory: ./marketing_automation/video_generator
-      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --timeout=120000
 
     - name: Post to Instagram (Chinese account)
       working-directory: ./marketing_automation/video_generator

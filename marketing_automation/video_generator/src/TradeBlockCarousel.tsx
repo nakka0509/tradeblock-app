@@ -36,7 +36,7 @@ export const TradeBlockCarousel: React.FC<{
   const slide3Duration = 4 * fps;
   const slide4Duration = 4 * fps;
 
-  const [handle] = useState(() => delayRender());
+  const [handle] = useState(() => delayRender('Loading video metadata', { timeoutInMilliseconds: 120000 }));
   const [part3Duration, setPart3Duration] = useState<number | null>(null);
   const [part4Duration, setPart4Duration] = useState<number | null>(null);
 
