@@ -82,7 +82,7 @@ export const TradeBlockCarousel: React.FC<{
       color: 'white',
       fontFamily: '"Noto Sans CJK JP", "Noto Sans CJK SC", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif'
     }}>
-      <Audio src={staticFile('assets/bgm.mp3')} volume={0.6} />
+      <Audio src={staticFile('assets/bgm.mp3')} volume={0.15} />
 
       {/* Slide 1: Hook */}
       <Sequence from={0} durationInFrames={slide1Duration}>
@@ -242,11 +242,13 @@ const SlideText: React.FC<{ text: string, isCta?: boolean }> = ({ text, isCta })
     }}>
       <div style={{
         textAlign: 'center',
-        width: '95%',
+        width: '100%',
+        maxWidth: '85%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        wordBreak: 'keep-all',
       }}>
         {lines.map((line, lineIdx) => {
           // Semantically tokenize the text into unbreakable phrase chunks using BudouX
