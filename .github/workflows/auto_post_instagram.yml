@@ -20,6 +20,15 @@ jobs:
       working-directory: ./marketing_automation/video_generator
       run: npm install
 
+    - name: Convert .mov assets to .mp4
+      working-directory: ./marketing_automation/video_generator
+      run: |
+        sudo apt-get update && sudo apt-get install -y ffmpeg
+        ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
+        ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
+        sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
+        sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
+
     - name: Pick a random Japanese composition
       id: pick
       run: |
@@ -50,6 +59,15 @@ jobs:
       working-directory: ./marketing_automation/video_generator
       run: npm install
 
+    - name: Convert .mov assets to .mp4
+      working-directory: ./marketing_automation/video_generator
+      run: |
+        sudo apt-get update && sudo apt-get install -y ffmpeg
+        ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
+        ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
+        sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
+        sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
+
     - name: Pick a random English composition
       id: pick
       run: |
@@ -79,6 +97,15 @@ jobs:
     - name: Install dependencies
       working-directory: ./marketing_automation/video_generator
       run: npm install
+
+    - name: Convert .mov assets to .mp4
+      working-directory: ./marketing_automation/video_generator
+      run: |
+        sudo apt-get update && sudo apt-get install -y ffmpeg
+        ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
+        ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
+        sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
+        sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
 
     - name: Pick a random Chinese composition
       id: pick
