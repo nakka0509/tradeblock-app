@@ -1531,11 +1531,15 @@
             }
 
             showModal(html) {
+                if (this._activeModalInterval) { clearInterval(this._activeModalInterval); this._activeModalInterval = null; }
                 const con = document.getElementById('modal-container');
                 con.innerHTML = `<div class="bg-[var(--card-bg)] w-full max-w-sm rounded-[32px] p-8 shadow-2xl border border-[var(--border)] relative overflow-hidden">${html}</div>`;
                 con.classList.remove('hidden');
             }
-            closeModal() { document.getElementById('modal-container').classList.add('hidden'); }
+            closeModal() {
+                if (this._activeModalInterval) { clearInterval(this._activeModalInterval); this._activeModalInterval = null; }
+                document.getElementById('modal-container').classList.add('hidden');
+            }
             completeTutorial() {
                 this.state.hasSeenTutorial = true;
                 this.save();
@@ -1708,15 +1712,15 @@
                 this.showModal(html);
 
                 let remaining = waitSec;
-                const tick = setInterval(() => {
+                this._activeModalInterval = setInterval(() => {
                     remaining--;
                     const lbl = document.getElementById('q-yes-label');
                     const btn = document.getElementById('q-yes-btn');
-                    if (!lbl || !btn) { clearInterval(tick); return; }
+                    if (!lbl || !btn) { clearInterval(this._activeModalInterval); return; }
                     if (remaining > 0) {
                         lbl.textContent = ja ? `確認中... (${remaining})` : `Reading... (${remaining})`;
                     } else {
-                        clearInterval(tick);
+                        clearInterval(this._activeModalInterval);
                         btn.disabled = false;
                         btn.classList.remove('opacity-40', 'cursor-not-allowed');
                         btn.classList.add('shadow-lg');
