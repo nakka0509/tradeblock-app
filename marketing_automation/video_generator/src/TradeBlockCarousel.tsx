@@ -11,7 +11,8 @@ import {
   Img,
   staticFile,
   spring,
-  Video
+  Video,
+  Audio
 } from 'remotion';
 import { getVideoMetadata } from '@remotion/media-utils';
 
@@ -81,6 +82,8 @@ export const TradeBlockCarousel: React.FC<{
       color: 'white',
       fontFamily: '"Noto Sans CJK JP", "Noto Sans CJK SC", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif'
     }}>
+      <Audio src={staticFile('assets/bgm.mp3')} volume={0.6} />
+
       {/* Slide 1: Hook */}
       <Sequence from={0} durationInFrames={slide1Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
