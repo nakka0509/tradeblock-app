@@ -76,7 +76,11 @@ export const TradeBlockCarousel: React.FC<{
   }, [videoSrc, bgImageSrc4, isPart4Video, handle, fps, slide4Duration]);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: '#121212', color: 'white', fontFamily: 'sans-serif' }}>
+    <AbsoluteFill style={{
+      backgroundColor: '#121212',
+      color: 'white',
+      fontFamily: '"Noto Sans CJK JP", "Noto Sans CJK SC", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif'
+    }}>
       {/* Slide 1: Hook */}
       <Sequence from={0} durationInFrames={slide1Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>

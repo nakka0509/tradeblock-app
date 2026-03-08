@@ -23,7 +23,7 @@ jobs:
     - name: Convert .mov assets to .mp4
       working-directory: ./marketing_automation/video_generator
       run: |
-        sudo apt-get update && sudo apt-get install -y ffmpeg
+        sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
         ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
         ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
@@ -46,7 +46,7 @@ jobs:
         IG_USER_ID: ${{ secrets.IG_USER_ID }}
         IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
       run: |
-        npx tsx scripts/post_to_instagram.ts out/video.mp4 "感情で負けるな。Trade Blockで強制ロック ✅ プロフィールから今すぐダウンロード #FX #デイトレ #ポジポジ病 #投資家と繋がりたい #株式投資"
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "感情で負けるな。Trade Blockで強制ロック 🔒\n\n『なぜ90%のデイトレーダーは資金を溶かすのか？』\n手法が悪いのではありません。脳の「興奮状態（ポジポジ病）」が原因です。\n\nTrade Blockは、タイマー設定で指定した時間中、\n強制的に取引画面からあなたを物理的に遮断します。\n\n🔥 損失を取り返そうとする「焦り」\n🔥 少しの利益ですぐ利確してしまう「チキン利食い」\n\nこれらはすべて、システムにブロックさせることで解決できます。\n\n✅ プロフィールリンクから今すぐダウンロードして、無駄な負けをゼロにしよう。\n\n#FX #デイトレード #ポジポジ病 #投資家と繋がりたい #株式投資 #トレード日誌 #FX初心者 #ダウ理論 #自動売買"
 
   # ===== 英語アカウント（Account 2）=====
   post-english:
@@ -63,7 +63,7 @@ jobs:
     - name: Convert .mov assets to .mp4
       working-directory: ./marketing_automation/video_generator
       run: |
-        sudo apt-get update && sudo apt-get install -y ffmpeg
+        sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
         ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
         ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
@@ -86,7 +86,7 @@ jobs:
         IG_USER_ID: ${{ secrets.IG_USER_ID_2 }}
         IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN_2 }}
       run: |
-        npx tsx scripts/post_to_instagram.ts out/video.mp4 "Stop overtrading. Trade Block forces you to step away 🔒 Download now from profile link. #daytrading #forex #trading #stockmarket #tradingpsychology"
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "Stop overtrading. Trade Block forces you to step away 🔒\n\nWhy do 90% of day traders lose money?\nIt's not your strategy. It's the 'euphoria' of the brain that causes overtrading.\n\nTrade Block physically blocks you from your trading apps for a set timer, preventing those emotional revenge trades.\n\n🔥 Stop revenge trading after a loss.\n🔥 Stop taking profits too early out of fear.\n\nLet the system block your bad habits.\n\n✅ Download now from the link in our profile and save your portfolio from yourself.\n\n#daytrading #forex #trading #stockmarket #tradingpsychology #forexsignals #crypto #propfirm"
 
   # ===== 中国語アカウント（Account 3）=====
   post-chinese:
@@ -103,7 +103,7 @@ jobs:
     - name: Convert .mov assets to .mp4
       working-directory: ./marketing_automation/video_generator
       run: |
-        sudo apt-get update && sudo apt-get install -y ffmpeg
+        sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
         ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
         ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
@@ -126,4 +126,4 @@ jobs:
         IG_USER_ID: ${{ secrets.IG_USER_ID_3 }}
         IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN_3 }}
       run: |
-        npx tsx scripts/post_to_instagram.ts out/video.mp4 "停止过度交易。Trade Block强制锁定帮助你冷静 🔒 点击主页链接立即下载 #交易 #外汇 #日内交易 #股票 #交易心理"
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "停止过度交易。Trade Block强制锁定帮助你冷静 🔒\n\n为什么90%的日内交易者会亏损？\n问题不在乎你的策略，而是大脑的“兴奋状态”导致了频繁交易。\n\nTrade Block通过设定计时器，在指定时间内强制屏蔽你的交易应用，防止情绪化的报复性交易。\n\n🔥 停止亏损后的上头交易\n🔥 停止因为恐惧而过早平仓\n\n让系统来阻止你破坏账户余额。\n\n✅ 立即点击主页链接下载，把不必要的亏损降到零。\n\n#交易 #外汇 #日内交易 #股票 #交易心理 #投资理财 #加密货币 #美股"
