@@ -41,7 +41,7 @@ export const TradeBlockCarousel: React.FC<{
   const slide1Duration = Math.ceil((meta.hook / playbackRate) * fps); // No buffer for Part1 → avoids gap before Part2
   const slide2Duration = Math.ceil((meta.empathy / playbackRate + buffer) * fps);
   const slide3Duration = Math.ceil((meta.appReveal / playbackRate + buffer) * fps);
-  const slide4Duration = Math.ceil((meta.cta / playbackRate + buffer) * fps);
+  const slide4Duration = 5 * fps; // Fixed at 5 seconds for a punchy CTA ending
 
   const [handle] = useState(() => delayRender('Loading video metadata', { timeoutInMilliseconds: 120000 }));
 
@@ -95,7 +95,7 @@ export const TradeBlockCarousel: React.FC<{
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Audio src={staticFile('assets/part1/警告音1.mp3')} volume={0.5} />
           <Video src={staticFile(bgImageSrc1A)} playbackRate={(8.234 * fps) / slide1Duration} style={{ position: 'absolute', width: '100%', height: 'auto', objectFit: 'contain', opacity: 0.8 }} muted />
-          <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', backgroundColor: visualTint || 'rgba(0,0,0,0.4)', zIndex: 0 }} />
+
 
           <SlideText text={hookText} lang={lang} />
           {/* TTS Audio starts reading immediately as the slide begins */}
@@ -181,7 +181,7 @@ export const TradeBlockCarousel: React.FC<{
             style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }}
             muted
           />
-          <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', backgroundColor: visualTint || 'rgba(0,0,0,0.6)', opacity: 0.8, zIndex: 0 }} />
+
 
           {/* Dark gradient overlay so text doesn't clash with video */}
           <AbsoluteFill style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.9) 100%)' }} />
