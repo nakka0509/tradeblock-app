@@ -53,7 +53,8 @@ jobs:
         )
         INDEX=$(( RANDOM % ${#CAPTIONS[@]} ))
         SELECTED_CAPTION="${CAPTIONS[$INDEX]}"
-        npx tsx scripts/post_to_instagram.ts out/video.mp4 "$SELECTED_CAPTION"
+        EVALUATED_CAPTION=$(echo -e "$SELECTED_CAPTION")
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "$EVALUATED_CAPTION"
 
   # ===== 英語アカウント（Account 2）=====
   post-english:
@@ -100,7 +101,8 @@ jobs:
         )
         INDEX=$(( RANDOM % ${#CAPTIONS[@]} ))
         SELECTED_CAPTION="${CAPTIONS[$INDEX]}"
-        npx tsx scripts/post_to_instagram.ts out/video.mp4 "$SELECTED_CAPTION"
+        EVALUATED_CAPTION=$(echo -e "$SELECTED_CAPTION")
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "$EVALUATED_CAPTION"
 
   # ===== 中国語アカウント（Account 3）=====
   post-chinese:
@@ -147,4 +149,5 @@ jobs:
         )
         INDEX=$(( RANDOM % ${#CAPTIONS[@]} ))
         SELECTED_CAPTION="${CAPTIONS[$INDEX]}"
-        npx tsx scripts/post_to_instagram.ts out/video.mp4 "$SELECTED_CAPTION"
+        EVALUATED_CAPTION=$(echo -e "$SELECTED_CAPTION")
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "$EVALUATED_CAPTION"
