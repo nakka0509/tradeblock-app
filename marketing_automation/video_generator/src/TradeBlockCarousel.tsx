@@ -171,25 +171,120 @@ export const TradeBlockCarousel: React.FC<{
         </AbsoluteFill>
       </Sequence>
 
-      {/* Slide 4: CTA */}
+      {/* Slide 4: CTA - High Conversion Layout */}
       <Sequence from={slide1Duration + slide2Duration + slide3Duration} durationInFrames={slide4Duration}>
-        <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' }}>
           <Audio src={staticFile('assets/part4/決定ボタンを押す40.mp3')} volume={0.5} />
+
+          {/* Background video - full brightness */}
           <Video
             src={staticFile(bgImageSrc4)}
             playbackRate={isPart4Video && part4VideoDuration ? (part4VideoDuration * fps) / slide4Duration : 1}
-            style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }}
+            style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25 }}
             muted
           />
 
+          {/* Strong top-to-bottom dark gradient */}
+          <AbsoluteFill style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 70%, rgba(0,0,0,0.98) 100%)' }} />
 
-          {/* Dark gradient overlay so text doesn't clash with video */}
-          <AbsoluteFill style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.9) 100%)' }} />
+          {/* Content container */}
+          <AbsoluteFill style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 160, gap: 0 }}>
 
-          <SlideText text={ctaText} isCta lang={lang} />
+            {/* Pulsing upward arrow - "tap profile link" signal */}
+            {(() => {
+              const frame = useCurrentFrame();
+              const bounce = interpolate(Math.sin((frame / (fps * 0.5)) * Math.PI), [-1, 1], [0, -18], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+              const arrowOpacity = interpolate(frame, [0, fps * 0.3], [0, 1], { extrapolateRight: 'clamp' });
+              return (
+                <div style={{ transform: `translateY(${bounce}px)`, opacity: arrowOpacity, textAlign: 'center', marginBottom: 8 }}>
+                  <div style={{ fontSize: 52, lineHeight: 1 }}>☝️</div>
+                  <div style={{
+                    fontSize: 22,
+                    color: '#fff',
+                    fontWeight: '900',
+                    letterSpacing: 1,
+                    textShadow: '0 2px 8px rgba(0,0,0,0.9)',
+                    marginTop: 4
+                  }}>
+                    {lang === 'en' ? 'Profile Link ↑' : lang === 'zh-CN' ? '点击主页链接 ↑' : 'プロフィールリンク ↑'}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Gold divider */}
+            <div style={{ width: 200, height: 2, backgroundColor: '#e8a900', borderRadius: 2, marginBottom: 28, marginTop: 12,
+              boxShadow: '0 0 12px #e8a900' }} />
+
+            {/* App name badge */}
+            {(() => {
+              const frame = useCurrentFrame();
+              const scale = interpolate(frame, [0, fps * 0.4], [0.8, 1], { extrapolateRight: 'clamp' });
+              return (
+                <div style={{
+                  transform: `scale(${scale})`,
+                  backgroundColor: 'rgba(232, 169, 0, 0.15)',
+                  border: '2px solid #e8a900',
+                  borderRadius: 16,
+                  paddingLeft: 32, paddingRight: 32, paddingTop: 10, paddingBottom: 10,
+                  marginBottom: 20,
+                  boxShadow: '0 0 30px rgba(232,169,0,0.35)',
+                }}>
+                  <div style={{ fontSize: 36, fontWeight: '900', color: '#fff', letterSpacing: 2,
+                    textShadow: '0 0 20px rgba(232,169,0,0.8)' }}>
+                    🔒 Trade Block
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Main CTA text */}
+            {(() => {
+              const frame = useCurrentFrame();
+              const opacity = interpolate(frame, [fps * 0.2, fps * 0.6], [0, 1], { extrapolateRight: 'clamp' });
+              const ctaLabel = lang === 'en'
+                ? 'Free Download — Start Today'
+                : lang === 'zh-CN'
+                ? '免费下载 · 立即开始'
+                : '無料で今すぐ始める';
+              const subLabel = lang === 'en'
+                ? 'Stop overtrading. Take back control.'
+                : lang === 'zh-CN'
+                ? '克服冲动交易，掌控自律'
+                : '感情トレードを、仕組みで止める。';
+              return (
+                <div style={{ opacity, textAlign: 'center', paddingLeft: 24, paddingRight: 24 }}>
+                  <div style={{
+                    fontSize: 40,
+                    fontWeight: '900',
+                    color: '#ffffff',
+                    WebkitTextStroke: '3px #e8a900',
+                    paintOrder: 'stroke fill',
+                    textShadow: '0 4px 20px rgba(0,0,0,0.9)',
+                    lineHeight: 1.2,
+                    marginBottom: 14,
+                  }}>
+                    {ctaLabel}
+                  </div>
+                  <div style={{
+                    fontSize: 26,
+                    fontWeight: '700',
+                    color: 'rgba(255,255,255,0.85)',
+                    textShadow: '0 2px 8px rgba(0,0,0,0.9)',
+                    letterSpacing: 0.5,
+                  }}>
+                    {subLabel}
+                  </div>
+                </div>
+              );
+            })()}
+
+          </AbsoluteFill>
+
           <TTSAudio fileName={`${id}_cta`} playbackRate={1.65} />
         </AbsoluteFill>
       </Sequence>
+
     </AbsoluteFill>
   );
 };
