@@ -7,5 +7,24 @@
 
 import { Config } from "@remotion/cli/config";
 
+import { Config } from "@remotion/cli/config";
+
 Config.setVideoImageFormat("jpeg");
 Config.setOverwriteOutput(true);
+
+Config.overrideWebpackConfig((currentConfiguration) => {
+    return {
+        ...currentConfiguration,
+        resolve: {
+            ...currentConfiguration.resolve,
+            fallback: {
+                ...currentConfiguration.resolve?.fallback,
+                "url": require.resolve("url/"),
+                "buffer": require.resolve("buffer/"),
+                "stream": require.resolve("stream-browserify"),
+                "vm": require.resolve("vm-browserify"),
+                "string_decoder": require.resolve("string_decoder/"),
+            },
+        },
+    };
+});

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { loadDefaultJapaneseParser } from 'budoux';
+import { loadDefaultJapaneseParser, loadDefaultSimplifiedChineseParser } from "budoux";
 import {
   continueRender,
   delayRender,
@@ -10,11 +10,12 @@ import {
   useVideoConfig,
   Img,
   staticFile,
-  spring,
   Video,
   Audio
 } from 'remotion';
 import { getVideoMetadata } from '@remotion/media-utils';
+import { TTSAudio } from './TTSAudio';
+import ttsMetadata from './ttsMetadata.json';
 
 export const TradeBlockCarousel: React.FC<{
   hookText: string;
@@ -27,47 +28,49 @@ export const TradeBlockCarousel: React.FC<{
   bgImageSrc2B: string;
   bgImageSrc4: string;
   videoSrc: string;
-}> = ({ hookText, empathyText, appRevealText, ctaText, bgImageSrc1A, bgImageSrc1B, bgImageSrc2A, bgImageSrc2B, bgImageSrc4, videoSrc }) => {
-  const frame = useCurrentFrame();
-  const { fps, durationInFrames } = useVideoConfig();
+  bgmSrc?: string;
+  visualTint?: string;
+  lang: 'ja' | 'en' | 'zh-CN';
+}> = ({ hookText, empathyText, appRevealText, ctaText, bgImageSrc1A, bgImageSrc1B, bgImageSrc2A, bgImageSrc2B, bgImageSrc4, videoSrc, bgmSrc, visualTint, lang }) => {
+  const { fps, id } = useVideoConfig();
 
-  // Timing constants (in frames, assuming 30fps) - Accelerated for better TikTok/Reels retention
-  const slide1Duration = 1.5 * fps;
-  const slide2Duration = 1.5 * fps;
-  const slide3Duration = 4 * fps;
-  const slide4Duration = 4 * fps;
+  // Dynamic timing calculation based on generated audio length
+  const meta = (ttsMetadata as Record<string, any>)[id] || { hook: 3, empathy: 3, appReveal: 3, cta: 3 };
+  const playbackRate = 1.65;
+  const buffer = 0.3; // Give 0.3s of visual breathing room after the text is read
+  const slide1Duration = Math.ceil((meta.hook / playbackRate) * fps); // No buffer for Part1 → avoids gap before Part2
+  const slide2Duration = Math.ceil((meta.empathy / playbackRate + buffer) * fps);
+  const slide3Duration = Math.ceil((meta.appReveal / playbackRate + buffer) * fps);
+  const slide4Duration = Math.ceil((meta.cta / playbackRate + buffer) * fps);
 
   const [handle] = useState(() => delayRender('Loading video metadata', { timeoutInMilliseconds: 120000 }));
-  const [part3Duration, setPart3Duration] = useState<number | null>(null);
-  const [part4Duration, setPart4Duration] = useState<number | null>(null);
 
   const isPart4Video = bgImageSrc4.toLowerCase().endsWith('.mov') || bgImageSrc4.toLowerCase().endsWith('.mp4');
+
+  const [part3VideoDuration, setPart3VideoDuration] = useState<number | null>(null);
+  const [part4VideoDuration, setPart4VideoDuration] = useState<number | null>(null);
 
   useEffect(() => {
     let unmounted = false;
     const loadMetadata = async () => {
       try {
-        const meta3 = await getVideoMetadata(staticFile(videoSrc));
+        const p3Meta = await getVideoMetadata(staticFile(videoSrc));
         if (unmounted) return;
-        setPart3Duration(meta3.durationInSeconds);
+        setPart3VideoDuration(p3Meta.durationInSeconds);
       } catch (err) {
         console.warn('Failed to load part3 video metadata. Using fallback 5s.', err);
         if (unmounted) return;
-        setPart3Duration(5);
       }
 
       if (isPart4Video) {
         try {
-          const meta4 = await getVideoMetadata(staticFile(bgImageSrc4));
+          const p4Meta = await getVideoMetadata(staticFile(bgImageSrc4));
           if (unmounted) return;
-          setPart4Duration(meta4.durationInSeconds);
+          setPart4VideoDuration(p4Meta.durationInSeconds);
         } catch (err) {
           console.warn('Failed to load part4 video metadata. Using fallback 5s.', err);
           if (unmounted) return;
-          setPart4Duration(5);
         }
-      } else {
-        setPart4Duration(slide4Duration / fps);
       }
 
       continueRender(handle);
@@ -80,43 +83,64 @@ export const TradeBlockCarousel: React.FC<{
     <AbsoluteFill style={{
       backgroundColor: '#121212',
       color: 'white',
-      fontFamily: '"Noto Sans CJK JP", "Noto Sans CJK SC", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif'
+      fontFamily: lang === 'en'
+        ? '"Inter", "Montserrat", "Helvetica", sans-serif'
+        : lang === 'zh-CN'
+          ? '"PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif'
+          : '"Noto Sans CJK JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif'
     }}>
-      <Audio src={staticFile('assets/bgm.mp3')} volume={0.15} />
+      <Audio src={staticFile(bgmSrc || 'assets/bgm.mp3')} volume={0.15} />
 
-      {/* Slide 1: Hook */}
       <Sequence from={0} durationInFrames={slide1Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-          {/* 2 Medias per slide (approx 0.75s each = 22.5 frames) */}
-          <Sequence from={0} durationInFrames={Math.floor(fps * 0.75)}>
-            <AnimatedMedia src={bgImageSrc1A} type={'zoomIn'} />
-          </Sequence>
-          <Sequence from={Math.floor(fps * 0.75)} durationInFrames={Math.ceil(fps * 0.75)}>
-            <AnimatedMedia src={bgImageSrc1B} type={'zoomOut'} />
-          </Sequence>
+          <Audio src={staticFile('assets/part1/警告音1.mp3')} volume={0.5} />
+          <Video src={staticFile(bgImageSrc1A)} playbackRate={(8.234 * fps) / slide1Duration} style={{ position: 'absolute', width: '100%', height: 'auto', objectFit: 'contain', opacity: 0.8 }} muted />
+          <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', backgroundColor: visualTint || 'rgba(0,0,0,0.4)', zIndex: 0 }} />
 
-          <SlideText text={hookText} />
+          <SlideText text={hookText} lang={lang} />
+          {/* TTS Audio starts reading immediately as the slide begins */}
+          <TTSAudio fileName={`${id}_hook`} playbackRate={1.65} />
         </AbsoluteFill>
       </Sequence>
 
       {/* Slide 2: Empathy */}
       <Sequence from={slide1Duration} durationInFrames={slide2Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Sequence from={0} durationInFrames={Math.floor(fps * 0.75)}>
-            <AnimatedMedia src={bgImageSrc2A} type={'zoomOut'} />
+          <Audio src={staticFile('assets/part2/決定ボタンを押す3.mp3')} volume={0.5} />
+          <Sequence from={0} durationInFrames={Math.floor(slide2Duration / 2)}>
+            <AnimatedMedia src={bgImageSrc2A} type={'zoomOut'} durationFrames={Math.floor(slide2Duration / 2)} />
           </Sequence>
-          <Sequence from={Math.floor(fps * 0.75)} durationInFrames={Math.ceil(fps * 0.75)}>
-            <AnimatedMedia src={bgImageSrc2B} type={'panRight'} />
+          <Sequence from={Math.floor(slide2Duration / 2)} durationInFrames={Math.ceil(slide2Duration / 2)}>
+            <Audio src={staticFile('assets/part3/2枚目.mp3')} volume={0.4} />
+            <AnimatedMedia src={bgImageSrc2B} type={'panRight'} durationFrames={Math.ceil(slide2Duration / 2)} />
           </Sequence>
 
-          <SlideText text={empathyText} />
+          <SlideText text={empathyText} lang={lang} />
+          <TTSAudio fileName={`${id}_empathy`} playbackRate={1.65} />
         </AbsoluteFill>
       </Sequence>
 
       {/* Slide 3: App Reveal */}
       <Sequence from={slide1Duration + slide2Duration} durationInFrames={slide3Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <h1 style={{ fontSize: 60, fontWeight: 'bold', textAlign: 'center', marginBottom: 60, marginTop: 100 }}>
+          <Audio src={staticFile('assets/part3/決定ボタンを押す47.mp3')} volume={0.4} />
+          <h1 style={{
+            width: '90%',
+            wordBreak: lang === 'en' ? 'break-word' : 'keep-all',
+            whiteSpace: 'pre-wrap',
+            lineHeight: 1.3,
+            fontSize: lang === 'en' ? 45 : 60,
+            fontFamily: lang === 'en' ? '"Inter", "Montserrat", "Helvetica", sans-serif' : undefined,
+            fontWeight: '900',
+            color: '#ffffff',
+            WebkitTextStroke: lang === 'en' ? '5px #e8a900' : '7px #e8a900',
+            paintOrder: 'stroke fill',
+            textShadow: '0px 4px 12px rgba(0,0,0,0.95)',
+            textAlign: 'center',
+            marginBottom: 60,
+            marginTop: 100,
+            zIndex: 10
+          }}>
             {appRevealText}
           </h1>
           {/* Mockup Container */}
@@ -133,57 +157,37 @@ export const TradeBlockCarousel: React.FC<{
               alignItems: 'center',
               position: 'relative',
               boxShadow: '0 0 100px rgba(255, 255, 255, 0.1)',
+              zIndex: 10,
             }}
           >
             <Video
               src={staticFile(videoSrc)}
-              playbackRate={(part3Duration || (slide3Duration / fps)) / (slide3Duration / fps)}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-              muted
+              playbackRate={part3VideoDuration ? (part3VideoDuration * fps) / slide3Duration : 1}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              muted={false}
             />
           </div>
+          <TTSAudio fileName={`${id}_appReveal`} playbackRate={1.65} />
         </AbsoluteFill>
       </Sequence>
 
       {/* Slide 4: CTA */}
       <Sequence from={slide1Duration + slide2Duration + slide3Duration} durationInFrames={slide4Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-          {isPart4Video ? (
-            <Video
-              src={staticFile(bgImageSrc4)}
-              playbackRate={(part4Duration || (slide4Duration / fps)) / (slide4Duration / fps)}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                opacity: 0.6,
-              }}
-              muted
-            />
-          ) : (
-            <Img
-              src={staticFile(bgImageSrc4)}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                opacity: 0.6,
-              }}
-            />
-          )}
+          <Audio src={staticFile('assets/part4/決定ボタンを押す40.mp3')} volume={0.5} />
+          <Video
+            src={staticFile(bgImageSrc4)}
+            playbackRate={isPart4Video && part4VideoDuration ? (part4VideoDuration * fps) / slide4Duration : 1}
+            style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.4 }}
+            muted
+          />
+          <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', backgroundColor: visualTint || 'rgba(0,0,0,0.6)', opacity: 0.8, zIndex: 0 }} />
 
           {/* Dark gradient overlay so text doesn't clash with video */}
           <AbsoluteFill style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.9) 100%)' }} />
 
-          <SlideText text={ctaText} isCta />
+          <SlideText text={ctaText} isCta lang={lang} />
+          <TTSAudio fileName={`${id}_cta`} playbackRate={1.65} />
         </AbsoluteFill>
       </Sequence>
     </AbsoluteFill>
@@ -191,48 +195,52 @@ export const TradeBlockCarousel: React.FC<{
 };
 
 // Helper component for background images with varied animations
-const AnimatedMedia: React.FC<{ src: string; type: 'zoomIn' | 'zoomOut' | 'panRight' }> = ({ src, type }) => {
+const AnimatedMedia: React.FC<{ src: string; type: 'zoomIn' | 'zoomOut' | 'panRight', durationFrames?: number }> = ({ src, type, durationFrames = 30 }) => {
   const frame = useCurrentFrame();
 
   // Calculate different animations (accelerated length)
-  const zoomIn = interpolate(frame, [0, 30], [1, 1.15], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const zoomOut = interpolate(frame, [0, 30], [1.15, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const panX = interpolate(frame, [0, 30], [0, -20], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const zoomIn = interpolate(frame, [0, durationFrames], [1, 1.15], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const zoomOut = interpolate(frame, [0, durationFrames], [1.15, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const panX = interpolate(frame, [0, durationFrames], [0, -20], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
   let transform = '';
   if (type === 'zoomIn') transform = `scale(${zoomIn})`;
   if (type === 'zoomOut') transform = `scale(${zoomOut})`;
   if (type === 'panRight') transform = `scale(1.15) translateX(${panX}px)`;
 
-  return (
-    <Img
-      src={staticFile(src)}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-        opacity: 0.35,
-        transform,
-      }}
-    />
-  );
+  const isVideo = src.toLowerCase().endsWith('.mp4') || src.toLowerCase().endsWith('.mov');
+  const style: React.CSSProperties = {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    opacity: 0.35,
+    transform,
+  };
+
+  if (isVideo) {
+    return <Video src={staticFile(src)} style={style} muted />;
+  }
+
+  return <Img src={staticFile(src)} style={style} />;
 };
 
 // Helper component for advanced TikTok-style text animations
-const SlideText: React.FC<{ text: string, isCta?: boolean }> = ({ text, isCta }) => {
+const SlideText: React.FC<{ text: string, isCta?: boolean, lang?: 'ja' | 'en' | 'zh-CN' }> = ({ text, isCta, lang = 'ja' }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
 
   // Split text into lines if user provided manual \n or literal \n
   const lines = text.replace(/\\n/g, '\n').split('\n');
 
-  // Use BudouX ML parser for flawless Japanese typographic line splitting
-  // This computationally detects valid phrases and prevents breaking Katakana/Kanji/Punctuation at line ends
-  const parser = React.useMemo(() => loadDefaultJapaneseParser(), []);
+  // Use BudouX ML parser for flawless Japanese/Chinese typographic line splitting
+  const parser = React.useMemo(() => {
+    if (lang === 'zh-CN') return loadDefaultSimplifiedChineseParser();
+    if (lang === 'ja') return loadDefaultJapaneseParser();
+    return null; // For English, standard browser word-wrapper suffices
+  }, [lang]);
 
-  let globalLetterIndex = 0;
+  const isEn = lang === 'en';
 
   return (
     <AbsoluteFill style={{
@@ -243,77 +251,42 @@ const SlideText: React.FC<{ text: string, isCta?: boolean }> = ({ text, isCta })
       <div style={{
         textAlign: 'center',
         width: '100%',
-        maxWidth: '85%',
+        maxWidth: isEn ? '90%' : '85%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        wordBreak: 'keep-all',
+        wordBreak: isEn ? 'break-word' : 'keep-all',
       }}>
         {lines.map((line, lineIdx) => {
-          // Semantically tokenize the text into unbreakable phrase chunks using BudouX
-          const words = parser.parse(line);
+          // English separates by space natively, CJK parsing uses BudouX
+          const words = parser ? parser.parse(line) : line.split(' ');
 
           return (
             <div key={lineIdx} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 15, width: '100%' }}>
-              {words.map((word: string, wordIdx: number) => (
-                <span key={wordIdx} style={{ display: 'inline-block', whiteSpace: 'pre' }}>
-                  {word.split('').map((char: string, charIdx: number) => {
-                    // Stagger animation based on letter index - Much faster now (0.8 instead of 1.5)
-                    const delay = globalLetterIndex * 0.8; // frames delay per letter
-                    if (char.trim() !== '') {
-                      globalLetterIndex++; // Only increment delay for visible characters
-                    } else {
-                      globalLetterIndex += 0.3; // smaller delay for spaces
-                    }
-
-                    // Spring animation for popping up
-                    const scale = spring({
-                      fps,
-                      frame: frame - delay,
-                      config: {
-                        damping: 12,
-                        stiffness: 150,
-                      },
-                    });
-
-                    // Opacity fade in
-                    const opacity = interpolate(
-                      frame - delay,
-                      [0, 5],
-                      [0, 1],
-                      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-                    );
-
-                    // Slide up effect
-                    const translateY = interpolate(
-                      frame - delay,
-                      [0, 10],
-                      [40, 0],
-                      { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
-                    );
-
-                    return (
-                      <span
-                        key={charIdx}
-                        style={{
-                          display: 'inline-block',
-                          opacity,
-                          transform: `translateY(${translateY}px) scale(${scale})`,
-                          fontSize: isCta ? 60 : 70, // Slightly reduced to ensure wide fits
-                          fontWeight: 'bold',
-                          color: 'white',
-                          // Add text shadow to ensure visibility over backgrounds
-                          textShadow: '0px 4px 15px rgba(0,0,0,0.8), 0px 0px 40px rgba(0,0,0,0.6)',
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {char}
-                      </span>
-                    );
-                  })}
-                </span>
-              ))}
+              {words.map((word: string, wordIdx: number) => {
+                const addSpace = isEn && wordIdx < words.length - 1;
+                return (
+                  <span key={wordIdx} style={{ display: 'inline-block', whiteSpace: isEn ? 'pre-wrap' : 'pre' }}>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        fontSize: isEn ? (isCta ? 50 : 55) : (isCta ? 65 : 78),
+                        fontFamily: isEn ? '"Inter", "Montserrat", "Helvetica", sans-serif' : undefined,
+                        fontWeight: 900,
+                        letterSpacing: isEn ? '0em' : '0.05em',
+                        color: '#ffffff',
+                        WebkitTextStroke: isEn ? '5px #e8a900' : '7px #e8a900',
+                        paintOrder: 'stroke fill',
+                        textShadow: '0px 4px 12px rgba(0,0,0,0.95), 0px 0px 30px rgba(0,0,0,0.9)',
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {word}{addSpace ? ' ' : ''}
+                    </span>
+                  </span>
+                )
+              })}
             </div>
           );
         })}

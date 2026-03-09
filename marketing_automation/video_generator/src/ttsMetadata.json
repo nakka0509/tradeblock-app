@@ -1,0 +1,1424 @@
+{
+  "JA-001": {
+    "hook": 6.264,
+    "empathy": 4.488,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-002": {
+    "hook": 8.64,
+    "empathy": 7.2,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-003": {
+    "hook": 5.76,
+    "empathy": 5.064,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-004": {
+    "hook": 6.072,
+    "empathy": 4.704,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-005": {
+    "hook": 7.512,
+    "empathy": 5.184,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-006": {
+    "hook": 7.368,
+    "empathy": 5.016,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-007": {
+    "hook": 8.88,
+    "empathy": 6.072,
+    "appReveal": 4.296,
+    "cta": 3.912
+  },
+  "JA-008": {
+    "hook": 7.248,
+    "empathy": 5.4,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-009": {
+    "hook": 5.328,
+    "empathy": 4.152,
+    "appReveal": 3.984,
+    "cta": 3.912
+  },
+  "JA-010": {
+    "hook": 7.848,
+    "empathy": 4.896,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-066": {
+    "hook": 8.256,
+    "empathy": 5.736,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-067": {
+    "hook": 9.072,
+    "empathy": 7.944,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-069": {
+    "hook": 8.112,
+    "empathy": 4.224,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-011": {
+    "hook": 7.752,
+    "empathy": 5.04,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-012": {
+    "hook": 9.6,
+    "empathy": 4.968,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-013": {
+    "hook": 6.48,
+    "empathy": 5.976,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-014": {
+    "hook": 8.52,
+    "empathy": 6.048,
+    "appReveal": 4.296,
+    "cta": 3.912
+  },
+  "JA-071": {
+    "hook": 7.272,
+    "empathy": 4.944,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-072": {
+    "hook": 8.184,
+    "empathy": 5.736,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-075": {
+    "hook": 10.944,
+    "empathy": 4.704,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-018": {
+    "hook": 8.112,
+    "empathy": 6,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-019": {
+    "hook": 7.44,
+    "empathy": 5.112,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-020": {
+    "hook": 7.656,
+    "empathy": 3.48,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-021": {
+    "hook": 7.08,
+    "empathy": 6.312,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-022": {
+    "hook": 9.648,
+    "empathy": 4.248,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-051": {
+    "hook": 6.12,
+    "empathy": 6.288,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-052": {
+    "hook": 9.864,
+    "empathy": 4.656,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-053": {
+    "hook": 8.304,
+    "empathy": 4.56,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-054": {
+    "hook": 7.824,
+    "empathy": 5.64,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-055": {
+    "hook": 9.096,
+    "empathy": 5.472,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-056": {
+    "hook": 7.392,
+    "empathy": 5.76,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-057": {
+    "hook": 7.416,
+    "empathy": 6.336,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-058": {
+    "hook": 9.528,
+    "empathy": 4.512,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-059": {
+    "hook": 10.584,
+    "empathy": 5.496,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-060": {
+    "hook": 8.232,
+    "empathy": 5.808,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-061": {
+    "hook": 9.288,
+    "empathy": 7.056,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-062": {
+    "hook": 8.928,
+    "empathy": 5.232,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-063": {
+    "hook": 8.136,
+    "empathy": 5.808,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-064": {
+    "hook": 8.928,
+    "empathy": 5.76,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-065": {
+    "hook": 8.712,
+    "empathy": 5.88,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-023": {
+    "hook": 8.256,
+    "empathy": 5.568,
+    "appReveal": 4.296,
+    "cta": 3.912
+  },
+  "JA-024": {
+    "hook": 7.152,
+    "empathy": 4.344,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-025": {
+    "hook": 6.648,
+    "empathy": 3.432,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-026": {
+    "hook": 7.896,
+    "empathy": 3.504,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-028": {
+    "hook": 7.056,
+    "empathy": 5.328,
+    "appReveal": 4.296,
+    "cta": 3.912
+  },
+  "JA-029": {
+    "hook": 7.056,
+    "empathy": 5.28,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-076": {
+    "hook": 9.144,
+    "empathy": 4.992,
+    "appReveal": 4.296,
+    "cta": 3.912
+  },
+  "JA-077": {
+    "hook": 8.64,
+    "empathy": 4.176,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-080": {
+    "hook": 7.56,
+    "empathy": 6.936,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-030": {
+    "hook": 7.152,
+    "empathy": 5.952,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-031": {
+    "hook": 7.56,
+    "empathy": 2.856,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-032": {
+    "hook": 6.168,
+    "empathy": 6.384,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-034": {
+    "hook": 7.92,
+    "empathy": 5.616,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-081": {
+    "hook": 7.92,
+    "empathy": 4.872,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-083": {
+    "hook": 9.744,
+    "empathy": 6.696,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-035": {
+    "hook": 8.112,
+    "empathy": 7.152,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-036": {
+    "hook": 7.752,
+    "empathy": 5.88,
+    "appReveal": 4.296,
+    "cta": 3.912
+  },
+  "JA-086": {
+    "hook": 7.392,
+    "empathy": 6.504,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-088": {
+    "hook": 7.176,
+    "empathy": 4.968,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-090": {
+    "hook": 8.592,
+    "empathy": 4.8,
+    "appReveal": 4.296,
+    "cta": 3.912
+  },
+  "JA-039": {
+    "hook": 7.008,
+    "empathy": 8.64,
+    "appReveal": 3.984,
+    "cta": 3.912
+  },
+  "JA-040": {
+    "hook": 6.792,
+    "empathy": 4.128,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-041": {
+    "hook": 7.44,
+    "empathy": 2.976,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-091": {
+    "hook": 9.096,
+    "empathy": 6.96,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-093": {
+    "hook": 9.336,
+    "empathy": 5.16,
+    "appReveal": 3.984,
+    "cta": 3.912
+  },
+  "JA-043": {
+    "hook": 9.264,
+    "empathy": 6.096,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-044": {
+    "hook": 8.736,
+    "empathy": 6.6,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-045": {
+    "hook": 6.84,
+    "empathy": 5.952,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-046": {
+    "hook": 6.888,
+    "empathy": 6.384,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-047": {
+    "hook": 6.216,
+    "empathy": 5.712,
+    "appReveal": 3.984,
+    "cta": 3.912
+  },
+  "JA-094": {
+    "hook": 8.496,
+    "empathy": 5.496,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-095": {
+    "hook": 8.736,
+    "empathy": 5.4,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-097": {
+    "hook": 7.848,
+    "empathy": 4.92,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-048": {
+    "hook": 9.096,
+    "empathy": 6,
+    "appReveal": 4.92,
+    "cta": 3.912
+  },
+  "JA-049": {
+    "hook": 9.168,
+    "empathy": 5.784,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-050": {
+    "hook": 7.344,
+    "empathy": 6.72,
+    "appReveal": 3.984,
+    "cta": 3.912
+  },
+  "JA-098": {
+    "hook": 8.76,
+    "empathy": 8.256,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "JA-099": {
+    "hook": 10.32,
+    "empathy": 5.856,
+    "appReveal": 4.104,
+    "cta": 3.912
+  },
+  "JA-100": {
+    "hook": 9.72,
+    "empathy": 7.584,
+    "appReveal": 4.416,
+    "cta": 3.912
+  },
+  "EN-001": {
+    "hook": 5.496,
+    "empathy": 4.896,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-002": {
+    "hook": 4.824,
+    "empathy": 5.304,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-003": {
+    "hook": 5.448,
+    "empathy": 3.936,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-004": {
+    "hook": 5.496,
+    "empathy": 3.24,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-005": {
+    "hook": 5.88,
+    "empathy": 4.008,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-006": {
+    "hook": 6.624,
+    "empathy": 3.816,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-007": {
+    "hook": 5.976,
+    "empathy": 4.728,
+    "appReveal": 4.368,
+    "cta": 2.016
+  },
+  "EN-008": {
+    "hook": 5.784,
+    "empathy": 5.52,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-009": {
+    "hook": 3.984,
+    "empathy": 3.456,
+    "appReveal": 2.592,
+    "cta": 2.016
+  },
+  "EN-010": {
+    "hook": 5.88,
+    "empathy": 4.8,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-066": {
+    "hook": 4.896,
+    "empathy": 4.104,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-067": {
+    "hook": 7.008,
+    "empathy": 4.992,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-069": {
+    "hook": 4.272,
+    "empathy": 3.552,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-011": {
+    "hook": 8.856,
+    "empathy": 5.04,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-012": {
+    "hook": 6.288,
+    "empathy": 3.984,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-013": {
+    "hook": 5.208,
+    "empathy": 6,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-014": {
+    "hook": 6.48,
+    "empathy": 5.064,
+    "appReveal": 4.368,
+    "cta": 2.016
+  },
+  "EN-071": {
+    "hook": 4.968,
+    "empathy": 4.752,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-072": {
+    "hook": 6.792,
+    "empathy": 5.04,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-075": {
+    "hook": 6.264,
+    "empathy": 5.328,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-018": {
+    "hook": 6.48,
+    "empathy": 5.352,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-019": {
+    "hook": 6.408,
+    "empathy": 5.064,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-020": {
+    "hook": 6.288,
+    "empathy": 3.192,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-021": {
+    "hook": 5.616,
+    "empathy": 4.2,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-022": {
+    "hook": 5.832,
+    "empathy": 5.448,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-051": {
+    "hook": 6,
+    "empathy": 4.896,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-052": {
+    "hook": 7.224,
+    "empathy": 4.008,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-053": {
+    "hook": 5.184,
+    "empathy": 3.576,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-054": {
+    "hook": 6.288,
+    "empathy": 3.816,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-055": {
+    "hook": 6.408,
+    "empathy": 4.032,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-056": {
+    "hook": 8.352,
+    "empathy": 4.992,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-057": {
+    "hook": 4.992,
+    "empathy": 4.632,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-058": {
+    "hook": 6.168,
+    "empathy": 4.104,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-059": {
+    "hook": 6.912,
+    "empathy": 4.704,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-060": {
+    "hook": 5.976,
+    "empathy": 5.4,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-061": {
+    "hook": 6.168,
+    "empathy": 4.896,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-062": {
+    "hook": 4.776,
+    "empathy": 5.184,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-063": {
+    "hook": 6.552,
+    "empathy": 4.056,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-064": {
+    "hook": 7.968,
+    "empathy": 4.584,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-065": {
+    "hook": 7.152,
+    "empathy": 4.272,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-023": {
+    "hook": 7.656,
+    "empathy": 4.464,
+    "appReveal": 4.368,
+    "cta": 2.016
+  },
+  "EN-024": {
+    "hook": 5.472,
+    "empathy": 3.336,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-025": {
+    "hook": 6.504,
+    "empathy": 4.008,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-026": {
+    "hook": 5.808,
+    "empathy": 3.264,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-028": {
+    "hook": 5.688,
+    "empathy": 5.688,
+    "appReveal": 4.368,
+    "cta": 2.016
+  },
+  "EN-029": {
+    "hook": 5.352,
+    "empathy": 5.184,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-076": {
+    "hook": 5.736,
+    "empathy": 3.912,
+    "appReveal": 4.368,
+    "cta": 2.016
+  },
+  "EN-077": {
+    "hook": 6.264,
+    "empathy": 3.864,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-080": {
+    "hook": 6.504,
+    "empathy": 3.672,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-030": {
+    "hook": 4.896,
+    "empathy": 5.088,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-031": {
+    "hook": 3.504,
+    "empathy": 3.36,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-032": {
+    "hook": 4.296,
+    "empathy": 5.472,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-034": {
+    "hook": 6.072,
+    "empathy": 4.248,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-081": {
+    "hook": 5.376,
+    "empathy": 3.816,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-083": {
+    "hook": 7.728,
+    "empathy": 5.424,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-035": {
+    "hook": 7.056,
+    "empathy": 5.88,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-036": {
+    "hook": 5.616,
+    "empathy": 4.128,
+    "appReveal": 4.368,
+    "cta": 2.016
+  },
+  "EN-086": {
+    "hook": 7.08,
+    "empathy": 5.28,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-088": {
+    "hook": 5.928,
+    "empathy": 4.008,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-090": {
+    "hook": 6.024,
+    "empathy": 5.256,
+    "appReveal": 4.368,
+    "cta": 2.016
+  },
+  "EN-039": {
+    "hook": 5.064,
+    "empathy": 4.728,
+    "appReveal": 2.592,
+    "cta": 2.016
+  },
+  "EN-040": {
+    "hook": 5.568,
+    "empathy": 4.68,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-041": {
+    "hook": 5.376,
+    "empathy": 3.24,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-091": {
+    "hook": 6.36,
+    "empathy": 5.88,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-093": {
+    "hook": 6.216,
+    "empathy": 4.128,
+    "appReveal": 2.592,
+    "cta": 2.016
+  },
+  "EN-043": {
+    "hook": 6.024,
+    "empathy": 4.848,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-044": {
+    "hook": 6.528,
+    "empathy": 4.896,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-045": {
+    "hook": 4.2,
+    "empathy": 5.448,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-046": {
+    "hook": 5.16,
+    "empathy": 5.136,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-047": {
+    "hook": 5.448,
+    "empathy": 4.896,
+    "appReveal": 2.592,
+    "cta": 2.016
+  },
+  "EN-094": {
+    "hook": 6.48,
+    "empathy": 5.016,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-095": {
+    "hook": 5.448,
+    "empathy": 4.632,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-097": {
+    "hook": 6.168,
+    "empathy": 4.032,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-048": {
+    "hook": 6.072,
+    "empathy": 4.392,
+    "appReveal": 5.016,
+    "cta": 2.016
+  },
+  "EN-049": {
+    "hook": 7.056,
+    "empathy": 5.016,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-050": {
+    "hook": 4.488,
+    "empathy": 4.152,
+    "appReveal": 2.592,
+    "cta": 2.016
+  },
+  "EN-098": {
+    "hook": 6.24,
+    "empathy": 4.896,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "EN-099": {
+    "hook": 7.224,
+    "empathy": 6,
+    "appReveal": 4.08,
+    "cta": 2.016
+  },
+  "EN-100": {
+    "hook": 5.4,
+    "empathy": 6,
+    "appReveal": 5.04,
+    "cta": 2.016
+  },
+  "CN-001": {
+    "hook": 6.744,
+    "empathy": 5.424,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-002": {
+    "hook": 7.44,
+    "empathy": 6.84,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-003": {
+    "hook": 6.216,
+    "empathy": 3.72,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-004": {
+    "hook": 8.424,
+    "empathy": 5.448,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-005": {
+    "hook": 7.632,
+    "empathy": 5.784,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-006": {
+    "hook": 9.312,
+    "empathy": 4.296,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-007": {
+    "hook": 6.864,
+    "empathy": 5.952,
+    "appReveal": 4.512,
+    "cta": 2.448
+  },
+  "CN-008": {
+    "hook": 7.32,
+    "empathy": 7.68,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-009": {
+    "hook": 4.392,
+    "empathy": 4.608,
+    "appReveal": 4.056,
+    "cta": 2.448
+  },
+  "CN-010": {
+    "hook": 6.984,
+    "empathy": 6.384,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-066": {
+    "hook": 5.544,
+    "empathy": 5.064,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-067": {
+    "hook": 8.28,
+    "empathy": 6.96,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-069": {
+    "hook": 5.856,
+    "empathy": 4.248,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-011": {
+    "hook": 7.536,
+    "empathy": 5.76,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-012": {
+    "hook": 8.496,
+    "empathy": 4.296,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-013": {
+    "hook": 6.336,
+    "empathy": 8.256,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-014": {
+    "hook": 7.824,
+    "empathy": 6.48,
+    "appReveal": 4.512,
+    "cta": 2.448
+  },
+  "CN-071": {
+    "hook": 6.072,
+    "empathy": 6.576,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-072": {
+    "hook": 8.184,
+    "empathy": 6.456,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-075": {
+    "hook": 9.192,
+    "empathy": 6.84,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-018": {
+    "hook": 8.088,
+    "empathy": 7.008,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-019": {
+    "hook": 7.92,
+    "empathy": 6.192,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-020": {
+    "hook": 7.2,
+    "empathy": 3.384,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-021": {
+    "hook": 6.936,
+    "empathy": 5.688,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-022": {
+    "hook": 7.992,
+    "empathy": 6.936,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-051": {
+    "hook": 7.224,
+    "empathy": 7.992,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-052": {
+    "hook": 9.168,
+    "empathy": 4.392,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-053": {
+    "hook": 6.12,
+    "empathy": 5.592,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-054": {
+    "hook": 8.232,
+    "empathy": 4.896,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-055": {
+    "hook": 7.632,
+    "empathy": 5.496,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-056": {
+    "hook": 9.84,
+    "empathy": 6.24,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-057": {
+    "hook": 7.152,
+    "empathy": 6.12,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-058": {
+    "hook": 9.12,
+    "empathy": 5.112,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-059": {
+    "hook": 8.52,
+    "empathy": 6.12,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-060": {
+    "hook": 6.192,
+    "empathy": 7.08,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-061": {
+    "hook": 6.312,
+    "empathy": 7.272,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-062": {
+    "hook": 7.632,
+    "empathy": 6.912,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-063": {
+    "hook": 8.328,
+    "empathy": 4.488,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-064": {
+    "hook": 8.448,
+    "empathy": 4.824,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-065": {
+    "hook": 7.992,
+    "empathy": 5.928,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-023": {
+    "hook": 7.92,
+    "empathy": 6.72,
+    "appReveal": 4.512,
+    "cta": 2.448
+  },
+  "CN-024": {
+    "hook": 7.296,
+    "empathy": 4.464,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-025": {
+    "hook": 7.128,
+    "empathy": 4.512,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-026": {
+    "hook": 8.28,
+    "empathy": 3.552,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-028": {
+    "hook": 6.456,
+    "empathy": 6.96,
+    "appReveal": 4.512,
+    "cta": 2.448
+  },
+  "CN-029": {
+    "hook": 8.472,
+    "empathy": 5.832,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-076": {
+    "hook": 6.408,
+    "empathy": 6.312,
+    "appReveal": 4.512,
+    "cta": 2.448
+  },
+  "CN-077": {
+    "hook": 7.56,
+    "empathy": 4.632,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-080": {
+    "hook": 11.184,
+    "empathy": 6.672,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-030": {
+    "hook": 5.664,
+    "empathy": 6.168,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-031": {
+    "hook": 5.496,
+    "empathy": 3.168,
+    "appReveal": 6.408,
+    "cta": 2.448
+  },
+  "CN-032": {
+    "hook": 5.544,
+    "empathy": 6.288,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-034": {
+    "hook": 7.464,
+    "empathy": 5.4,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-081": {
+    "hook": 7.2,
+    "empathy": 4.608,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-083": {
+    "hook": 8.88,
+    "empathy": 7.92,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-035": {
+    "hook": 9.888,
+    "empathy": 7.656,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-036": {
+    "hook": 7.056,
+    "empathy": 5.184,
+    "appReveal": 4.512,
+    "cta": 2.448
+  },
+  "CN-086": {
+    "hook": 9.24,
+    "empathy": 6.864,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-088": {
+    "hook": 6.672,
+    "empathy": 4.632,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-090": {
+    "hook": 9.144,
+    "empathy": 7.368,
+    "appReveal": 4.512,
+    "cta": 2.448
+  },
+  "CN-039": {
+    "hook": 6.48,
+    "empathy": 6.552,
+    "appReveal": 4.056,
+    "cta": 2.448
+  },
+  "CN-040": {
+    "hook": 8.256,
+    "empathy": 6.072,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-041": {
+    "hook": 6.144,
+    "empathy": 3.744,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-091": {
+    "hook": 7.92,
+    "empathy": 7.608,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-093": {
+    "hook": 6.984,
+    "empathy": 6.384,
+    "appReveal": 4.056,
+    "cta": 2.448
+  },
+  "CN-043": {
+    "hook": 6.456,
+    "empathy": 6.84,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-044": {
+    "hook": 8.376,
+    "empathy": 5.256,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-045": {
+    "hook": 4.872,
+    "empathy": 4.44,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-046": {
+    "hook": 7.248,
+    "empathy": 6.432,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-047": {
+    "hook": 6.288,
+    "empathy": 6.048,
+    "appReveal": 4.056,
+    "cta": 2.448
+  },
+  "CN-094": {
+    "hook": 8.544,
+    "empathy": 6.576,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-095": {
+    "hook": 9.504,
+    "empathy": 6.192,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-097": {
+    "hook": 7.68,
+    "empathy": 4.632,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-048": {
+    "hook": 7.032,
+    "empathy": 4.776,
+    "appReveal": 6.912,
+    "cta": 2.448
+  },
+  "CN-049": {
+    "hook": 7.416,
+    "empathy": 6.384,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-050": {
+    "hook": 5.808,
+    "empathy": 5.856,
+    "appReveal": 4.056,
+    "cta": 2.448
+  },
+  "CN-098": {
+    "hook": 8.304,
+    "empathy": 8.184,
+    "appReveal": 6.12,
+    "cta": 2.448
+  },
+  "CN-099": {
+    "hook": 8.472,
+    "empathy": 7.056,
+    "appReveal": 6.384,
+    "cta": 2.448
+  },
+  "CN-100": {
+    "hook": 8.832,
+    "empathy": 7.56,
+    "appReveal": 6.12,
+    "cta": 2.448
+  }
+}

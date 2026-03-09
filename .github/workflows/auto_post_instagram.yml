@@ -29,16 +29,17 @@ jobs:
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
         sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
 
-    - name: Pick a random Japanese composition
+    - name: Generate TTS and Pick random Japanese composition
       id: pick
+      working-directory: ./marketing_automation/video_generator
       run: |
-        COMPOSITIONS=("Feature1-TimeLock" "Feature2-TradeLog" "Feature3-SecureProfit" "Feature4-Questionnaire")
-        INDEX=$(( RANDOM % ${#COMPOSITIONS[@]} ))
-        echo "composition=${COMPOSITIONS[$INDEX]}" >> $GITHUB_OUTPUT
+        node scripts/generate_tts_and_metadata.mjs
+        COMP_ID=$(npx tsx scripts/prepare_daily_video.ts ja)
+        echo "composition=$COMP_ID" >> $GITHUB_OUTPUT
 
     - name: Render Video
       working-directory: ./marketing_automation/video_generator
-      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --timeout=120000
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --props=src/dailyOverride.json --timeout=120000
 
     - name: Post to Instagram (Japanese account)
       working-directory: ./marketing_automation/video_generator
@@ -77,16 +78,17 @@ jobs:
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
         sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
 
-    - name: Pick a random English composition
+    - name: Generate TTS and Pick random English composition
       id: pick
+      working-directory: ./marketing_automation/video_generator
       run: |
-        COMPOSITIONS=("Feature1-TimeLock-EN" "Feature2-TradeLog-EN" "Feature3-SecureProfit-EN" "Feature4-Questionnaire-EN")
-        INDEX=$(( RANDOM % ${#COMPOSITIONS[@]} ))
-        echo "composition=${COMPOSITIONS[$INDEX]}" >> $GITHUB_OUTPUT
+        node scripts/generate_tts_and_metadata.mjs
+        COMP_ID=$(npx tsx scripts/prepare_daily_video.ts en)
+        echo "composition=$COMP_ID" >> $GITHUB_OUTPUT
 
     - name: Render Video
       working-directory: ./marketing_automation/video_generator
-      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --timeout=120000
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --props=src/dailyOverride.json --timeout=120000
 
     - name: Post to Instagram (English account)
       working-directory: ./marketing_automation/video_generator
@@ -125,16 +127,17 @@ jobs:
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
         sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
 
-    - name: Pick a random Chinese composition
+    - name: Generate TTS and Pick random Chinese composition
       id: pick
+      working-directory: ./marketing_automation/video_generator
       run: |
-        COMPOSITIONS=("Feature1-TimeLock-CN" "Feature2-TradeLog-CN" "Feature3-SecureProfit-CN" "Feature4-Questionnaire-CN")
-        INDEX=$(( RANDOM % ${#COMPOSITIONS[@]} ))
-        echo "composition=${COMPOSITIONS[$INDEX]}" >> $GITHUB_OUTPUT
+        node scripts/generate_tts_and_metadata.mjs
+        COMP_ID=$(npx tsx scripts/prepare_daily_video.ts zh-CN)
+        echo "composition=$COMP_ID" >> $GITHUB_OUTPUT
 
     - name: Render Video
       working-directory: ./marketing_automation/video_generator
-      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --timeout=120000
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --props=src/dailyOverride.json --timeout=120000
 
     - name: Post to Instagram (Chinese account)
       working-directory: ./marketing_automation/video_generator
