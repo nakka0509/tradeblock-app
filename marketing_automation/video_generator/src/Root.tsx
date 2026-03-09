@@ -3,8 +3,8 @@ import { TradeBlockCarousel } from './TradeBlockCarousel';
 
 export const RemotionRoot: React.FC = () => {
   const fps = 30;
-  // Slide 1,2: 3s each. Slide 3,4: 4s each = 14s total
-  const durationInFrames = Math.floor(14 * fps);
+  // Slide 1,2: 1.5s each. Slide 3,4: 4s each = 11s total
+  const durationInFrames = Math.floor(11 * fps);
 
   return (
     <>

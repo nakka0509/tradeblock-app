@@ -31,9 +31,9 @@ export const TradeBlockCarousel: React.FC<{
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  // Timing constants (in frames, assuming 30fps) - User requested 3s, 3s, 4s, 4s
-  const slide1Duration = 3 * fps;
-  const slide2Duration = 3 * fps;
+  // Timing constants (in frames, assuming 30fps) - Accelerated for better TikTok/Reels retention
+  const slide1Duration = 1.5 * fps;
+  const slide2Duration = 1.5 * fps;
   const slide3Duration = 4 * fps;
   const slide4Duration = 4 * fps;
 
@@ -87,11 +87,11 @@ export const TradeBlockCarousel: React.FC<{
       {/* Slide 1: Hook */}
       <Sequence from={0} durationInFrames={slide1Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-          {/* 2 Medias per slide (approx 1.5s each = 45 frames) */}
-          <Sequence from={0} durationInFrames={fps * 1.5}>
+          {/* 2 Medias per slide (approx 0.75s each = 22.5 frames) */}
+          <Sequence from={0} durationInFrames={Math.floor(fps * 0.75)}>
             <AnimatedMedia src={bgImageSrc1A} type={'zoomIn'} />
           </Sequence>
-          <Sequence from={fps * 1.5} durationInFrames={fps * 1.5}>
+          <Sequence from={Math.floor(fps * 0.75)} durationInFrames={Math.ceil(fps * 0.75)}>
             <AnimatedMedia src={bgImageSrc1B} type={'zoomOut'} />
           </Sequence>
 
@@ -102,10 +102,10 @@ export const TradeBlockCarousel: React.FC<{
       {/* Slide 2: Empathy */}
       <Sequence from={slide1Duration} durationInFrames={slide2Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Sequence from={0} durationInFrames={fps * 1.5}>
+          <Sequence from={0} durationInFrames={Math.floor(fps * 0.75)}>
             <AnimatedMedia src={bgImageSrc2A} type={'zoomOut'} />
           </Sequence>
-          <Sequence from={fps * 1.5} durationInFrames={fps * 1.5}>
+          <Sequence from={Math.floor(fps * 0.75)} durationInFrames={Math.ceil(fps * 0.75)}>
             <AnimatedMedia src={bgImageSrc2B} type={'panRight'} />
           </Sequence>
 
@@ -194,10 +194,10 @@ export const TradeBlockCarousel: React.FC<{
 const AnimatedMedia: React.FC<{ src: string; type: 'zoomIn' | 'zoomOut' | 'panRight' }> = ({ src, type }) => {
   const frame = useCurrentFrame();
 
-  // Calculate different animations
-  const zoomIn = interpolate(frame, [0, 60], [1, 1.15], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const zoomOut = interpolate(frame, [0, 60], [1.15, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-  const panX = interpolate(frame, [0, 60], [0, -20], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  // Calculate different animations (accelerated length)
+  const zoomIn = interpolate(frame, [0, 30], [1, 1.15], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const zoomOut = interpolate(frame, [0, 30], [1.15, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const panX = interpolate(frame, [0, 30], [0, -20], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
   let transform = '';
   if (type === 'zoomIn') transform = `scale(${zoomIn})`;
