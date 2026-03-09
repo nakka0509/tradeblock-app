@@ -1763,8 +1763,8 @@
 
                 const ja = this.state.lang === 'ja';
                 const sub_notice = ja
-                    ? `※サブスクリプションは自動更新されます。解約はアップル設定画面からいつでも可能`
-                    : `*Subscriptions auto-renew. Cancel anytime in Apple ID settings.`;
+                    ? `【月額プラン】7日間無料トライアル終了後、自動的に¥900/月が請求されます。無料期間終了の24時間前までにキャンセルしない場合、自動更新されます。解約はApple ID設定の「サブスクリプション」からいつでも可能です。【年額プラン】¥5,000/年で自動更新（無料トライアルなし）。`
+                    : `[Monthly] After the 7-day free trial, \$9.99/month will be charged automatically. Cancel anytime in Apple ID Settings > Subscriptions before the trial ends. [Annual] \$49.99/year, auto-renews (no free trial).`;
                 div.innerHTML = `
                     <div class="flex-1 flex flex-col justify-start items-center text-center max-w-md mx-auto w-full pt-4">
                         <div class="w-full flex justify-between pb-4 items-center">
@@ -1796,6 +1796,9 @@
                                 <span class="font-bold text-sm text-white flex-1">${this.t('sub_monthly')}</span>
                                 <span class="font-black text-xl text-[#D4AF37] drop-shadow-sm">${this.t('sub_monthly_price')}</span>
                             </button>
+                            <div class="text-[10px] text-blue-300 font-bold px-2 pt-1 pb-2 text-left leading-snug opacity-80">
+                                ${ja ? '✅ 7日間無料トライアル → 無料期間終了後、自動的に<b>¥900/月</b>が請求されます' : '✅ 7-day FREE trial → then <b>$9.99/mo</b> billed automatically after trial ends'}
+                            </div>
                             <button id="plan-annual" onclick="app.selectPremiumPlan('com.shota.tradeblock.premium.annual')" class="w-full relative overflow-hidden rounded-xl p-5 flex justify-between items-center transition-all text-left ${this._selPlan === 'com.shota.tradeblock.premium.annual' ? 'border-2 border-[#D4AF37] scale-[1.02] shadow-[0_0_20px_rgba(212,175,55,0.4)] bg-gradient-to-br from-[#332a15] to-[#111]' : 'border border-gray-700 hover:border-gray-500 bg-gradient-to-br from-[#2a2211] to-[#111] scale-100 opacity-80'}">
                                 <div class="absolute top-0 right-0 bg-red-600 shadow-sm text-[10px] font-black py-1 px-3 rounded-bl-xl tracking-wider z-10 animate-pulse">BEST VALUE</div>
                                 <span class="font-bold text-sm text-white flex-1">${this.t('sub_annual')}</span>
