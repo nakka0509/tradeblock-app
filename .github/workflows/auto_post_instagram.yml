@@ -25,9 +25,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
         ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
-        ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
-        sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
 
     - name: Generate TTS and Pick random Japanese composition
       id: pick
@@ -74,9 +72,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
         ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
-        ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
-        sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
 
     - name: Generate TTS and Pick random English composition
       id: pick
@@ -123,9 +119,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
         ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
-        ffmpeg -i public/assets/part4/part4.mov -vcodec libx264 -acodec aac public/assets/part4/part4.mp4
         sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
-        sed -i 's/part4.mov/part4.mp4/g' src/Root.tsx
 
     - name: Generate TTS and Pick random Chinese composition
       id: pick
