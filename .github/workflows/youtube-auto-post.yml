@@ -19,22 +19,27 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: './marketing_automation/video_generator/package-lock.json'
 
       - name: Install dependencies
+        working-directory: ./marketing_automation/video_generator
         run: npm ci
 
       - name: Set up FFmpeg (required for Remotion / Audio)
         uses: FedericoCarboni/setup-ffmpeg@v3
 
       - name: Generate Random Video Props
+        working-directory: ./marketing_automation/video_generator
         run: node scripts/prepare_daily_video.ts
         env:
           TARGET_PLATFORM: youtube
 
       - name: Render Video
+        working-directory: ./marketing_automation/video_generator
         run: npx remotion render Root out/video.mp4 --props=./src/dailyOverride.json
 
       - name: Upload to YouTube
+        working-directory: ./marketing_automation/video_generator
         run: node scripts/upload_youtube.mjs
         env:
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
