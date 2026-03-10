@@ -17,6 +17,51 @@ import { getVideoMetadata } from '@remotion/media-utils';
 import { TTSAudio } from './TTSAudio';
 import ttsMetadata from './ttsMetadata.json';
 
+// --- New Component: Double Tap Prompt ---
+const DoubleTapPrompt: React.FC<{ lang: string }> = ({ lang }) => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 10], [0, 1], { extrapolateRight: 'clamp' });
+  const pulse = interpolate(Math.sin(frame * 0.3), [-1, 1], [0.9, 1.1]);
+
+  const text = lang === 'en' ? 'Double Tap if you relate! ❤️' :
+    lang === 'zh-CN' ? '有同感的双击屏幕！ ❤️' :
+      'あるあると思ったら2回タップ！ ❤️';
+
+  return (
+    <div style={{
+      position: 'absolute',
+      bottom: '15%',
+      width: '100%',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'column',
+      opacity,
+      zIndex: 50,
+    }}>
+      <div style={{
+        transform: `scale(${pulse})`,
+        backgroundColor: 'rgba(255, 0, 80, 0.95)',
+        padding: '16px 40px',
+        borderRadius: '50px',
+        boxShadow: '0 10px 30px rgba(255, 0, 80, 0.6)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px'
+      }}>
+        <div style={{ fontSize: 45, filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.5))' }}>❤️</div>
+        <div style={{
+          fontSize: lang === 'en' ? 36 : 42,
+          fontWeight: '900',
+          color: 'white',
+          textShadow: '0 2px 4px rgba(0,0,0,0.4)',
+          letterSpacing: 2
+        }}>{text}</div>
+      </div>
+    </div>
+  );
+};
+
 export const TradeBlockCarousel: React.FC<{
   hookText: string;
   empathyText: string;
@@ -117,6 +162,11 @@ export const TradeBlockCarousel: React.FC<{
 
           <SlideText text={empathyText} lang={lang} />
           <TTSAudio fileName={`${id}_empathy`} playbackRate={1.65} />
+
+          {/* Show the interactive Double Tap Prompt in the last 60 frames (2 seconds) of the empathy slide */}
+          <Sequence from={slide2Duration - 60} durationInFrames={60}>
+            <DoubleTapPrompt lang={lang} />
+          </Sequence>
         </AbsoluteFill>
       </Sequence>
 
