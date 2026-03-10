@@ -1,15 +1,15 @@
 {
-  "hookText": "深夜3時の損切りライン引き下げ。翌朝、後悔だけが残った。",
-  "empathyText": "夜中の判断は、\n昼とは別の脳がやっている。",
-  "appRevealText": "勝ち逃げ確定。翌朝まで強制ロック。",
+  "hookText": "ボーナス全額をFXに入金した月に、過去最大の損失を出した。",
+  "empathyText": "大きな資金は、\n感情トレードをより大きくするだけだ。",
+  "appRevealText": "感情トレードを、システムで物理遮断。",
   "ctaText": "トレードブロック、今すぐダウンロード",
-  "bgImageSrc1A": "assets/part1/trading_loss_video_new.mp4",
+  "bgImageSrc1A": "assets/part1/ScreenRecording_03-09-2026 13-36-36_1.mov",
   "bgImageSrc1B": "assets/part1/trading_despair_jp_1.png",
-  "bgImageSrc2A": "assets/part2/trading_despair_jp_1.png",
-  "bgImageSrc2B": "assets/part2/trading_loss_phone_2.png",
-  "bgImageSrc4": "assets/part4/new_cta_background.mp4",
+  "bgImageSrc2A": "assets/part2/trading_despair_6.png",
+  "bgImageSrc2B": "assets/part2/trading_despair_cn_1.png",
+  "bgImageSrc4": "assets/part4/名称未設定.mp4",
   "videoSrc": "assets/part3/part3.mp4",
   "lang": "ja",
   "bgmSrc": "assets/bgm.mp3",
-  "visualTint": "rgba(20, 0, 0, 0.45)"
+  "visualTint": "rgba(0, 0, 0, 0.5)"
 }
