@@ -41,7 +41,7 @@ const DEFAULT_ASSETS = {
   bgImageSrc1B: 'assets/part1/trading_despair_jp_1.png',
   bgImageSrc2A: PART2_ASSETS_A[0],
   bgImageSrc2B: PART2_ASSETS_B[0],
-  bgImageSrc4: 'assets/part4/part4.mp4',
+  bgImageSrc4: 'assets/part4/new_cta_background.mp4',
   videoSrc: 'assets/part3/part3.mp4',
   bgmSrc: 'assets/bgm.mp3',
   visualTint: 'rgba(0,0,0,0.4)'
