@@ -1,5 +1,6 @@
 import { Composition } from 'remotion';
 import { TradeBlockCarousel } from './TradeBlockCarousel';
+import { TradeBlockAruaruCarousel } from './TradeBlockAruaruCarousel';
 import ttsMetadata from './ttsMetadata.json';
 import { videoVariations } from './videoTexts';
 
@@ -19,11 +20,26 @@ export const RemotionRoot: React.FC = () => {
 
   return (
     <>
+      {/* Standard Templates */}
       {videoVariations.map((v) => (
         <Composition
           key={v.id}
           id={v.id}
           component={TradeBlockCarousel}
+          durationInFrames={getDuration(v.id, v.props)}
+          fps={fps}
+          width={1080}
+          height={1920}
+          defaultProps={v.props}
+        />
+      ))}
+
+      {/* Relatable (Aruaru) Templates - with Double Tap animation */}
+      {videoVariations.map((v) => (
+        <Composition
+          key={`ARUARU-${v.id}`}
+          id={`ARUARU-${v.id}`}
+          component={TradeBlockAruaruCarousel}
           durationInFrames={getDuration(v.id, v.props)}
           fps={fps}
           width={1080}
