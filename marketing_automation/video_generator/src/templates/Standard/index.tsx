@@ -11,11 +11,32 @@ import {
   Img,
   staticFile,
   Video,
-  Audio
+  Audio,
+  random
 } from 'remotion';
 import { getVideoMetadata } from '@remotion/media-utils';
-import { TTSAudio } from './TTSAudio';
-import ttsMetadata from './ttsMetadata.json';
+import { TTSAudio } from '../../TTSAudio';
+import ttsMetadata from '../../ttsMetadata.json';
+
+const generateIrregularFocusLines = (seed: string) => {
+  let stops = [];
+  let currentAngle = 0;
+  let i = 0;
+  while (currentAngle < 360) {
+    let isLine = random(`${seed}-isLine-${i}`) > 0.65; // Sharper, less dense
+    let width = isLine ? random(`${seed}-wL-${i}`) * 1.5 + 0.1 : random(`${seed}-wG-${i}`) * 6 + 2;
+    let nextAngle = Math.min(360, currentAngle + width);
+    if (isLine) {
+      let opacity = random(`${seed}-op-${i}`) * 0.7 + 0.3;
+      stops.push(`rgba(255,255,255,${opacity.toFixed(2)}) ${currentAngle.toFixed(1)}deg ${nextAngle.toFixed(1)}deg`);
+    } else {
+      stops.push(`transparent ${currentAngle.toFixed(1)}deg ${nextAngle.toFixed(1)}deg`);
+    }
+    currentAngle = nextAngle;
+    i++;
+  }
+  return `conic-gradient(from 0deg, ${stops.join(', ')})`;
+};
 
 export const TradeBlockCarousel: React.FC<{
   hookText: string;
@@ -33,11 +54,14 @@ export const TradeBlockCarousel: React.FC<{
   lang: 'ja' | 'en' | 'zh-CN';
 }> = ({ hookText, empathyText, appRevealText, ctaText, bgImageSrc1A, bgImageSrc1B, bgImageSrc2A, bgImageSrc2B, bgImageSrc4, videoSrc, bgmSrc, visualTint, lang }) => {
   const { fps, id } = useVideoConfig();
+  const frame = useCurrentFrame();
+  const patternFrame = Math.floor(frame / 2); // Update every 2 frames for classic anime step-animation
+  const focusLinesBg = React.useMemo(() => generateIrregularFocusLines(`${id}-${patternFrame}`), [id, patternFrame]);
 
   // Dynamic timing calculation based on generated audio length
   const meta = (ttsMetadata as Record<string, any>)[id] || { hook: 3, empathy: 3, appReveal: 3, cta: 3 };
   const playbackRate = 1.65;
-  const buffer = 0.3; // Give 0.3s of visual breathing room after the text is read
+  const buffer = 0.1; // Brutally fast pacing, minimal breathing room
   const slide1Duration = Math.ceil((meta.hook / playbackRate) * fps); // No buffer for Part1 → avoids gap before Part2
   const slide2Duration = Math.ceil((meta.empathy / playbackRate + buffer) * fps);
   const slide3Duration = Math.ceil((meta.appReveal / playbackRate + buffer) * fps);
@@ -94,10 +118,28 @@ export const TradeBlockCarousel: React.FC<{
       <Sequence from={0} durationInFrames={slide1Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Audio src={staticFile('assets/part1/警告音1.mp3')} volume={0.5} />
-          <Video src={staticFile(bgImageSrc1A)} playbackRate={(8.234 * fps) / slide1Duration} style={{ position: 'absolute', width: '100%', height: 'auto', objectFit: 'contain', opacity: 0.8 }} muted />
+          <AbsoluteFill style={{
+            transform: `scale(${interpolate(frame, [0, 15], [1.15, 1], { extrapolateRight: 'clamp' })})`
+          }}>
+            <Video src={staticFile(bgImageSrc1A)} playbackRate={(8.234 * fps) / slide1Duration} style={{ position: 'absolute', width: '100%', height: 'auto', objectFit: 'contain', opacity: 0.8 }} muted />
+            {/* 集中線 (Focus Lines) for max impact - Irregular and not spinning */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: focusLinesBg,
+              mixBlendMode: 'overlay',
+              transform: `scale(${interpolate(frame, [0, 45], [1, 1.4], { extrapolateRight: 'clamp' })})`,
+              pointerEvents: 'none',
+              maskImage: 'radial-gradient(ellipse at center, transparent 40%, black 75%)',
+              WebkitMaskImage: 'radial-gradient(ellipse at center, transparent 40%, black 75%)',
+            }} />
+          </AbsoluteFill>
 
 
-          <SlideText text={hookText} lang={lang} />
+          <SlideText text={hookText} lang={lang} isHook />
           {/* TTS Audio starts reading immediately as the slide begins */}
           <TTSAudio fileName={`${id}_hook`} playbackRate={1.65} />
         </AbsoluteFill>
@@ -125,18 +167,18 @@ export const TradeBlockCarousel: React.FC<{
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
           <Audio src={staticFile('assets/part4/決定ボタンを押す47.mp3')} volume={0.4} />
           <h1 style={{
-            width: '90%',
+            width: '98%',
             wordBreak: lang === 'en' ? 'break-word' : 'keep-all',
             whiteSpace: 'pre-wrap',
             lineHeight: 1.3,
-            fontSize: lang === 'en' ? 45 : 60,
-            fontFamily: lang === 'en' ? '"Inter", "Montserrat", "Helvetica", sans-serif' : undefined,
+            fontSize: lang === 'en' ? 70 : 110,
+            fontFamily: lang === 'en' ? '"Inter", "Montserrat", "Helvetica", sans-serif' : '"Noto Sans CJK JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif',
             fontWeight: '900',
+            textAlign: 'center',
             color: '#ffffff',
             WebkitTextStroke: lang === 'en' ? '5px #e8a900' : '7px #e8a900',
             paintOrder: 'stroke fill',
             textShadow: '0px 4px 12px rgba(0,0,0,0.95)',
-            textAlign: 'center',
             marginBottom: 60,
             marginTop: 100,
             zIndex: 10
@@ -180,15 +222,12 @@ export const TradeBlockCarousel: React.FC<{
           <Video
             src={staticFile(bgImageSrc4)}
             playbackRate={isPart4Video && part4VideoDuration ? (part4VideoDuration * fps) / slide4Duration : 1}
-            style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.25 }}
+            style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', opacity: 1 }}
             muted
           />
 
-          {/* Strong top-to-bottom dark gradient */}
-          <AbsoluteFill style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 70%, rgba(0,0,0,0.98) 100%)' }} />
-
           {/* Content container */}
-          <AbsoluteFill style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 160, gap: 0 }}>
+          <AbsoluteFill style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 350, gap: 0 }}>
 
             {/* Pulsing upward arrow - "tap profile link" signal */}
             {(() => {
@@ -196,17 +235,17 @@ export const TradeBlockCarousel: React.FC<{
               const bounce = interpolate(Math.sin((frame / (fps * 0.5)) * Math.PI), [-1, 1], [0, -18], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
               const arrowOpacity = interpolate(frame, [0, fps * 0.3], [0, 1], { extrapolateRight: 'clamp' });
               return (
-                <div style={{ transform: `translateY(${bounce}px)`, opacity: arrowOpacity, textAlign: 'center', marginBottom: 8 }}>
-                  <div style={{ fontSize: 52, lineHeight: 1 }}>☝️</div>
+                <div style={{ transform: `translateY(${bounce}px)`, opacity: arrowOpacity, textAlign: 'center', marginBottom: 12 }}>
+                  <div style={{ fontSize: 100, lineHeight: 1 }}>☝️</div>
                   <div style={{
-                    fontSize: 22,
+                    fontSize: 45,
                     color: '#fff',
                     fontWeight: '900',
                     letterSpacing: 1,
-                    textShadow: '0 2px 8px rgba(0,0,0,0.9)',
-                    marginTop: 4
+                    textShadow: '0 6px 16px rgba(0,0,0,0.9), 0 0 24px rgba(0,0,0,0.6)',
+                    marginTop: 16
                   }}>
-                    {lang === 'en' ? 'Profile Link ↑' : lang === 'zh-CN' ? '点击主页链接 ↑' : 'プロフィールリンク ↑'}
+                    {lang === 'en' ? 'Tap Link Below ↓' : lang === 'zh-CN' ? '点击主页链接 ↑' : 'プロフィールリンク ↑'}
                   </div>
                 </div>
               );
@@ -214,8 +253,8 @@ export const TradeBlockCarousel: React.FC<{
 
             {/* Gold divider */}
             <div style={{
-              width: 200, height: 2, backgroundColor: '#e8a900', borderRadius: 2, marginBottom: 28, marginTop: 12,
-              boxShadow: '0 0 12px #e8a900'
+              width: 250, height: 4, backgroundColor: '#e8a900', borderRadius: 2, marginBottom: 36, marginTop: 16,
+              boxShadow: '0 0 16px #e8a900'
             }} />
 
             {/* App name badge */}
@@ -225,16 +264,16 @@ export const TradeBlockCarousel: React.FC<{
               return (
                 <div style={{
                   transform: `scale(${scale})`,
-                  backgroundColor: 'rgba(232, 169, 0, 0.15)',
-                  border: '2px solid #e8a900',
-                  borderRadius: 16,
-                  paddingLeft: 32, paddingRight: 32, paddingTop: 10, paddingBottom: 10,
-                  marginBottom: 20,
-                  boxShadow: '0 0 30px rgba(232,169,0,0.35)',
+                  backgroundColor: 'rgba(232, 169, 0, 0.25)',
+                  border: '4px solid #e8a900',
+                  borderRadius: 24,
+                  paddingLeft: 48, paddingRight: 48, paddingTop: 16, paddingBottom: 16,
+                  marginBottom: 28,
+                  boxShadow: '0 0 40px rgba(232,169,0,0.5)',
                 }}>
                   <div style={{
-                    fontSize: 36, fontWeight: '900', color: '#fff', letterSpacing: 2,
-                    textShadow: '0 0 20px rgba(232,169,0,0.8)'
+                    fontSize: 70, fontWeight: '900', color: '#fff', letterSpacing: 4,
+                    textShadow: '0 4px 24px rgba(0,0,0,0.9)'
                   }}>
                     🔒 Trade Block
                   </div>
@@ -259,23 +298,25 @@ export const TradeBlockCarousel: React.FC<{
               return (
                 <div style={{ opacity, textAlign: 'center', paddingLeft: 24, paddingRight: 24 }}>
                   <div style={{
-                    fontSize: 40,
+                    fontSize: 90,
                     fontWeight: '900',
+                    fontFamily: lang === 'en' ? '"Inter", "Montserrat", "Helvetica", sans-serif' : '"Noto Sans CJK JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif',
                     color: '#ffffff',
-                    WebkitTextStroke: '3px #e8a900',
+                    WebkitTextStroke: lang === 'en' ? '7px #e8a900' : '8px #e8a900',
                     paintOrder: 'stroke fill',
-                    textShadow: '0 4px 20px rgba(0,0,0,0.9)',
-                    lineHeight: 1.2,
-                    marginBottom: 14,
+                    textShadow: '0 8px 30px rgba(0,0,0,0.95)',
+                    lineHeight: 1.1,
+                    marginBottom: 20,
                   }}>
                     {ctaLabel}
                   </div>
                   <div style={{
-                    fontSize: 26,
-                    fontWeight: '700',
-                    color: 'rgba(255,255,255,0.85)',
-                    textShadow: '0 2px 8px rgba(0,0,0,0.9)',
-                    letterSpacing: 0.5,
+                    fontSize: 55,
+                    fontWeight: '900',
+                    fontFamily: lang === 'en' ? '"Inter", "Montserrat", "Helvetica", sans-serif' : '"Noto Sans CJK JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif',
+                    color: '#ffffff',
+                    textShadow: '0 6px 20px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.8)',
+                    letterSpacing: 0,
                   }}>
                     {subLabel}
                   </div>
@@ -326,8 +367,9 @@ const AnimatedMedia: React.FC<{ src: string; type: 'zoomIn' | 'zoomOut' | 'panRi
 };
 
 // Helper component for advanced TikTok-style text animations
-const SlideText: React.FC<{ text: string, isCta?: boolean, lang?: 'ja' | 'en' | 'zh-CN' }> = ({ text, isCta, lang = 'ja' }) => {
+const SlideText: React.FC<{ text: string, isCta?: boolean, isHook?: boolean, lang?: 'ja' | 'en' | 'zh-CN' }> = ({ text, isCta, isHook, lang = 'ja' }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
 
   // Split text into lines if user provided manual \n or literal \n
   const lines = text.replace(/\\n/g, '\n').split('\n');
@@ -341,51 +383,110 @@ const SlideText: React.FC<{ text: string, isCta?: boolean, lang?: 'ja' | 'en' | 
 
   const isEn = lang === 'en';
 
+  // --- Aggressive "Warning Label" Hook Animation ---
+
+  // 1. Violent Shake/Glitch in the first 0.5 seconds (first 15 frames)
+  const isShakePeriod = frame < fps * 0.5;
+  const shakeX = isHook && isShakePeriod ? interpolate(random(`shakeX-${frame}`), [0, 1], [-15, 15]) : 0;
+  const shakeY = isHook && isShakePeriod ? interpolate(random(`shakeY-${frame}`), [0, 1], [-15, 15]) : 0;
+
+  // 2. High impact slam (starts big and slams down over 4 frames)
+  const slamScale = isHook ? interpolate(frame, [0, 4], [1.5, 1], { extrapolateRight: 'clamp' }) : 1;
+
+  // 3. Uncomfortable tilt to break visual symmetry
+  const tilt = isHook ? -3 : 0;
+
   return (
     <AbsoluteFill style={{
-      justifyContent: isCta ? 'flex-end' : 'center',
+      justifyContent: isCta ? 'flex-end' : isHook ? 'center' : 'center',
       alignItems: 'center',
-      paddingBottom: isCta ? 250 : 0
+      paddingBottom: isCta ? 250 : isHook ? 100 : 0 // slightly higher for hook
     }}>
       <div style={{
         textAlign: 'center',
         width: '100%',
-        maxWidth: isEn ? '90%' : '85%',
+        maxWidth: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         wordBreak: isEn ? 'break-word' : 'keep-all',
+        transform: isHook ? `scale(${slamScale}) translate(${shakeX}px, ${shakeY}px) rotate(${tilt}deg)` : 'none',
+        zIndex: 50,
       }}>
         {lines.map((line, lineIdx) => {
-          // English separates by space natively, CJK parsing uses BudouX
           const words = parser ? parser.parse(line) : line.split(' ');
 
+          // Alternate colors for the aggressive "tape" look
+          const isWarningRed = lineIdx % 2 === 0;
+
           return (
-            <div key={lineIdx} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 15, width: '100%' }}>
-              {words.map((word: string, wordIdx: number) => {
-                const addSpace = isEn && wordIdx < words.length - 1;
-                return (
-                  <span key={wordIdx} style={{ display: 'inline-block', whiteSpace: isEn ? 'pre-wrap' : 'pre' }}>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        fontSize: isEn ? (isCta ? 50 : 55) : (isCta ? 65 : 78),
-                        fontFamily: isEn ? '"Inter", "Montserrat", "Helvetica", sans-serif' : undefined,
-                        fontWeight: 900,
-                        letterSpacing: isEn ? '0em' : '0.05em',
-                        color: '#ffffff',
-                        WebkitTextStroke: isEn ? '5px #e8a900' : '7px #e8a900',
-                        paintOrder: 'stroke fill',
-                        textShadow: '0px 4px 12px rgba(0,0,0,0.95), 0px 0px 30px rgba(0,0,0,0.9)',
-                        lineHeight: 1.4,
-                      }}
-                    >
-                      {word}{addSpace ? ' ' : ''}
+            <div key={lineIdx} style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: isHook ? 8 : 15, width: '100%' }}>
+
+              {/* If it's the hook, background wrapper for the "Warning Tape" effect */}
+              {isHook ? (
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  backgroundColor: isWarningRed ? '#ff0033' : '#000000', // Blinding Neon Red / Pitch Black
+                  padding: '24px 0',
+                  width: '110%', // Bleed off the edges
+                  marginLeft: '-5%', // Center the bleeding tape
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+                  transform: `skewX(-5deg)`, // Sharp, fast look
+                }}>
+                  {words.map((word: string, wordIdx: number) => {
+                    const addSpace = isEn && wordIdx < words.length - 1;
+                    return (
+                      <span key={wordIdx} style={{ display: 'inline-block', whiteSpace: isEn ? 'pre-wrap' : 'pre' }}>
+                        <span style={{
+                          display: 'inline-block',
+                          fontSize: isEn ? 110 : Math.min(180, Math.max(80, Math.floor(1050 / Math.max(1, line.length)))), // Super massive
+                          fontFamily: isEn ? '"Inter", "Montserrat", "Helvetica", sans-serif' : '"Noto Sans CJK JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif',
+                          fontWeight: 900,
+                          letterSpacing: isEn ? '-0.05em' : '-0.02em', // Extremely tight English, tight CJK for blocky look
+                          color: '#ffffff',
+                          transform: `skewX(5deg)`, // Un-skew the text itself so only the box is skewed
+                          lineHeight: 1.1,
+                        }}>
+                          {word}{addSpace ? ' ' : ''}
+                        </span>
+                      </span>
+                    )
+                  })}
+                </div>
+              ) : (
+                /* Standard elegant SlideText for non-hooks (Part 2, 3) */
+                words.map((word: string, wordIdx: number) => {
+                  const addSpace = isEn && wordIdx < words.length - 1;
+                  const baseFontSize = isEn ? (isCta ? 50 : 55) : (isCta ? 65 : 78);
+                  const baseStroke = isEn ? '5px #e8a900' : '7px #e8a900';
+
+                  return (
+                    <span key={wordIdx} style={{ display: 'inline-block', whiteSpace: isEn ? 'pre-wrap' : 'pre' }}>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          fontSize: isCta
+                            ? (isEn ? 100 : Math.min(180, Math.max(80, Math.floor(1050 / Math.max(1, line.length)))))
+                            : baseFontSize,
+                          fontFamily: isCta && !isEn ? '"Noto Sans CJK JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif' : (isEn ? '"Inter", "Montserrat", "Helvetica", sans-serif' : undefined),
+                          fontWeight: 900,
+                          letterSpacing: isCta ? (isEn ? '-0.05em' : '-0.02em') : (isEn ? '0em' : '0.05em'),
+                          color: '#ffffff',
+                          WebkitTextStroke: baseStroke,
+                          paintOrder: 'stroke fill',
+                          textShadow: '0px 4px 12px rgba(0,0,0,0.95), 0px 0px 30px rgba(0,0,0,0.9)',
+                          lineHeight: isCta ? 1.1 : 1.4,
+                        }}
+                      >
+                        {word}{addSpace ? ' ' : ''}
+                      </span>
                     </span>
-                  </span>
-                )
-              })}
+                  )
+                })
+              )}
             </div>
           );
         })}

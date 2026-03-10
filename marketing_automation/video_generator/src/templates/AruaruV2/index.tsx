@@ -313,7 +313,7 @@ export const TradeBlockAruaruV2Carousel: React.FC<{
                     textShadow: '0 6px 16px rgba(0,0,0,0.9), 0 0 24px rgba(0,0,0,0.6)',
                     marginTop: 16
                   }}>
-                    {lang === 'en' ? 'Profile Link ↑' : lang === 'zh-CN' ? '点击主页链接 ↑' : 'プロフィールリンク ↑'}
+                    {lang === 'en' ? 'Tap Link Below ↓' : lang === 'zh-CN' ? '点击主页链接 ↑' : 'プロフィールリンク ↑'}
                   </div>
                 </div>
               );
@@ -370,7 +370,7 @@ export const TradeBlockAruaruV2Carousel: React.FC<{
                     fontWeight: '900',
                     fontFamily: lang === 'en' ? '"Inter", "Montserrat", "Helvetica", sans-serif' : '"Noto Sans CJK JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", sans-serif',
                     color: '#ffffff',
-                    WebkitTextStroke: '8px #e8a900',
+                    WebkitTextStroke: lang === 'en' ? '7px #e8a900' : '8px #e8a900',
                     paintOrder: 'stroke fill',
                     textShadow: '0 8px 30px rgba(0,0,0,0.95)',
                     lineHeight: 1.1,

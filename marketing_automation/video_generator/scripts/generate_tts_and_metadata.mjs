@@ -60,11 +60,12 @@ async function run() {
         console.log(`Processing ${id}...`);
         metadata[id] = {};
 
+        const sanitizeForTTS = (str) => str.replace(/\\n/g, ' ').replace(/[。、.,!?！？]/g, '');
         const texts = {
-            hook: props.hookText.replace(/\\n/g, ' '),
-            empathy: props.empathyText.replace(/\\n/g, ' '),
-            appReveal: props.appRevealText.replace(/\\n/g, ' '),
-            cta: props.ctaText.replace(/\\n/g, ' ')
+            hook: sanitizeForTTS(props.hookText),
+            empathy: sanitizeForTTS(props.empathyText),
+            appReveal: sanitizeForTTS(props.appRevealText),
+            cta: sanitizeForTTS(props.ctaText)
         };
 
         for (const [key, text] of Object.entries(texts)) {

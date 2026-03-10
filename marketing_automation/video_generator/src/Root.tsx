@@ -1,6 +1,7 @@
 import { Composition } from 'remotion';
-import { TradeBlockCarousel } from './TradeBlockCarousel';
-import { TradeBlockAruaruCarousel } from './TradeBlockAruaruCarousel';
+import { TradeBlockCarousel } from './templates/Standard';
+import { TradeBlockAruaruCarousel } from './templates/Aruaru';
+import { TradeBlockAruaruV2Carousel } from './templates/AruaruV2';
 import ttsMetadata from './ttsMetadata.json';
 import { videoVariations } from './videoTexts';
 
@@ -34,7 +35,7 @@ export const RemotionRoot: React.FC = () => {
         />
       ))}
 
-      {/* Relatable (Aruaru) Templates - with Double Tap animation */}
+      {/* Relatable (Aruaru) Templates */}
       {videoVariations.map((v) => (
         <Composition
           key={`ARUARU-${v.id}`}
@@ -45,6 +46,33 @@ export const RemotionRoot: React.FC = () => {
           width={1080}
           height={1920}
           defaultProps={v.props}
+        />
+      ))}
+
+      {/* Relatable (Aruaru) V2 Templates */}
+      {videoVariations.map((v) => (
+        <Composition
+          key={`ARUARUV2-${v.id}`}
+          id={`ARUARUV2-${v.id}`}
+          component={TradeBlockAruaruV2Carousel}
+          durationInFrames={getDuration(v.id, v.props)}
+          fps={fps}
+          width={1080}
+          height={1920}
+          defaultProps={v.props}
+        />
+      ))}
+      {/* YouTube English (Global) - Aruaru Style */}
+      {videoVariations.map((v) => (
+        <Composition
+          key={`YT-EN-ARUARU-${v.id}`}
+          id={`YT-EN-ARUARU-${v.id}`}
+          component={TradeBlockAruaruCarousel}
+          durationInFrames={getDuration(v.id, v.props)}
+          fps={fps}
+          width={1080}
+          height={1920}
+          defaultProps={{ ...v.props, lang: 'en' }}
         />
       ))}
     </>
