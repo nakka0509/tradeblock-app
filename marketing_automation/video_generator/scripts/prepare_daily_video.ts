@@ -31,11 +31,11 @@ const pickRandomFile = (dirPath: string, allowedExts: string[]) => {
     return path.join(dirPath, randFile); // e.g., 'assets/part1/video.mp4'
 };
 
-const bgImageSrc1A = pickRandomFile('assets/part1', ['.mp4', '.mov']);
+const bgImageSrc1A = pickRandomFile('assets/part1', ['.mp4']);
 const bgImageSrc1B = pickRandomFile('assets/part1', ['.png', '.jpg', '.jpeg']);
 const bgImageSrc2A = pickRandomFile('assets/part2', ['.png', '.jpg', '.jpeg']);
 const bgImageSrc2B = pickRandomFile('assets/part2', ['.png', '.jpg', '.jpeg']);
-const bgImageSrc4 = pickRandomFile('assets/part4', ['.mp4', '.mov']);
+const bgImageSrc4 = pickRandomFile('assets/part4', ['.mp4']);
 const bgmSrc = pickRandomFile('assets', ['.mp3']); // Finds MP3s directly in /assets/
 
 if (bgImageSrc1A) props.bgImageSrc1A = bgImageSrc1A;
