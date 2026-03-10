@@ -7,6 +7,21 @@ dotenv.config();
 
 const isDryRun = process.argv.includes('--dry-run');
 
+// Dynamic Metadata Integration
+const overridePath = path.resolve('./src/dailyOverride.json');
+let hookText = 'Stop Overtrading - Take Control';
+if (fs.existsSync(overridePath)) {
+    try {
+        const data = JSON.parse(fs.readFileSync(overridePath, 'utf8'));
+        if (data.hookText) {
+            // Take the first sentence or truncate if too long
+            hookText = data.hookText.split(/[\.\!\?。！？]/)[0].trim().substring(0, 50);
+        }
+    } catch (e) {
+        console.error('Could not read dailyOverride.json:', e.message);
+    }
+}
+
 const CLIENT_ID = process.env.YOUTUBE_CLIENT_ID;
 const CLIENT_SECRET = process.env.YOUTUBE_CLIENT_SECRET;
 const REFRESH_TOKEN = process.env.YOUTUBE_REFRESH_TOKEN;
@@ -58,6 +73,29 @@ async function verifyAuth() {
     }
 }
 
+async function postComment(videoId) {
+    console.log('Posting pinned comment...');
+    try {
+        await youtube.commentThreads.insert({
+            part: 'snippet',
+            requestBody: {
+                snippet: {
+                    videoId: videoId,
+                    topLevelComment: {
+                        snippet: {
+                            textOriginal: `👇 Are you tired of blowing your account?\nTake your phone out of your own hands.\nDownload Trade Block now: https://example.com/download`
+                        }
+                    }
+                }
+            }
+        });
+        console.log('✅ Comment posted successfully.');
+    } catch (error) {
+        console.error('⚠️ Could not post comment (this is normal if token is upload-only):');
+        console.error(error.message);
+    }
+}
+
 async function uploadVideo() {
     if (isDryRun) {
         await verifyAuth();
@@ -77,8 +115,8 @@ async function uploadVideo() {
             part: 'snippet,status',
             requestBody: {
                 snippet: {
-                    title: 'Stop Overtrading - Take Control #shorts #forex', // Adjust title as needed
-                    description: 'Trade Block is the ultimate app for day traders. 👇 Download now: [Link] #shorts #tradingpsychology',
+                    title: `${hookText} | Stop Overtrading #shorts #forex`,
+                    description: `"${hookText}"\n\nTrade Block is the ultimate discipline app designed to physically lock you out of your trading platform when emotions take over.\n\nDownload Trade Block and take back control:\n🔗 https://example.com/download\n\n#DayTrading #Forex #Crypto #TradingPsychology #Overtrading #TradeBlock #RevengeTrading`,
                     tags: ['shorts', 'forex', 'daytrading', 'crypto', 'tradingpsychology'],
                     categoryId: '27' // Category 27 is Education
                 },
@@ -95,6 +133,9 @@ async function uploadVideo() {
         console.log('\n✅ Success! Video uploaded.');
         console.log(`YouTube ID: ${res.data.id}`);
         console.log(`URL: https://youtube.com/shorts/${res.data.id}`);
+
+        // Try to post the comment
+        await postComment(res.data.id);
 
     } catch (error) {
         console.error('\n❌ Failed to upload video');
