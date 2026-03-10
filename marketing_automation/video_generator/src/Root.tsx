@@ -63,7 +63,7 @@ export const RemotionRoot: React.FC = () => {
         />
       ))}
       {/* YouTube English (Global) - Aruaru Style */}
-      {videoVariations.map((v) => (
+      {videoVariations.filter(v => v.props.lang === 'en').map((v) => (
         <Composition
           key={`YT-EN-ARUARU-${v.id}`}
           id={`YT-EN-ARUARU-${v.id}`}
@@ -72,7 +72,7 @@ export const RemotionRoot: React.FC = () => {
           fps={fps}
           width={1080}
           height={1920}
-          defaultProps={{ ...v.props, lang: 'en' }}
+          defaultProps={{ ...v.props, lang: 'en', ttsId: v.id }}
         />
       ))}
     </>

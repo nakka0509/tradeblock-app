@@ -19,6 +19,7 @@ interface VideoProps {
   bgmSrc?: string;
   visualTint?: string;
   lang: Lang;
+  ttsId?: string;
 }
 
 // ---- 固定アセットのパスを定数化 ----

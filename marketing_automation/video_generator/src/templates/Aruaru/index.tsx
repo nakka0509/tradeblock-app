@@ -114,14 +114,16 @@ export const TradeBlockAruaruCarousel: React.FC<{
   bgmSrc?: string;
   visualTint?: string;
   lang: 'ja' | 'en' | 'zh-CN';
-}> = ({ hookText, empathyText, appRevealText, ctaText, bgImageSrc1A, bgImageSrc1B, bgImageSrc2A, bgImageSrc2B, bgImageSrc4, videoSrc, bgmSrc, visualTint, lang }) => {
+  ttsId?: string;
+}> = ({ hookText, empathyText, appRevealText, ctaText, bgImageSrc1A, bgImageSrc1B, bgImageSrc2A, bgImageSrc2B, bgImageSrc4, videoSrc, bgmSrc, visualTint, lang, ttsId }) => {
   const { fps, id } = useVideoConfig();
+  const resolvedTtsId = ttsId ?? id;
   const frame = useCurrentFrame();
   const patternFrame = Math.floor(frame / 2); // Update every 2 frames for classic anime step-animation
   const focusLinesBg = React.useMemo(() => generateIrregularFocusLines(`${id}-${patternFrame}`), [id, patternFrame]);
 
   // Dynamic timing calculation based on generated audio length
-  const meta = (ttsMetadata as Record<string, any>)[id] || { hook: 3, empathy: 3, appReveal: 3, cta: 3 };
+  const meta = (ttsMetadata as Record<string, any>)[resolvedTtsId] || { hook: 3, empathy: 3, appReveal: 3, cta: 3 };
   const playbackRate = 1.65;
   const buffer = 0.1; // Brutally fast pacing, minimal breathing room
   const slide1Duration = Math.ceil((meta.hook / playbackRate) * fps); // No buffer for Part1 → avoids gap before Part2
@@ -203,7 +205,7 @@ export const TradeBlockAruaruCarousel: React.FC<{
 
           <SlideText text={hookText} lang={lang} isHook />
           {/* TTS Audio starts reading immediately as the slide begins */}
-          <TTSAudio fileName={`${id}_hook`} playbackRate={1.65} />
+          <TTSAudio fileName={`${resolvedTtsId}_hook`} playbackRate={1.65} />
         </AbsoluteFill>
       </Sequence>
 
@@ -220,7 +222,7 @@ export const TradeBlockAruaruCarousel: React.FC<{
           </Sequence>
 
           <SlideText text={empathyText} lang={lang} />
-          <TTSAudio fileName={`${id}_empathy`} playbackRate={1.65} />
+          <TTSAudio fileName={`${resolvedTtsId}_empathy`} playbackRate={1.65} />
 
         </AbsoluteFill>
       </Sequence>
@@ -277,7 +279,7 @@ export const TradeBlockAruaruCarousel: React.FC<{
               muted={false}
             />
           </div>
-          <TTSAudio fileName={`${id}_appReveal`} playbackRate={1.65} />
+          <TTSAudio fileName={`${resolvedTtsId}_appReveal`} playbackRate={1.65} />
         </AbsoluteFill>
       </Sequence>
 
@@ -394,7 +396,7 @@ export const TradeBlockAruaruCarousel: React.FC<{
 
           </AbsoluteFill>
 
-          <TTSAudio fileName={`${id}_cta`} playbackRate={1.65} />
+          <TTSAudio fileName={`${resolvedTtsId}_cta`} playbackRate={1.65} />
         </AbsoluteFill>
       </Sequence>
 
