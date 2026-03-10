@@ -28,15 +28,30 @@ jobs:
       - name: Set up FFmpeg (required for Remotion / Audio)
         uses: FedericoCarboni/setup-ffmpeg@v3
 
-      - name: Generate Random Video Props
+      - name: Convert .mov assets to .mp4
         working-directory: ./marketing_automation/video_generator
-        run: node scripts/prepare_daily_video.ts
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
+          for f in public/assets/part1/*.mov; do
+            if [ -f "$f" ]; then
+              ffmpeg -i "$f" -vcodec libx264 -acodec aac "${f%.mov}.mp4" -y
+            fi
+          done
+          sed -i 's/\.mov/.mp4/g' src/videoTexts.ts
+
+      - name: Generate TTS and Pick random composition
+        id: pick
+        working-directory: ./marketing_automation/video_generator
+        run: |
+          node scripts/generate_tts_and_metadata.mjs
+          COMP_ID=$(npx tsx scripts/prepare_daily_video.ts)
+          echo "composition=$COMP_ID" >> $GITHUB_OUTPUT
         env:
           TARGET_PLATFORM: youtube
 
       - name: Render Video
         working-directory: ./marketing_automation/video_generator
-        run: npx remotion render Root out/video.mp4 --props=./src/dailyOverride.json
+        run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --props=src/dailyOverride.json --timeout=120000
 
       - name: Upload to YouTube
         working-directory: ./marketing_automation/video_generator
