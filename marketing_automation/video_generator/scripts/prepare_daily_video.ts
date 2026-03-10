@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { videoVariations } from '../src/videoTexts';
 
-const lang = process.argv[2] || 'ja';
+const platform = process.env.TARGET_PLATFORM || 'instagram';
+const lang = platform === 'youtube' ? 'en' : (process.argv[2] || 'ja');
 
 // Filter variations by chosen language
 const availableVariations = videoVariations.filter(v => v.props.lang === lang);
@@ -62,4 +63,5 @@ props.visualTint = tints[Math.floor(Math.random() * tints.length)];
 fs.writeFileSync('src/dailyOverride.json', JSON.stringify(props, null, 2));
 
 // 4. Expose the base composition ID to GitHub Actions
-console.log(selectedVariation.id);
+const compId = platform === 'youtube' ? `YT-EN-ARUARU-${selectedVariation.id}` : selectedVariation.id;
+console.log(compId);
