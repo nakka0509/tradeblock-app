@@ -123,7 +123,7 @@ export const TradeBlockCarousel: React.FC<{
       {/* Slide 3: App Reveal */}
       <Sequence from={slide1Duration + slide2Duration} durationInFrames={slide3Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Audio src={staticFile('assets/part3/決定ボタンを押す47.mp3')} volume={0.4} />
+          <Audio src={staticFile('assets/part4/決定ボタンを押す47.mp3')} volume={0.4} />
           <h1 style={{
             width: '90%',
             wordBreak: lang === 'en' ? 'break-word' : 'keep-all',
@@ -174,7 +174,7 @@ export const TradeBlockCarousel: React.FC<{
       {/* Slide 4: CTA - High Conversion Layout */}
       <Sequence from={slide1Duration + slide2Duration + slide3Duration} durationInFrames={slide4Duration}>
         <AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a' }}>
-          <Audio src={staticFile('assets/part4/決定ボタンを押す40.mp3')} volume={0.5} />
+          <Audio src={staticFile('assets/part3/決定ボタンを押す40.mp3')} volume={0.5} />
 
           {/* Background video - full brightness */}
           <Video
@@ -213,8 +213,10 @@ export const TradeBlockCarousel: React.FC<{
             })()}
 
             {/* Gold divider */}
-            <div style={{ width: 200, height: 2, backgroundColor: '#e8a900', borderRadius: 2, marginBottom: 28, marginTop: 12,
-              boxShadow: '0 0 12px #e8a900' }} />
+            <div style={{
+              width: 200, height: 2, backgroundColor: '#e8a900', borderRadius: 2, marginBottom: 28, marginTop: 12,
+              boxShadow: '0 0 12px #e8a900'
+            }} />
 
             {/* App name badge */}
             {(() => {
@@ -230,8 +232,10 @@ export const TradeBlockCarousel: React.FC<{
                   marginBottom: 20,
                   boxShadow: '0 0 30px rgba(232,169,0,0.35)',
                 }}>
-                  <div style={{ fontSize: 36, fontWeight: '900', color: '#fff', letterSpacing: 2,
-                    textShadow: '0 0 20px rgba(232,169,0,0.8)' }}>
+                  <div style={{
+                    fontSize: 36, fontWeight: '900', color: '#fff', letterSpacing: 2,
+                    textShadow: '0 0 20px rgba(232,169,0,0.8)'
+                  }}>
                     🔒 Trade Block
                   </div>
                 </div>
@@ -245,13 +249,13 @@ export const TradeBlockCarousel: React.FC<{
               const ctaLabel = lang === 'en'
                 ? 'Free Download — Start Today'
                 : lang === 'zh-CN'
-                ? '免费下载 · 立即开始'
-                : '無料で今すぐ始める';
+                  ? '免费下载 · 立即开始'
+                  : '無料で今すぐ始める';
               const subLabel = lang === 'en'
                 ? 'Stop overtrading. Take back control.'
                 : lang === 'zh-CN'
-                ? '克服冲动交易，掌控自律'
-                : '感情トレードを、仕組みで止める。';
+                  ? '克服冲动交易，掌控自律'
+                  : '感情トレードを、仕組みで止める。';
               return (
                 <div style={{ opacity, textAlign: 'center', paddingLeft: 24, paddingRight: 24 }}>
                   <div style={{
