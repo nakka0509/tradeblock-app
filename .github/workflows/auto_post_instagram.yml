@@ -24,8 +24,12 @@ jobs:
       working-directory: ./marketing_automation/video_generator
       run: |
         sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
-        ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
-        sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
+        for f in public/assets/part1/*.mov; do
+          if [ -f "$f" ]; then
+            ffmpeg -i "$f" -vcodec libx264 -acodec aac "${f%.mov}.mp4" -y
+          fi
+        done
+        sed -i 's/\.mov/.mp4/g' src/videoTexts.ts
 
     - name: Generate TTS and Pick random Japanese composition
       id: pick
@@ -71,8 +75,12 @@ jobs:
       working-directory: ./marketing_automation/video_generator
       run: |
         sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
-        ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
-        sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
+        for f in public/assets/part1/*.mov; do
+          if [ -f "$f" ]; then
+            ffmpeg -i "$f" -vcodec libx264 -acodec aac "${f%.mov}.mp4" -y
+          fi
+        done
+        sed -i 's/\.mov/.mp4/g' src/videoTexts.ts
 
     - name: Generate TTS and Pick random English composition
       id: pick
@@ -118,8 +126,12 @@ jobs:
       working-directory: ./marketing_automation/video_generator
       run: |
         sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
-        ffmpeg -i public/assets/part3/part3.mov -vcodec libx264 -acodec aac public/assets/part3/part3.mp4
-        sed -i 's/part3.mov/part3.mp4/g' src/Root.tsx
+        for f in public/assets/part1/*.mov; do
+          if [ -f "$f" ]; then
+            ffmpeg -i "$f" -vcodec libx264 -acodec aac "${f%.mov}.mp4" -y
+          fi
+        done
+        sed -i 's/\.mov/.mp4/g' src/videoTexts.ts
 
     - name: Generate TTS and Pick random Chinese composition
       id: pick
