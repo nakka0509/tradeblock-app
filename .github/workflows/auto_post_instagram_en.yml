@@ -1,0 +1,49 @@
+name: Daily Instagram Auto-Post (English)
+
+on:
+  schedule:
+    # 毎日 アメリカ東部時間(EST) 7:00, 12:00, 18:00 (UTC 12:00, 17:00, 23:00) に自動実行
+    - cron: '0 12,17,23 * * *'
+  workflow_dispatch: # GitHubの画面から手動でテスト実行できるボタン
+
+jobs:
+
+  # ===== 英語アカウント（Account 2）=====
+  post-english:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      working-directory: ./marketing_automation/video_generator
+      run: npm install
+
+    - name: Generate TTS and Pick random English composition
+      id: pick
+      working-directory: ./marketing_automation/video_generator
+      run: |
+        node scripts/generate_tts_and_metadata.mjs
+        COMP_ID=$(npx tsx scripts/prepare_daily_video.ts en)
+        echo "composition=$COMP_ID" >> $GITHUB_OUTPUT
+
+    - name: Render Video
+      working-directory: ./marketing_automation/video_generator
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --props=src/dailyOverride.json --timeout=120000
+
+    - name: Post to Instagram (English account)
+      working-directory: ./marketing_automation/video_generator
+      env:
+        IG_USER_ID: ${{ secrets.IG_USER_ID_2 }}
+        IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN_2 }}
+      run: |
+        CAPTIONS=(
+          "Stop overtrading. Trade Block forces you to step away 🔒\n\nWhy do 90% of day traders lose money?\nIt's not your strategy. It's the 'euphoria' of the brain that causes overtrading.\n\nTrade Block physically blocks you from your trading apps for a set timer, preventing those emotional revenge trades.\n\n🔥 Stop revenge trading after a loss.\n🔥 Stop taking profits too early out of fear.\n\nLet the system block your bad habits.\n\n✅ Download now from the link in our profile and save your portfolio from yourself.\n\n#daytrading #forex #trading #stockmarket #tradingpsychology #forexsignals #crypto #propfirm"
+          "Sometimes the best trade is no trade at all. 📉\n\nBut staying away from the charts is hard. Trade Block makes it easy by physically locking your brokerage apps for a custom set timer.\n\nStop letting your emotions execute trades.\n\n💡 Profitable traders know when to walk away.\n\n✅ Hit the link in our bio to download and take control of your discipline.\n\n#daytrader #forextrading #investing #tradingmindset #financetips #stocktrading #overtrading"
+          "Are you trading on tilt? ⚠️\n\n'Just one more trade...' 'I need to make it back...'\nThat one emotional trade can wipe out a month of profits.\n\nTrade Block acts as your personal risk manager. Set the lock timer, and you are literally blocked from opening your trading apps until you cool down.\n\n🔥 Risk Management = Emotional Management 🔥\n\n✅ Download from our profile ink and stop giving money back to the market!\n\n#forexmarket #cryptotrading #options #tradinglifestyle #wallstreet #trader #tradingdiscipline"
+        )
+        INDEX=$(( RANDOM % ${#CAPTIONS[@]} ))
+        SELECTED_CAPTION="${CAPTIONS[$INDEX]}"
+        EVALUATED_CAPTION=$(echo -e "$SELECTED_CAPTION")
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "$EVALUATED_CAPTION"

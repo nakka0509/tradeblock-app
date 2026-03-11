@@ -1,0 +1,49 @@
+name: Daily Instagram Auto-Post (Japanese)
+
+on:
+  schedule:
+    # 毎日 日本時間 7:00, 12:00, 18:00 (UTC 22:00, 3:00, 9:00) に自動実行
+    - cron: '0 22,3,9 * * *'
+  workflow_dispatch: # GitHubの画面から手動でテスト実行できるボタン
+
+jobs:
+
+  # ===== 日本語アカウント（Account 1）=====
+  post-japanese:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      working-directory: ./marketing_automation/video_generator
+      run: npm install
+
+    - name: Generate TTS and Pick random Japanese composition
+      id: pick
+      working-directory: ./marketing_automation/video_generator
+      run: |
+        node scripts/generate_tts_and_metadata.mjs
+        COMP_ID=$(npx tsx scripts/prepare_daily_video.ts ja)
+        echo "composition=$COMP_ID" >> $GITHUB_OUTPUT
+
+    - name: Render Video
+      working-directory: ./marketing_automation/video_generator
+      run: npx remotion render src/index.ts ${{ steps.pick.outputs.composition }} out/video.mp4 --props=src/dailyOverride.json --timeout=120000
+
+    - name: Post to Instagram (Japanese account)
+      working-directory: ./marketing_automation/video_generator
+      env:
+        IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      run: |
+        CAPTIONS=(
+          "感情で負けるな。Trade Blockで強制ロック 🔒\n\n『なぜ90%のデイトレーダーは資金を溶かすのか？』\n手法が悪いのではありません。脳の「興奮状態（ポジポジ病）」が原因です。\n\nTrade Blockは、タイマー設定で指定した時間中、\n強制的に取引画面からあなたを物理的に遮断します。\n\n🔥 損失を取り返そうとする「焦り」\n🔥 少しの利益ですぐ利確してしまう「チキン利食い」\n\nこれらはすべて、システムにブロックさせることで解決できます。\n\n✅ プロフィールリンクから今すぐダウンロードして、無駄な負けをゼロにしよう。\n\n#FX #デイトレード #ポジポジ病 #投資家と繋がりたい #株式投資 #トレード日誌 #FX初心者 #ダウ理論 #自動売買"
+          "待つこともトレードのうち。でも、待てないのが人間です。📉\n\nTrade Blockなら、指定した時間だけ証券アプリを物理的にロック。\n感情的な「リベンジトレード」や「飛び乗り」をシステムレベルで防ぎます。\n\n💡 勝てるトレーダーは、トレードしない時間をコントロールしています。\n\n✅ 今すぐプロフィールからダウンロードして、資金を守る自律を手に入れよう。\n\n#FXトレード #投資信託 #投資初心者 #デイトレーダー #FX手法 #ポジポジ病克服 #マインドセット"
+          "トレードで熱くなりすぎていませんか？⚠️\n\n「あと少しだけ…」「取り返さなきゃ…」\nその1回の感情トレードが、1ヶ月の利益を吹き飛ばします。\n\nTrade Blockは、あなたを相場から強制的に引き剥がす「自律サポートアプリ」です。タイマー中は取引アプリが一切開けなくなります。\n\n🔥 資金管理 ＝ 感情管理 🔥\n\n✅ プロフィールのリンクからダウンロードして、冷静なトレードを取り戻そう！\n\n#FX #為替 #投資家 #デイトレ #スキャルピング #投資心理 #メンタルコントロール"
+        )
+        INDEX=$(( RANDOM % ${#CAPTIONS[@]} ))
+        SELECTED_CAPTION="${CAPTIONS[$INDEX]}"
+        EVALUATED_CAPTION=$(echo -e "$SELECTED_CAPTION")
+        npx tsx scripts/post_to_instagram.ts out/video.mp4 "$EVALUATED_CAPTION"
