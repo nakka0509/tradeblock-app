@@ -28,17 +28,6 @@ jobs:
       - name: Set up FFmpeg (required for Remotion / Audio)
         uses: FedericoCarboni/setup-ffmpeg@v3
 
-      - name: Convert .mov assets to .mp4
-        working-directory: ./marketing_automation/video_generator
-        run: |
-          sudo apt-get update && sudo apt-get install -y ffmpeg fonts-noto-cjk
-          for f in public/assets/part1/*.mov; do
-            if [ -f "$f" ]; then
-              ffmpeg -i "$f" -vcodec libx264 -acodec aac "${f%.mov}.mp4" -y
-            fi
-          done
-          sed -i 's/\.mov/.mp4/g' src/videoTexts.ts
-
       - name: Generate TTS and Pick random composition
         id: pick
         working-directory: ./marketing_automation/video_generator
